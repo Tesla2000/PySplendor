@@ -8,10 +8,11 @@ class ReserveVisible(Reserve):
         super().__init__(tier_index)
         self.index = index
 
-    def perform(self, game: GamePrototype) -> None:
+    def perform(self, game: GamePrototype) -> GamePrototype:
         tier = game.board.tiers[self.tier_index]
         card = tier.pop(self.index)
         self.reserve_card(game, card)
+        return game
 
     def is_valid(self, game: GamePrototype) -> bool:
         tier = game.board.tiers[self.tier_index]

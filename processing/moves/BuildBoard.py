@@ -12,7 +12,7 @@ class BuildBoard(Move):
         self.tier_index = tier_index
         self.index = index
 
-    def perform(self, game: GamePrototype) -> None:
+    def perform(self, game: GamePrototype) -> GamePrototype:
         current_player = game.current_player
         tier = game.board.tiers[self.tier_index]
         card = tier.pop(self.index)
@@ -21,6 +21,7 @@ class BuildBoard(Move):
         )
         current_player.resources -= not_produced
         current_player.cards.append(card)
+        return game
 
     def is_valid(self, game: GamePrototype) -> bool:
         tier = game.board.tiers[self.tier_index]

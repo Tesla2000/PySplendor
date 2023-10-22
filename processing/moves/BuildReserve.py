@@ -11,7 +11,7 @@ class BuildReserve(Move):
     def __init__(self, index: int):
         self.index = index
 
-    def perform(self, game: GamePrototype) -> None:
+    def perform(self, game: GamePrototype) -> GamePrototype:
         current_player = game.current_player
         card = current_player.reserve.pop(self.index)
         not_produced = BasicResources(
@@ -19,6 +19,7 @@ class BuildReserve(Move):
         )
         current_player.resources -= not_produced
         current_player.cards.append(card)
+        return game
 
     def is_valid(self, game: GamePrototype) -> bool:
         current_player = game.current_player

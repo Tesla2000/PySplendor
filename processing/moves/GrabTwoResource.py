@@ -6,9 +6,10 @@ from PySplendor.processing.moves.GrabResource import GrabResource
 
 
 class GrabTwoResource(GrabResource):
-    def perform(self, game: GamePrototype) -> None:
+    def perform(self, game: GamePrototype) -> GamePrototype:
         game.board.resources -= self.resources
         game.current_player.resources += self.resources
+        return game
 
     def is_valid(self, game: GamePrototype) -> bool:
         tuple_resources = astuple(self.resources)

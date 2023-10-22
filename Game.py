@@ -1,14 +1,14 @@
 from dataclasses import astuple, fields, asdict
 from itertools import combinations, starmap, product, cycle
-from typing import Iterable
+from typing import Iterable, Generator
 
 from more_itertools import sliding_window
 
 from PySplendor.data.BasicResources import BasicResources
 from PySplendor.data.Board import Board
 from PySplendor.data.Card import empty_card
-from PySplendor.data.Tier import Tier
 from PySplendor.data.Player import Player
+from PySplendor.data.Tier import Tier
 from PySplendor.processing.GamePrototype import GamePrototype
 from PySplendor.processing.flatter_recursely import flatter_recursively
 from PySplendor.processing.moves.BuildBoard import BuildBoard
@@ -16,8 +16,9 @@ from PySplendor.processing.moves.BuildReserve import BuildReserve
 from PySplendor.processing.moves.GrabThreeResource import GrabThreeResource
 from PySplendor.processing.moves.ReserveTop import ReserveTop
 from PySplendor.processing.moves.ReserveVisible import ReserveVisible
+from alpha_trainer.classes.AlphaGameResult import AlphaGameResult
 from alpha_trainer.classes.AlphaMove import AlphaMove
-from alpha_trainer.exceptions.GameFinishedException import GameFinishedException
+from alpha_trainer.classes.AlphaPlayer import AlphaPlayer
 
 
 class Game(GamePrototype):
@@ -31,7 +32,7 @@ class Game(GamePrototype):
 
     def _init(self):
         self._performed_the_last_move = dict(
-            (id(player), False) for player in self.players
+            (player.id, False) for player in self.players
         )
         self._last_turn = False
 
@@ -42,13 +43,19 @@ class Game(GamePrototype):
                 self.current_player.aristocrats.append(self.board.aristocrats.pop(index))
         if self.current_player.points >= 15 or self._last_turn:
             self._last_turn = True
-        self._performed_the_last_move[id(self.current_player)] = self._last_turn
+        self._performed_the_last_move[self.current_player.id] = self._last_turn
+        self.current_player = self.players[0]
+
+    def is_terminal(self) -> bool:
+        return all(self._performed_the_last_move.values()) or (not all(self.get_possible_actions()))
+
+    def get_result(self, player: AlphaPlayer) -> AlphaGameResult:
         if all(self._performed_the_last_move.values()):
             winner = max(
                 self.players, key=lambda player: (player.points, -len(player.cards))
             )
-            raise GameFinishedException(winner)
-        self.current_player = self.players[0]
+            return AlphaGameResult(1 if winner == player else -1)
+        return AlphaGameResult(-1 if self.current_player == player else 1)
 
     def get_state(self) -> list:
         tiers = self.board.tiers
@@ -70,10 +77,9 @@ class Game(GamePrototype):
         players = map(asdict, self.players)
         return Game.from_dict(board, players)
 
-    @property
-    def all_moves(self) -> list[AlphaMove]:
+    def get_possible_actions(self) -> Generator[AlphaMove, None, None]:
         if self._all_moves:
-            return self._all_moves
+            return (move for move in self._all_moves if move.is_valid(self))
         combos = combinations([{field.name: 1} for field in fields(BasicResources)], 3)
         all_moves = list(
             GrabThreeResource(BasicResources(**res_1, **res_2, **res_3))
@@ -88,7 +94,7 @@ class Game(GamePrototype):
         all_moves += list(starmap(ReserveVisible, product(range(3), range(4))))
         all_moves += list(map(ReserveTop, range(3)))
         self._all_moves = all_moves
-        return all_moves
+        return (move for move in self._all_moves if move.is_valid(self))
 
     @classmethod
     def from_dict(cls, board: dict, players: Iterable[dict]) -> "Game":

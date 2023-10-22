@@ -6,7 +6,7 @@ from PySplendor.processing.GamePrototype import GamePrototype
 
 class Move(AlphaMove, ABC):
     @abstractmethod
-    def perform(self, game: GamePrototype) -> None:
+    def perform(self, game: GamePrototype) -> GamePrototype:
         pass
 
     @abstractmethod
