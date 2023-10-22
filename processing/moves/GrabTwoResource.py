@@ -1,16 +1,16 @@
 from dataclasses import astuple, asdict
 from itertools import compress
 
-from PySplendor.processing._Game import _Game
+from PySplendor.processing.GamePrototype import GamePrototype
 from PySplendor.processing.moves.GrabResource import GrabResource
 
 
 class GrabTwoResource(GrabResource):
-    def perform(self, game: _Game) -> None:
+    def perform(self, game: GamePrototype) -> None:
         game.board.resources -= self.resources
         game.current_player.resources += self.resources
 
-    def is_valid(self, game: _Game) -> bool:
+    def is_valid(self, game: GamePrototype) -> bool:
         tuple_resources = astuple(self.resources)
         if sum(astuple(game.current_player.resources)) + sum(tuple_resources) > 10:
             return False

@@ -9,7 +9,7 @@ from PySplendor.data.Board import Board
 from PySplendor.data.Card import empty_card
 from PySplendor.data.Tier import Tier
 from PySplendor.data.Player import Player
-from PySplendor.processing._Game import _Game
+from PySplendor.processing.GamePrototype import GamePrototype
 from PySplendor.processing.flatter_recursely import flatter_recursively
 from PySplendor.processing.moves.BuildBoard import BuildBoard
 from PySplendor.processing.moves.BuildReserve import BuildReserve
@@ -20,7 +20,7 @@ from alpha_trainer.classes.AlphaMove import AlphaMove
 from alpha_trainer.exceptions.GameFinishedException import GameFinishedException
 
 
-class Game(_Game):
+class Game(GamePrototype):
     _last_turn: bool = None
     _all_moves: list[AlphaMove] = None
     _performed_the_last_move: dict[int, bool] = None

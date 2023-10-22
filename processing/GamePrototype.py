@@ -8,7 +8,7 @@ from PySplendor.data.Player import Player
 from alpha_trainer.classes.AlphaTrainableGame import AlphaTrainableGame
 
 
-class _Game(AlphaTrainableGame, ABC):
+class GamePrototype(AlphaTrainableGame, ABC):
     players: tuple[Player]
     board: Board
     current_player: Player

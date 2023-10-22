@@ -1,5 +1,5 @@
 from PySplendor.data.Card import empty_card
-from PySplendor.processing._Game import _Game
+from PySplendor.processing.GamePrototype import GamePrototype
 from PySplendor.processing.moves.Reserve import Reserve
 
 
@@ -8,12 +8,12 @@ class ReserveVisible(Reserve):
         super().__init__(tier_index)
         self.index = index
 
-    def perform(self, game: _Game) -> None:
+    def perform(self, game: GamePrototype) -> None:
         tier = game.board.tiers[self.tier_index]
         card = tier.pop(self.index)
         self.reserve_card(game, card)
 
-    def is_valid(self, game: _Game) -> bool:
+    def is_valid(self, game: GamePrototype) -> bool:
         tier = game.board.tiers[self.tier_index]
         if tier.visible[self.index] == empty_card:
             return False

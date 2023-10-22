@@ -1,14 +1,14 @@
 from abc import ABC, abstractmethod
 
 from alpha_trainer.classes.AlphaMove import AlphaMove
-from PySplendor.processing._Game import _Game
+from PySplendor.processing.GamePrototype import GamePrototype
 
 
 class Move(AlphaMove, ABC):
     @abstractmethod
-    def perform(self, game: _Game) -> None:
+    def perform(self, game: GamePrototype) -> None:
         pass
 
     @abstractmethod
-    def is_valid(self, game: _Game) -> bool:
+    def is_valid(self, game: GamePrototype) -> bool:
         pass
