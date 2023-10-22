@@ -3,9 +3,9 @@ from itertools import cycle
 
 from more_itertools import sliding_window
 
+from PySplendor.data.Board import Board
+from PySplendor.data.Player import Player
 from alpha_trainer.classes.AlphaTrainableGame import AlphaTrainableGame
-from splendor.data.Board import Board
-from splendor.data.player.Player import Player
 
 
 class _Game(AlphaTrainableGame, ABC):

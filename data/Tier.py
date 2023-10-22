@@ -1,7 +1,7 @@
 import random
 from dataclasses import field, dataclass
 
-from splendor.data.Card import Card, empty_card
+from PySplendor.data.Card import Card
 
 
 @dataclass(slots=True)

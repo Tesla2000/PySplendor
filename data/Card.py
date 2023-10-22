@@ -1,4 +1,4 @@
-from splendor.data.BasicResources import BasicResources
+from PySplendor.data.BasicResources import BasicResources
 from dataclasses import dataclass
 
 

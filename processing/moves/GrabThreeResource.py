@@ -1,7 +1,7 @@
 from dataclasses import astuple
 
-from splendor.processing._Game import _Game
-from splendor.processing.moves.GrabResource import GrabResource
+from PySplendor.processing._Game import _Game
+from PySplendor.processing.moves.GrabResource import GrabResource
 
 
 class GrabThreeResource(GrabResource):

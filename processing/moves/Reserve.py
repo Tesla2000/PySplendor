@@ -1,8 +1,8 @@
 from abc import ABC
 
-from splendor.data.Card import Card
-from splendor.processing._Game import _Game
-from splendor.processing.moves.Move import Move
+from PySplendor.data.Card import Card
+from PySplendor.processing._Game import _Game
+from PySplendor.processing.moves.Move import Move
 
 
 class Reserve(Move, ABC):

@@ -1,8 +1,8 @@
 from dataclasses import astuple, asdict
 from itertools import compress
 
-from splendor.processing._Game import _Game
-from splendor.processing.moves.GrabResource import GrabResource
+from PySplendor.processing._Game import _Game
+from PySplendor.processing.moves.GrabResource import GrabResource
 
 
 class GrabTwoResource(GrabResource):

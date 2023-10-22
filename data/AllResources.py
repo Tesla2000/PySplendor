@@ -1,6 +1,6 @@
 from dataclasses import dataclass, asdict, astuple
 
-from splendor.data.BasicResources import BasicResources
+from PySplendor.data.BasicResources import BasicResources
 
 
 @dataclass(slots=True)
@@ -13,7 +13,7 @@ class AllResources(BasicResources):
         self_dict = asdict(self)
         other_dict = asdict(other)
         resources = AllResources(
-            **dict((key, value - other_dict[key]) for key, value in self_dict.items())
+            **dict((key, value - other_dict.get(key, 0)) for key, value in self_dict.items())
         )
         resources.gold -= sum(map(lambda v: min(0, v), astuple(resources)))
         return resources

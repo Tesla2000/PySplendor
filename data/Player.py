@@ -1,13 +1,13 @@
 from dataclasses import dataclass, field
 
-from splendor.data.AllResources import AllResources
-from splendor.data.BasicResources import BasicResources
-from splendor.data.player.PlayerAristocrats import PlayerAristocrats
-from splendor.data.player.PlayerCards import PlayerCards
-from splendor.data.player.PlayerReserve import PlayerReserve
+from PySplendor.data.AllResources import AllResources
+from PySplendor.data.BasicResources import BasicResources
+from PySplendor.data.extended_lists.PlayerAristocrats import PlayerAristocrats
+from PySplendor.data.extended_lists.PlayerCards import PlayerCards
+from PySplendor.data.extended_lists.PlayerReserve import PlayerReserve
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, eq=False)
 class Player:
     resources: AllResources = field(default_factory=AllResources)
     cards: PlayerCards = field(default_factory=PlayerCards)

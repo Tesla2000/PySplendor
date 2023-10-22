@@ -2,24 +2,28 @@ from dataclasses import astuple, fields, asdict
 from itertools import combinations, starmap, product, cycle
 from typing import Iterable
 
+from more_itertools import sliding_window
+
+from PySplendor.data.BasicResources import BasicResources
+from PySplendor.data.Board import Board
+from PySplendor.data.Card import empty_card
+from PySplendor.data.Tier import Tier
+from PySplendor.data.Player import Player
+from PySplendor.processing._Game import _Game
+from PySplendor.processing.flatter_recursely import flatter_recursively
+from PySplendor.processing.moves.BuildBoard import BuildBoard
+from PySplendor.processing.moves.BuildReserve import BuildReserve
+from PySplendor.processing.moves.GrabThreeResource import GrabThreeResource
+from PySplendor.processing.moves.ReserveTop import ReserveTop
+from PySplendor.processing.moves.ReserveVisible import ReserveVisible
 from alpha_trainer.classes.AlphaMove import AlphaMove
 from alpha_trainer.exceptions.GameFinishedException import GameFinishedException
-from splendor.data.BasicResources import BasicResources
-from splendor.data.Board import Board
-from splendor.data.player.Player import Player
-from splendor.processing._Game import _Game
-from splendor.processing.flatter_recursely import flatter_recursively
-from splendor.processing.moves.BuildBoard import BuildBoard
-from splendor.processing.moves.BuildReserve import BuildReserve
-from splendor.processing.moves.GrabThreeResource import GrabThreeResource
-from splendor.processing.moves.ReserveTop import ReserveTop
-from splendor.processing.moves.ReserveVisible import ReserveVisible
 
 
 class Game(_Game):
-    _last_turn: bool
-    _all_moves: list[AlphaMove]
-    _performed_the_last_move: dict[int, bool]
+    _last_turn: bool = None
+    _all_moves: list[AlphaMove] = None
+    _performed_the_last_move: dict[int, bool] = None
 
     def __init__(self, n_players: int = 2):
         super().__init__(n_players)
@@ -33,10 +37,9 @@ class Game(_Game):
 
     def next_turn(self) -> None:
         self.players = next(self.player_order)
-        for aristocrat in self.board.aristocrats:
+        for index, aristocrat in enumerate(self.board.aristocrats):
             if not (self.current_player.resources - aristocrat.cost).lacks():
-                self.board.aristocrats.remove(aristocrat)
-                self.current_player.aristocrats.append(aristocrat)
+                self.current_player.aristocrats.append(self.board.aristocrats.pop(index))
         if self.current_player.points >= 15 or self._last_turn:
             self._last_turn = True
         self._performed_the_last_move[id(self.current_player)] = self._last_turn
@@ -47,18 +50,19 @@ class Game(_Game):
             raise GameFinishedException(winner)
         self.current_player = self.players[0]
 
-    def get_state(self, expected_length=276) -> list:
+    def get_state(self) -> list:
+        tiers = self.board.tiers
+        self.board.tiers = list(Tier([], tier.visible) for tier in tiers)
         state = flatter_recursively(astuple(self.board))
+        self.board.tiers = tiers
         for player in self.players:
             state += astuple(player.resources, tuple_factory=list)
             state += astuple(player.production, tuple_factory=list)
             if player != self.current_player:
-                state.append(len(player.reserve))
+                state.append(sum(card != empty_card for card in player.reserve))
             else:
-                state += flatter_recursively(astuple(self.current_player.reserve))
+                state += flatter_recursively(map(astuple, self.current_player.reserve))
             state.append(player.points)
-        if len(state) != expected_length:
-            raise ValueError
         return state
 
     def copy(self) -> "Game":

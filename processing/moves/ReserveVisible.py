@@ -1,6 +1,6 @@
-from splendor.data.Card import empty_card
-from splendor.processing._Game import _Game
-from splendor.processing.moves.Reserve import Reserve
+from PySplendor.data.Card import empty_card
+from PySplendor.processing._Game import _Game
+from PySplendor.processing.moves.Reserve import Reserve
 
 
 class ReserveVisible(Reserve):
@@ -17,4 +17,4 @@ class ReserveVisible(Reserve):
         tier = game.board.tiers[self.tier_index]
         if tier.visible[self.index] == empty_card:
             return False
-        return empty_card in game.current_player.reserve.cards
+        return empty_card in game.current_player.reserve

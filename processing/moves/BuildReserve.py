@@ -1,10 +1,10 @@
 from collections import Counter
 from dataclasses import asdict
 
-from splendor.data.BasicResources import BasicResources
-from splendor.data.Card import empty_card
-from splendor.processing._Game import _Game
-from splendor.processing.moves.Move import Move
+from PySplendor.data.BasicResources import BasicResources
+from PySplendor.data.Card import empty_card
+from PySplendor.processing._Game import _Game
+from PySplendor.processing.moves.Move import Move
 
 
 class BuildReserve(Move):

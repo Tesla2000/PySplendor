@@ -14,6 +14,6 @@ class BasicResources:
             raise ValueError(f"Other element must be resource is {other.__class__}")
         self_dict = asdict(self)
         other_dict = asdict(other)
-        return BasicResources(
-            **dict((key, value + other_dict[key]) for key, value in self_dict.items())
+        return type(self)(
+            **dict((key, value + other_dict.get(key, 0)) for key, value in self_dict.items())
         )

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 from alpha_trainer.classes.AlphaMove import AlphaMove
-from splendor.processing._Game import _Game
+from PySplendor.processing._Game import _Game
 
 
 class Move(AlphaMove, ABC):

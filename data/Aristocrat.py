@@ -1,5 +1,6 @@
-from splendor.data.BasicResources import BasicResources
 from dataclasses import dataclass
+
+from PySplendor.data.BasicResources import BasicResources
 
 
 @dataclass(slots=True)

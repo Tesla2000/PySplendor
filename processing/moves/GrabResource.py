@@ -1,7 +1,7 @@
 from abc import ABC
 
-from splendor.data.BasicResources import BasicResources
-from splendor.processing.moves.Move import Move
+from PySplendor.data.BasicResources import BasicResources
+from PySplendor.processing.moves.Move import Move
 
 
 class GrabResource(Move, ABC):
