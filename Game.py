@@ -18,10 +18,10 @@ from PySplendor.processing.moves.ReserveTop import ReserveTop
 from PySplendor.processing.moves.ReserveVisible import ReserveVisible
 from alpha_trainer.classes.AlphaGameResult import AlphaGameResult
 from alpha_trainer.classes.AlphaMove import AlphaMove
-from alpha_trainer.classes.AlphaPlayer import AlphaPlayer
 
 
 class Game(GamePrototype):
+    _turn_counter: int = 0
     _last_turn: bool = None
     _all_moves: list[AlphaMove] = None
     _performed_the_last_move: dict[int, bool] = None
@@ -45,17 +45,25 @@ class Game(GamePrototype):
             self._last_turn = True
         self._performed_the_last_move[self.current_player.id] = self._last_turn
         self.current_player = self.players[0]
+        self._turn_counter += 1
 
     def is_terminal(self) -> bool:
         return all(self._performed_the_last_move.values()) or (not all(self.get_possible_actions()))
 
-    def get_result(self, player: AlphaPlayer) -> AlphaGameResult:
-        if all(self._performed_the_last_move.values()):
-            winner = max(
-                self.players, key=lambda player: (player.points, -len(player.cards))
-            )
-            return AlphaGameResult(1 if winner == player else -1)
-        return AlphaGameResult(-1 if self.current_player == player else 1)
+    def get_result(self, player: Player) -> AlphaGameResult:
+        if not all(self._performed_the_last_move.values()):
+            return AlphaGameResult(1 if player != self.current_player else -1)
+        players_in_order = sorted(
+            self.players, key=lambda player: (player.points, -len(player.cards))
+        )
+        max_points = players_in_order[0].points
+        point_differences = tuple(player.points - max_points for player in players_in_order)
+        speed_modifier = 1 + (self._turn_counter/len(self.players))
+        if players_in_order[0] == player:
+            score = (-point_differences[1] / max_points) / speed_modifier
+        else:
+            score = point_differences[players_in_order.index(player)] / speed_modifier
+        return AlphaGameResult(score)
 
     def get_state(self) -> list:
         tiers = self.board.tiers

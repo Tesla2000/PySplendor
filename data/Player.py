@@ -13,7 +13,7 @@ from alpha_trainer.classes.AlphaPlayer import AlphaPlayer
 
 @dataclass(slots=True, eq=False)
 class Player(AlphaPlayer):
-    id: int = field(default_factory=lambda: randint(0, 2**63))
+    id: int = field(default_factory=lambda: randint(0, 2 ** 63))
     resources: AllResources = field(default_factory=AllResources)
     cards: PlayerCards = field(default_factory=PlayerCards)
     reserve: PlayerReserve = field(default_factory=PlayerReserve)
@@ -26,7 +26,6 @@ class Player(AlphaPlayer):
         self.reserve = PlayerReserve(Card(**card) if isinstance(card, dict) else card for card in self.reserve)
         self.aristocrats = PlayerAristocrats(
             Aristocrat(**aristocrat) if isinstance(aristocrat, dict) else aristocrat for aristocrat in self.aristocrats)
-
 
     @property
     def points(self) -> int:
