@@ -54,7 +54,7 @@ class Game(GamePrototype):
         if not all(self._performed_the_last_move.values()):
             return AlphaGameResult(1 if player != self.current_player else -1)
         players_in_order = sorted(
-            self.players, key=lambda player_instance: -(player_instance.points, -len(player_instance.cards))
+            self.players, key=lambda player_instance: (player_instance.points, -len(player_instance.cards)), reverse=True
         )
         max_points = players_in_order[0].points
         point_differences = tuple(player.points - max_points for player in players_in_order)

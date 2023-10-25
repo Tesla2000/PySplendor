@@ -15,7 +15,7 @@ class AllResources(BasicResources):
         resources = AllResources(
             **dict((key, value - other_dict.get(key, 0)) for key, value in self_dict.items())
         )
-        resources.gold -= sum(map(lambda v: min(0, v), astuple(resources)))
+        resources.gold += sum(map(lambda v: min(0, v), astuple(resources)))
         return resources
 
     def __rsub__(self, other: "BasicResources") -> "AllResources":
