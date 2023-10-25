@@ -51,14 +51,15 @@ class Game(GamePrototype):
         return all(self._performed_the_last_move.values()) or (not all(self.get_possible_actions()))
 
     def get_result(self, player: Player) -> AlphaGameResult:
+        speed_modifier = 1 + (self._turn_counter / len(self.players))
         if not all(self._performed_the_last_move.values()):
-            return AlphaGameResult(1 if player != self.current_player else -1)
+            return AlphaGameResult(0 if player != self.current_player else -1 / speed_modifier)
         players_in_order = sorted(
-            self.players, key=lambda player_instance: (player_instance.points, -len(player_instance.cards)), reverse=True
+            self.players, key=lambda player_instance: (player_instance.points, -len(player_instance.cards)),
+            reverse=True
         )
         max_points = players_in_order[0].points
         point_differences = tuple(player.points - max_points for player in players_in_order)
-        speed_modifier = 1 + (self._turn_counter/len(self.players))
         if players_in_order[0] == player:
             score = (-point_differences[1] / max_points) / speed_modifier
         else:
@@ -109,8 +110,8 @@ class Game(GamePrototype):
         game = object.__new__(Game)
         game.board = Board(**board)
         players = list(Player(**player_state) for player_state in players)
-        game.players = players
         game.player_order = sliding_window(cycle(players), len(players))
+        game.players = next(game.player_order)
         game.current_player = players[0]
         game._init()
         return game
