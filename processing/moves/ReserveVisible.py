@@ -18,4 +18,4 @@ class ReserveVisible(Reserve):
         tier = game.board.tiers[self.tier_index]
         if tier.visible[self.index] == empty_card:
             return False
-        return empty_card in game.current_player.reserve
+        return game.current_player.reserve.can_add()

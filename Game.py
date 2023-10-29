@@ -88,7 +88,8 @@ class Game(GamePrototype):
         players = list(from_dict(Player, asdict(player)) for player in self.players)
         game = object.__new__(Game)
         game.__dict__ = self.__dict__
-        game._performed_the_last_move = tee(game._performed_the_last_move)
+        game._performed_the_last_move = game._performed_the_last_move.copy()
+        game.player_order = tee(game.player_order, 1)[0]
         game.board = board
         game.players = players
         return game

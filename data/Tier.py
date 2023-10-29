@@ -10,12 +10,6 @@ class Tier:
     visible: list[Card] = field(default_factory=list)
 
     def __post_init__(self):
-        self.hidden = list(
-            Card(**card) if isinstance(card, dict) else card for card in self.hidden
-        )
-        self.visible = list(
-            Card(**card) if isinstance(card, dict) else card for card in self.visible
-        )
         if not self.visible:
             random.shuffle(self.hidden)
             for _ in range(4):

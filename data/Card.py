@@ -8,12 +8,6 @@ class Card:
     cost: BasicResources
     points: int = 0
 
-    def __post_init__(self):
-        if isinstance(self.production, dict):
-            self.production = BasicResources(**self.production)
-        if isinstance(self.cost, dict):
-            self.cost = BasicResources(**self.cost)
-
     @classmethod
     def from_text(cls, line: str) -> "Card":
         tier, production, points, name, white, blue, green, red, black = line.split(",")

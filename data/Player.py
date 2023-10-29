@@ -22,10 +22,10 @@ class Player(AlphaPlayer):
     def __post_init__(self):
         if isinstance(self.resources, dict):
             self.resources = AllResources(**self.resources)
-        self.cards = PlayerCards(Card(**card) if isinstance(card, dict) else card for card in self.cards)
-        self.reserve = PlayerReserve(Card(**card) if isinstance(card, dict) else card for card in self.reserve)
+        self.cards = PlayerCards(list(Card(**card) if isinstance(card, dict) else card for card in self.cards))
+        self.reserve = PlayerReserve(list(Card(**card) if isinstance(card, dict) else card for card in self.reserve))
         self.aristocrats = PlayerAristocrats(
-            Aristocrat(**aristocrat) if isinstance(aristocrat, dict) else aristocrat for aristocrat in self.aristocrats)
+            list(Aristocrat(**aristocrat) if isinstance(aristocrat, dict) else aristocrat for aristocrat in self.aristocrats))
 
     @property
     def points(self) -> int:
