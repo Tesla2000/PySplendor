@@ -3,12 +3,13 @@ from dataclasses import dataclass, field
 from functools import reduce
 
 from PySplendor.data.BasicResources import BasicResources
+from PySplendor.data.Card import Card
 from PySplendor.data.extended_lists.ExtendedList import ExtendedList
 
 
 @dataclass
 class PlayerCards(ExtendedList):
-    _cards: list = field(default_factory=list)
+    _cards: list[Card] = field(default_factory=list)
 
     @property
     def production(self) -> BasicResources:

@@ -6,7 +6,7 @@ from PySplendor.data.extended_lists.ExtendedList import ExtendedList
 
 @dataclass
 class PlayerReserve(ExtendedList):
-    _cards: list = field(default_factory=lambda: list(empty_card for _ in range(3)))
+    _cards: list[Card] = field(default_factory=lambda: list(empty_card for _ in range(3)))
 
     def can_add(self) -> bool:
         return empty_card in self._cards

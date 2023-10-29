@@ -22,4 +22,4 @@ class ExtendedList(ABC):
 
     @property
     def _list_field(self) -> list:
-        return getattr(self, next(field.name for field in fields(self) if field.type == list))
+        return getattr(self, next(field.name for field in fields(self) if str(field.type).startswith('list') or field.type == list))
