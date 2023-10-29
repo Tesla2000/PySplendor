@@ -1,0 +1,3 @@
+[submodule "dacite"]
+	path = dacite
+	url = git@github.com:konradhalas/dacite.git

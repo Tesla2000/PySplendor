@@ -1,9 +1,8 @@
 from dataclasses import astuple, fields, asdict
-from itertools import combinations, starmap, product, cycle
-from typing import Iterable, Generator
+from itertools import combinations, starmap, product, tee
+from typing import Generator
 
-from more_itertools import sliding_window
-
+from PySplendor.dacite.dacite.core import from_dict
 from PySplendor.data.BasicResources import BasicResources
 from PySplendor.data.Board import Board
 from PySplendor.data.Card import empty_card
@@ -19,6 +18,8 @@ from PySplendor.processing.moves.ReserveVisible import ReserveVisible
 from alpha_trainer.classes.AlphaGameResult import AlphaGameResult
 from alpha_trainer.classes.AlphaMove import AlphaMove
 
+max_turns = 0
+
 
 class Game(GamePrototype):
     _turn_counter: int = 0
@@ -28,9 +29,6 @@ class Game(GamePrototype):
 
     def __init__(self, n_players: int = 2):
         super().__init__(n_players)
-        self._init()
-
-    def _init(self):
         self._performed_the_last_move = dict(
             (player.id, False) for player in self.players
         )
@@ -51,6 +49,10 @@ class Game(GamePrototype):
         return all(self._performed_the_last_move.values()) or (not all(self.get_possible_actions()))
 
     def get_result(self, player: Player) -> AlphaGameResult:
+        global max_turns
+        if max_turns < self._turn_counter:
+            max_turns = self._turn_counter
+            print(max_turns)
         speed_modifier = 1 + (self._turn_counter / len(self.players))
         if not all(self._performed_the_last_move.values()):
             return AlphaGameResult(0 if player != self.current_player else -1 / speed_modifier)
@@ -82,9 +84,14 @@ class Game(GamePrototype):
         return state
 
     def copy(self) -> "Game":
-        board = asdict(self.board)
-        players = map(asdict, self.players)
-        return Game.from_dict(board, players)
+        board = from_dict(Board, asdict(self.board))
+        players = list(from_dict(Player, asdict(player)) for player in self.players)
+        game = object.__new__(Game)
+        game.__dict__ = self.__dict__
+        game._performed_the_last_move = tee(game._performed_the_last_move)
+        game.board = board
+        game.players = players
+        return game
 
     def get_possible_actions(self) -> Generator[AlphaMove, None, None]:
         if self._all_moves:
@@ -104,17 +111,6 @@ class Game(GamePrototype):
         all_moves += list(map(ReserveTop, range(3)))
         self._all_moves = all_moves
         return (move for move in self._all_moves if move.is_valid(self))
-
-    @classmethod
-    def from_dict(cls, board: dict, players: Iterable[dict]) -> "Game":
-        game = object.__new__(Game)
-        game.board = Board(**board)
-        players = list(Player(**player_state) for player_state in players)
-        game.player_order = sliding_window(cycle(players), len(players))
-        game.players = next(game.player_order)
-        game.current_player = players[0]
-        game._init()
-        return game
 
 
 n_moves = 45
