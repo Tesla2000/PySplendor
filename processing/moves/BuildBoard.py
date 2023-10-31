@@ -3,7 +3,9 @@ from dataclasses import asdict
 
 from PySplendor.data.BasicResources import BasicResources
 from PySplendor.data.Card import empty_card
-from PySplendor.processing.GamePrototype import GamePrototype
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from PySplendor.Game import Game
 from PySplendor.processing.moves.Move import Move
 
 
@@ -12,7 +14,7 @@ class BuildBoard(Move):
         self.tier_index = tier_index
         self.index = index
 
-    def perform(self, game: GamePrototype) -> GamePrototype:
+    def perform(self, game: "Game") -> "Game":
         current_player = game.current_player
         tier = game.board.tiers[self.tier_index]
         card = tier.pop(self.index)
@@ -23,7 +25,7 @@ class BuildBoard(Move):
         current_player.cards.append(card)
         return game
 
-    def is_valid(self, game: GamePrototype) -> bool:
+    def is_valid(self, game: "Game") -> bool:
         tier = game.board.tiers[self.tier_index]
         if tier.visible[self.index] == empty_card:
             return False

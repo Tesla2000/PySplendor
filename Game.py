@@ -14,7 +14,6 @@ from PySplendor.data.extended_lists.Aristocrats import Aristocrats
 from PySplendor.data.extended_lists.PlayerAristocrats import PlayerAristocrats
 from PySplendor.data.extended_lists.PlayerCards import PlayerCards
 from PySplendor.data.extended_lists.PlayerReserve import PlayerReserve
-from PySplendor.processing.GamePrototype import GamePrototype
 from PySplendor.processing.flatter_recursely import flatter_recursively
 from PySplendor.processing.moves.BuildBoard import BuildBoard
 from PySplendor.processing.moves.BuildReserve import BuildReserve
@@ -23,12 +22,16 @@ from PySplendor.processing.moves.ReserveTop import ReserveTop
 from PySplendor.processing.moves.ReserveVisible import ReserveVisible
 from alpha_trainer.classes.AlphaGameResult import AlphaGameResult
 from alpha_trainer.classes.AlphaMove import AlphaMove
+from alpha_trainer.classes.AlphaTrainableGame import AlphaTrainableGame
 
 max_turns = 0
 
 
 @dataclass
-class Game(GamePrototype):
+class Game(AlphaTrainableGame):
+    players: tuple[Player]
+    board: Board
+    current_player: Player
     _turn_counter: int = 0
     _performed_the_last_move: dict = None
     _last_turn: bool = False
@@ -36,7 +39,9 @@ class Game(GamePrototype):
     @classmethod
     def create(cls, n_players: int = 2):
         result = object.__new__(Game)
-        result.__dict__ = super().create(n_players).__dict__
+        result.players = tuple(Player() for _ in range(n_players))
+        result.board = Board(n_players)
+        result.current_player = result.players[0]
         result._performed_the_last_move = dict(
             (player.id, False) for player in result.players
         )
@@ -93,14 +98,7 @@ class Game(GamePrototype):
         return state
 
     def copy(self) -> "Game":
-        board = from_dict(Board, asdict(self.board))
-        players = tuple(from_dict(Player, asdict(player)) for player in self.players)
-        game = object.__new__(Game)
-        game.__dict__ = self.__dict__.copy()
-        game._performed_the_last_move = self._performed_the_last_move.copy()
-        game.board = board
-        game.players = players
-        return game
+        return eval(str(self))
 
     def get_possible_actions(self) -> Generator[AlphaMove, None, None]:
         return (move for move in _all_moves if move.is_valid(self))
