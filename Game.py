@@ -1,13 +1,19 @@
-from dataclasses import astuple, fields, asdict
-from itertools import combinations, starmap, product, tee
+from dataclasses import astuple, fields, asdict, dataclass
+from itertools import combinations, starmap, product
 from typing import Generator
 
 from PySplendor.dacite.dacite.core import from_dict
+from PySplendor.data.AllResources import AllResources
+from PySplendor.data.Aristocrat import Aristocrat
 from PySplendor.data.BasicResources import BasicResources
 from PySplendor.data.Board import Board
-from PySplendor.data.Card import empty_card
+from PySplendor.data.Card import empty_card, Card
 from PySplendor.data.Player import Player
 from PySplendor.data.Tier import Tier
+from PySplendor.data.extended_lists.Aristocrats import Aristocrats
+from PySplendor.data.extended_lists.PlayerAristocrats import PlayerAristocrats
+from PySplendor.data.extended_lists.PlayerCards import PlayerCards
+from PySplendor.data.extended_lists.PlayerReserve import PlayerReserve
 from PySplendor.processing.GamePrototype import GamePrototype
 from PySplendor.processing.flatter_recursely import flatter_recursively
 from PySplendor.processing.moves.BuildBoard import BuildBoard
@@ -21,21 +27,24 @@ from alpha_trainer.classes.AlphaMove import AlphaMove
 max_turns = 0
 
 
+@dataclass
 class Game(GamePrototype):
     _turn_counter: int = 0
-    _last_turn: bool = None
-    _all_moves: list[AlphaMove] = None
-    _performed_the_last_move: dict[int, bool] = None
+    _performed_the_last_move: dict = None
+    _last_turn: bool = False
 
-    def __init__(self, n_players: int = 2):
-        super().__init__(n_players)
-        self._performed_the_last_move = dict(
-            (player.id, False) for player in self.players
+    @classmethod
+    def create(cls, n_players: int = 2):
+        result = object.__new__(Game)
+        result.__dict__ = super().create(n_players).__dict__
+        result._performed_the_last_move = dict(
+            (player.id, False) for player in result.players
         )
-        self._last_turn = False
+        result._last_turn = False
+        return result
 
     def next_turn(self) -> None:
-        self.players = next(self.player_order)
+        self.players = (*self.players[1:], self.players[0])
         for index, aristocrat in enumerate(self.board.aristocrats):
             if not (self.current_player.resources - aristocrat.cost).lacks():
                 self.current_player.aristocrats.append(self.board.aristocrats.pop(index))
@@ -85,33 +94,33 @@ class Game(GamePrototype):
 
     def copy(self) -> "Game":
         board = from_dict(Board, asdict(self.board))
-        players = list(from_dict(Player, asdict(player)) for player in self.players)
+        players = tuple(from_dict(Player, asdict(player)) for player in self.players)
         game = object.__new__(Game)
-        game.__dict__ = self.__dict__
-        game._performed_the_last_move = game._performed_the_last_move.copy()
-        game.player_order = tee(game.player_order, 1)[0]
+        game.__dict__ = self.__dict__.copy()
+        game._performed_the_last_move = self._performed_the_last_move.copy()
         game.board = board
         game.players = players
         return game
 
     def get_possible_actions(self) -> Generator[AlphaMove, None, None]:
-        if self._all_moves:
-            return (move for move in self._all_moves if move.is_valid(self))
-        combos = combinations([{field.name: 1} for field in fields(BasicResources)], 3)
-        all_moves = list(
-            GrabThreeResource(BasicResources(**res_1, **res_2, **res_3))
-            for res_1, res_2, res_3 in combos
-        )
-        all_moves += list(
-            GrabThreeResource(BasicResources(**{field.name: 2}))
-            for field in fields(BasicResources)
-        )
-        all_moves += list(starmap(BuildBoard, product(range(3), range(4))))
-        all_moves += list(map(BuildReserve, range(3)))
-        all_moves += list(starmap(ReserveVisible, product(range(3), range(4))))
-        all_moves += list(map(ReserveTop, range(3)))
-        self._all_moves = all_moves
-        return (move for move in self._all_moves if move.is_valid(self))
+        return (move for move in _all_moves if move.is_valid(self))
 
 
-n_moves = 45
+combos = combinations([{field.name: 1} for field in fields(BasicResources)], 3)
+_all_moves = list(
+    GrabThreeResource(BasicResources(**res_1, **res_2, **res_3))
+    for res_1, res_2, res_3 in combos
+)
+_all_moves += list(
+    GrabThreeResource(BasicResources(**{field.name: 2}))
+    for field in fields(BasicResources)
+)
+_all_moves += list(starmap(BuildBoard, product(range(3), range(4))))
+_all_moves += list(map(BuildReserve, range(3)))
+_all_moves += list(starmap(ReserveVisible, product(range(3), range(4))))
+_all_moves += list(map(ReserveTop, range(3)))
+n_moves = len(_all_moves)
+
+if __name__ == '__main__':
+    g = Game.create()
+    copy = eval(str(g))

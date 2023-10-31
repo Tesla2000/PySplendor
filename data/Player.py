@@ -11,7 +11,7 @@ from PySplendor.data.extended_lists.PlayerReserve import PlayerReserve
 from alpha_trainer.classes.AlphaPlayer import AlphaPlayer
 
 
-@dataclass(slots=True, eq=False)
+@dataclass(slots=True)
 class Player(AlphaPlayer):
     id: int = field(default_factory=lambda: randint(0, 2 ** 63))
     resources: AllResources = field(default_factory=AllResources)
