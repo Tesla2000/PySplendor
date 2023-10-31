@@ -4,17 +4,11 @@ from typing import Generator
 
 from PySplendor.dacite.dacite import Config
 from PySplendor.dacite.dacite.core import from_dict
-from PySplendor.data.AllResources import AllResources
-from PySplendor.data.Aristocrat import Aristocrat
 from PySplendor.data.BasicResources import BasicResources
 from PySplendor.data.Board import Board
-from PySplendor.data.Card import empty_card, Card
+from PySplendor.data.Card import empty_card
 from PySplendor.data.Player import Player
 from PySplendor.data.Tier import Tier
-from PySplendor.data.extended_lists.Aristocrats import Aristocrats
-from PySplendor.data.extended_lists.PlayerAristocrats import PlayerAristocrats
-from PySplendor.data.extended_lists.PlayerCards import PlayerCards
-from PySplendor.data.extended_lists.PlayerReserve import PlayerReserve
 from PySplendor.processing.flatter_recursely import flatter_recursively
 from PySplendor.processing.moves.BuildBoard import BuildBoard
 from PySplendor.processing.moves.BuildReserve import BuildReserve
@@ -24,7 +18,7 @@ from PySplendor.processing.moves.ReserveTop import ReserveTop
 from PySplendor.processing.moves.ReserveVisible import ReserveVisible
 from alpha_trainer.classes.AlphaGameResult import AlphaGameResult
 from alpha_trainer.classes.AlphaMove import AlphaMove
-from alpha_trainer.classes.AlphaTrainableGame import AlphaTrainableGame
+from alpha_trainer.classes.AlphaTrainableGame import AlphaTrainableGame, AlphaGameResults
 
 max_turns = 0
 
@@ -67,25 +61,28 @@ class Game(AlphaTrainableGame):
     def is_terminal(self) -> bool:
         return all(self._performed_the_last_move.values()) or (not all(self.get_possible_actions()))
 
-    def get_result(self, player: Player) -> AlphaGameResult:
+    def get_results(self) -> AlphaGameResults:
         global max_turns
         if max_turns < self._turn_counter:
             max_turns = self._turn_counter
             print(max_turns)
         speed_modifier = 1 + (self._turn_counter / len(self.players))
-        if not all(self._performed_the_last_move.values()):
-            return AlphaGameResult(0 if player != self.current_player else -1 / speed_modifier)
-        players_in_order = sorted(
-            self.players, key=lambda player_instance: (player_instance.points, -len(player_instance.cards)),
-            reverse=True
-        )
-        max_points = players_in_order[0].points
-        point_differences = tuple(player.points - max_points for player in players_in_order)
-        if players_in_order[0] == player:
-            score = (-point_differences[1] / max_points) / speed_modifier
-        else:
-            score = point_differences[players_in_order.index(player)] / speed_modifier
-        return AlphaGameResult(score)
+        results = {}
+        for player in self.players:
+            if not all(self._performed_the_last_move.values()):
+                results[player.id] = AlphaGameResult(0 if player != self.current_player else -1 / speed_modifier)
+            players_in_order = sorted(
+                self.players, key=lambda player_instance: (player_instance.points, -len(player_instance.cards)),
+                reverse=True
+            )
+            max_points = players_in_order[0].points
+            point_differences = tuple(player.points - max_points for player in players_in_order)
+            if players_in_order[0] == player:
+                score = (-point_differences[1] / max_points) / speed_modifier
+            else:
+                score = point_differences[players_in_order.index(player)] / speed_modifier
+            results[player.id] = AlphaGameResult(score)
+        return results
 
     def get_state(self) -> list:
         tiers = self.board.tiers
