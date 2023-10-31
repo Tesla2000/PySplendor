@@ -1,7 +1,8 @@
-from dataclasses import astuple, fields, asdict, dataclass
+from dataclasses import astuple, fields, asdict, dataclass, field
 from itertools import combinations, starmap, product
 from typing import Generator
 
+from PySplendor.dacite.dacite import Config
 from PySplendor.dacite.dacite.core import from_dict
 from PySplendor.data.AllResources import AllResources
 from PySplendor.data.Aristocrat import Aristocrat
@@ -32,10 +33,13 @@ max_turns = 0
 class Game(AlphaTrainableGame):
     players: tuple[Player]
     board: Board
-    current_player: Player
+    current_player: Player = field(init=False)
     _turn_counter: int = 0
     _performed_the_last_move: dict = None
     _last_turn: bool = False
+
+    def __post_init__(self):
+        self.current_player = self.players[0]
 
     @classmethod
     def create(cls, n_players: int = 2):
@@ -99,7 +103,7 @@ class Game(AlphaTrainableGame):
         return state
 
     def copy(self) -> "Game":
-        game = eval(str(self))
+        game = from_dict(Game, asdict(self), Config(check_types=False))
         game.current_player = game.players[0]
         return game
 
