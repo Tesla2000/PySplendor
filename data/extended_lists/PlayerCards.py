@@ -1,20 +1,15 @@
 import operator
-from dataclasses import dataclass, field
 from functools import reduce
 
 from PySplendor.data.BasicResources import BasicResources
-from PySplendor.data.Card import Card
-from PySplendor.data.extended_lists.ExtendedList import ExtendedList
 
 
-@dataclass
-class PlayerCards(ExtendedList):
-    _cards: list[Card] = field(default_factory=list)
+class PlayerCards(list):
 
     @property
     def production(self) -> BasicResources:
-        return reduce(operator.add, (card.production for card in self._cards), BasicResources())
+        return reduce(operator.add, (card.production for card in self), BasicResources())
 
     @property
     def points(self) -> int:
-        return sum(card.points for card in self._cards)
+        return sum(card.points for card in self)

@@ -18,6 +18,7 @@ from PySplendor.processing.flatter_recursely import flatter_recursively
 from PySplendor.processing.moves.BuildBoard import BuildBoard
 from PySplendor.processing.moves.BuildReserve import BuildReserve
 from PySplendor.processing.moves.GrabThreeResource import GrabThreeResource
+from PySplendor.processing.moves.GrabTwoResource import GrabTwoResource
 from PySplendor.processing.moves.ReserveTop import ReserveTop
 from PySplendor.processing.moves.ReserveVisible import ReserveVisible
 from alpha_trainer.classes.AlphaGameResult import AlphaGameResult
@@ -98,7 +99,9 @@ class Game(AlphaTrainableGame):
         return state
 
     def copy(self) -> "Game":
-        return eval(str(self))
+        game = eval(str(self))
+        game.current_player = game.players[0]
+        return game
 
     def get_possible_actions(self) -> Generator[AlphaMove, None, None]:
         return (move for move in _all_moves if move.is_valid(self))
@@ -110,7 +113,7 @@ _all_moves = list(
     for res_1, res_2, res_3 in combos
 )
 _all_moves += list(
-    GrabThreeResource(BasicResources(**{field.name: 2}))
+    GrabTwoResource(BasicResources(**{field.name: 2}))
     for field in fields(BasicResources)
 )
 _all_moves += list(starmap(BuildBoard, product(range(3), range(4))))

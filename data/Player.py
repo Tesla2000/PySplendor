@@ -15,9 +15,9 @@ from alpha_trainer.classes.AlphaPlayer import AlphaPlayer
 class Player(AlphaPlayer):
     id: int = field(default_factory=lambda: randint(0, 2 ** 63))
     resources: AllResources = field(default_factory=AllResources)
-    cards: PlayerCards = field(default_factory=PlayerCards)
-    reserve: PlayerReserve = field(default_factory=PlayerReserve)
-    aristocrats: PlayerAristocrats = field(default_factory=PlayerAristocrats)
+    cards: PlayerCards[Card] = field(default_factory=PlayerCards)
+    reserve: PlayerReserve[Card] = field(default_factory=PlayerReserve)
+    aristocrats: PlayerAristocrats[Aristocrat] = field(default_factory=PlayerAristocrats)
 
     def __post_init__(self):
         if isinstance(self.resources, dict):
