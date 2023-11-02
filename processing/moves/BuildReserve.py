@@ -4,6 +4,7 @@ from dataclasses import asdict
 from PySplendor.data.BasicResources import BasicResources
 from PySplendor.data.Card import empty_card
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from PySplendor.Game import Game
 from PySplendor.processing.moves.Move import Move
@@ -15,10 +16,14 @@ class BuildReserve(Move):
 
     def perform(self, game: "Game") -> "Game":
         current_player = game.current_player
+        if current_player.resources.lacks():
+            raise ValueError()
         card = current_player.reserve.pop(self.index)
         not_produced = BasicResources(
             **(Counter(asdict(card.cost)) - Counter(asdict(current_player.production)))
         )
+        if (current_player.resources - not_produced).lacks():
+            raise ValueError()
         current_player.resources -= not_produced
         current_player.cards.append(card)
         return game

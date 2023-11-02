@@ -1,4 +1,4 @@
-from dataclasses import dataclass, asdict, astuple
+from dataclasses import dataclass, asdict, fields, astuple
 
 from PySplendor.data.BasicResources import BasicResources
 
@@ -13,9 +13,18 @@ class AllResources(BasicResources):
         self_dict = asdict(self)
         other_dict = asdict(other)
         resources = AllResources(
-            **dict((key, value - other_dict.get(key, 0)) for key, value in self_dict.items())
+            **dict(
+                (key, value - other_dict.get(key, 0))
+                for key, value in self_dict.items()
+            )
         )
-        resources.gold += sum(map(lambda v: min(0, v), astuple(resources)))
+        resources.gold += sum(
+            min(0, getattr(resources, field.name)) for field in fields(BasicResources)
+        )
+        resources = AllResources(
+            *tuple(max(0, resource) for resource in astuple(resources)[:-1]),
+            resources.gold,
+        )
         return resources
 
     def __rsub__(self, other: "BasicResources") -> "AllResources":

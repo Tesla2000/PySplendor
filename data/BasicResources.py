@@ -15,5 +15,8 @@ class BasicResources:
         self_dict = asdict(self)
         other_dict = asdict(other)
         return type(self)(
-            **dict((key, value + other_dict.get(key, 0)) for key, value in self_dict.items())
+            **dict(
+                (key, value + other_dict.get(key, 0))
+                for key, value in self_dict.items()
+            )
         )

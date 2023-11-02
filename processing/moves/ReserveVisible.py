@@ -1,5 +1,6 @@
 from PySplendor.data.Card import empty_card
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from PySplendor.Game import Game
 from PySplendor.processing.moves.Reserve import Reserve

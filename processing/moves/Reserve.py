@@ -2,6 +2,7 @@ from abc import ABC
 
 from PySplendor.data.Card import Card
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from PySplendor.Game import Game
 from PySplendor.processing.moves.Move import Move

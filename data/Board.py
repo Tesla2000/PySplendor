@@ -17,6 +17,8 @@ class Board:
 
     def __post_init__(self):
         if self.resources is None:
-            self.resources = AllResources(*5 * [{2: 4, 3: 5, 4: 7}[self.n_players]], gold=5)
+            self.resources = AllResources(
+                *5 * [{2: 4, 3: 5, 4: 7}[self.n_players]], gold=5
+            )
         if len(self.aristocrats) > self.n_players + 1:
             self.aristocrats = Aristocrats(self.aristocrats[: self.n_players + 1])
