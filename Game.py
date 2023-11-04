@@ -23,8 +23,6 @@ from alpha_trainer.classes.AlphaTrainableGame import (
     AlphaGameResults,
 )
 
-max_turns = 0
-
 
 @dataclass
 class Game(AlphaTrainableGame):
@@ -70,16 +68,14 @@ class Game(AlphaTrainableGame):
         )
 
     def get_results(self) -> AlphaGameResults:
-        global max_turns
-        if max_turns < self._turn_counter:
-            max_turns = self._turn_counter
-            print(max_turns)
         results = {}
         for player in self.players:
             if not all(self._performed_the_last_move.values()):
                 results[player.id] = AlphaGameResult(
-                    1 if player != self.current_player else -1
+                    1 if player.id != self.current_player.id else -1
                 )
+            else:
+                print("Finished game")
         return results
 
     def get_state(self) -> tuple:
