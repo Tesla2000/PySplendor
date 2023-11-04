@@ -2,7 +2,6 @@ from dataclasses import astuple, fields, asdict, dataclass, field
 from itertools import combinations, starmap, product
 from typing import Self
 
-from PySplendor.dacite.dacite import Config
 from PySplendor.dacite.dacite.core import from_dict
 from PySplendor.data.BasicResources import BasicResources
 from PySplendor.data.Board import Board
@@ -22,7 +21,7 @@ from alpha_trainer.src.alpha_trainer.alpha_classes import AlphaGameResults
 
 @dataclass
 class Game(AlphaTrainableGame):
-    players: tuple[Player] = field(default=None)
+    players: tuple[Player, ...] = field(default=None)
     board: Board = field(default=None)
     n_players: int = field(default=2)
     current_player: Player = field(init=False)
@@ -89,8 +88,8 @@ class Game(AlphaTrainableGame):
             state.append(player.points)
         return tuple(state)
 
-    def copy(self) -> "Game":
-        game = from_dict(Game, asdict(self), Config(check_types=False))
+    def copy(self) -> Self:
+        game = from_dict(Game, asdict(self))
         game.current_player = game.players[0]
         return game
 
