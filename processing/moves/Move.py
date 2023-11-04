@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
-from alpha_trainer.classes.AlphaMove import AlphaMove
 from typing import TYPE_CHECKING
+from alpha_trainer.src.alpha_trainer import AlphaMove
 
 if TYPE_CHECKING:
     from PySplendor.Game import Game

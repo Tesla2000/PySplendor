@@ -8,7 +8,7 @@ from PySplendor.data.Card import Card
 from PySplendor.data.extended_lists.PlayerAristocrats import PlayerAristocrats
 from PySplendor.data.extended_lists.PlayerCards import PlayerCards
 from PySplendor.data.extended_lists.PlayerReserve import PlayerReserve
-from alpha_trainer.classes.AlphaPlayer import AlphaPlayer
+from alpha_trainer.src.alpha_trainer.alpha_classes.AlphaPlayer import AlphaPlayer
 
 
 @dataclass(slots=True)

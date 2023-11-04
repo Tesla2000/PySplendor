@@ -16,12 +16,8 @@ from PySplendor.processing.moves.GrabThreeResource import GrabThreeResource
 from PySplendor.processing.moves.GrabTwoResource import GrabTwoResource
 from PySplendor.processing.moves.ReserveTop import ReserveTop
 from PySplendor.processing.moves.ReserveVisible import ReserveVisible
-from alpha_trainer.classes.AlphaGameResult import AlphaGameResult
-from alpha_trainer.classes.AlphaMove import AlphaMove
-from alpha_trainer.classes.AlphaTrainableGame import (
-    AlphaTrainableGame,
-    AlphaGameResults,
-)
+from alpha_trainer.src.alpha_trainer import AlphaTrainableGame, AlphaGameResult, AlphaMove
+from alpha_trainer.src.alpha_trainer.alpha_classes import AlphaGameResults
 
 
 @dataclass
