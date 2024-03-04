@@ -1,11 +1,11 @@
 from dataclasses import dataclass, field
 
-from PySplendor.data.AllResources import AllResources
-from PySplendor.data.Aristocrat import Aristocrat
-from PySplendor.data.Tier import Tier
-from PySplendor.data.extended_lists.Aristocrats import Aristocrats
-from PySplendor.data.game_setup.generate_aristocrats import generate_aristocrats
-from PySplendor.data.game_setup.generate_tiers import generate_tiers
+from .AllResources import AllResources
+from .Aristocrat import Aristocrat
+from .Tier import Tier
+from .extended_lists.Aristocrats import Aristocrats
+from .game_setup.generate_aristocrats import generate_aristocrats
+from .game_setup.generate_tiers import generate_tiers
 
 
 @dataclass(slots=True)

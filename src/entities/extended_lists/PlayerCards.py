@@ -1,7 +1,7 @@
 import operator
 from functools import reduce
 
-from PySplendor.data.BasicResources import BasicResources
+from ..BasicResources import BasicResources
 
 
 class PlayerCards(list):

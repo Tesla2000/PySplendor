@@ -1,6 +1,7 @@
 from dataclasses import dataclass
+from typing import Self
 
-from PySplendor.data.BasicResources import BasicResources
+from .BasicResources import BasicResources
 
 
 @dataclass(slots=True)
@@ -9,7 +10,7 @@ class Aristocrat:
     cost: BasicResources
 
     @classmethod
-    def from_text(cls, line: str) -> "Aristocrat":
+    def from_text(cls, line: str) -> Self:
         points, white, blue, green, red, black = map(int, line.split(","))
         cost = BasicResources(red, green, blue, black, white)
         return Aristocrat(points, cost)

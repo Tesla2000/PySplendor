@@ -1,15 +1,15 @@
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
-from alpha_trainer.src.alpha_trainer import AlphaMove
 
 if TYPE_CHECKING:
-    from PySplendor.Game import Game
+    from src.Game import Game
 
 
-class Move(AlphaMove, ABC):
+class Move(ABC):
     @abstractmethod
     def perform(self, game: "Game") -> "Game":
-        pass
+        game.is_blocked[game.current_player] = False
+        return game
 
     @abstractmethod
     def is_valid(self, game: "Game") -> bool:

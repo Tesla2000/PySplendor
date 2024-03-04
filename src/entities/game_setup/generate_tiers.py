@@ -1,12 +1,12 @@
 from itertools import groupby
 from pathlib import Path
 
-from PySplendor.data.Card import Card
-from PySplendor.data.Tier import Tier
+from ..Card import Card
+from ..Tier import Tier
 
 
 def generate_tiers() -> list[Tier]:
-    building_data = iter(Path("PySplendor/buildings.csv").read_text().splitlines())
+    building_data = iter(Path(__file__).parents[2].joinpath('buildings.csv').read_text().splitlines())
     next(building_data)
     tiers = list(
         Tier(list(map(Card.from_text, group)))

@@ -1,17 +1,21 @@
-from PySplendor.data.Card import empty_card
+from dataclasses import dataclass
+
+from src.entities.Card import empty_card
 from typing import TYPE_CHECKING
 
+from .Move import Move
+
 if TYPE_CHECKING:
-    from PySplendor.Game import Game
-from PySplendor.processing.moves.Reserve import Reserve
+    from src.Game import Game
+from .Reserve import Reserve
 
 
+@dataclass(slots=True)
 class ReserveVisible(Reserve):
-    def __init__(self, tier_index: int, index: int):
-        super().__init__(tier_index)
-        self.index = index
+    index: int
 
     def perform(self, game: "Game") -> "Game":
+        Move.perform(self, game)
         tier = game.board.tiers[self.tier_index]
         card = tier.pop(self.index)
         self.reserve_card(game, card)

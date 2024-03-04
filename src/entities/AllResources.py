@@ -1,13 +1,14 @@
 from dataclasses import dataclass, asdict, fields, astuple
+from typing import Self
 
-from PySplendor.data.BasicResources import BasicResources
+from .BasicResources import BasicResources
 
 
 @dataclass(slots=True)
 class AllResources(BasicResources):
     gold: int = 0
 
-    def __sub__(self, other: "BasicResources") -> "AllResources":
+    def __sub__(self, other: BasicResources) -> Self:
         if not isinstance(other, BasicResources):
             raise ValueError(f"Other element must be resource is {other.__class__}")
         self_dict = asdict(self)
@@ -27,7 +28,7 @@ class AllResources(BasicResources):
         )
         return resources
 
-    def __rsub__(self, other: "BasicResources") -> "AllResources":
+    def __rsub__(self, other: BasicResources) -> Self:
         return self.__sub__(other)
 
     def lacks(self) -> bool:

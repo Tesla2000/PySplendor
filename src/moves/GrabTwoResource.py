@@ -3,13 +3,16 @@ from itertools import compress
 
 from typing import TYPE_CHECKING
 
+from .Move import Move
+
 if TYPE_CHECKING:
-    from PySplendor.Game import Game
-from PySplendor.processing.moves.GrabResource import GrabResource
+    from src.Game import Game
+from .GrabResource import GrabResource
 
 
 class GrabTwoResource(GrabResource):
     def perform(self, game: "Game") -> "Game":
+        Move.perform(self, game)
         game.board.resources -= self.resources
         game.current_player.resources += self.resources
         return game

@@ -1,4 +1,5 @@
 from dataclasses import dataclass, asdict
+from typing import Self
 
 
 @dataclass(slots=True)
@@ -9,7 +10,7 @@ class BasicResources:
     black: int = 0
     white: int = 0
 
-    def __add__(self, other: "BasicResources") -> "BasicResources":
+    def __add__(self, other: Self) -> Self:
         if not isinstance(other, BasicResources):
             raise ValueError(f"Other element must be resource is {other.__class__}")
         self_dict = asdict(self)

@@ -1,9 +1,7 @@
 from itertools import filterfalse
 from typing import Iterable
 
-from typing_extensions import override
-
-from PySplendor.data.Card import Card, empty_card
+from ..Card import Card, empty_card
 
 
 class PlayerReserve(list):
@@ -19,7 +17,6 @@ class PlayerReserve(list):
         empty_index = self.index(empty_card)
         self[empty_index] = card
 
-    @override
     def pop(self, index: int) -> Card:
         card = self[index]
         if card == empty_card:

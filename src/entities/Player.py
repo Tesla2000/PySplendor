@@ -1,19 +1,16 @@
 from dataclasses import dataclass, field
-from random import randint
 
-from PySplendor.data.AllResources import AllResources
-from PySplendor.data.Aristocrat import Aristocrat
-from PySplendor.data.BasicResources import BasicResources
-from PySplendor.data.Card import Card
-from PySplendor.data.extended_lists.PlayerAristocrats import PlayerAristocrats
-from PySplendor.data.extended_lists.PlayerCards import PlayerCards
-from PySplendor.data.extended_lists.PlayerReserve import PlayerReserve
-from alpha_trainer.src.alpha_trainer.alpha_classes.AlphaPlayer import AlphaPlayer
+from .AllResources import AllResources
+from .Aristocrat import Aristocrat
+from .BasicResources import BasicResources
+from .Card import Card
+from .extended_lists.PlayerAristocrats import PlayerAristocrats
+from .extended_lists.PlayerCards import PlayerCards
+from .extended_lists.PlayerReserve import PlayerReserve
 
 
 @dataclass(slots=True)
-class Player(AlphaPlayer):
-    id: int = field(default_factory=lambda: randint(0, 2**63))
+class Player:
     resources: AllResources = field(default_factory=AllResources)
     cards: PlayerCards[Card] = field(default_factory=PlayerCards)
     reserve: PlayerReserve[Card] = field(default_factory=PlayerReserve)
@@ -49,3 +46,6 @@ class Player(AlphaPlayer):
     @property
     def production(self) -> BasicResources:
         return self.cards.production
+
+    def __hash__(self):
+        return id(self)

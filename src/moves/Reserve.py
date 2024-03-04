@@ -1,16 +1,17 @@
 from abc import ABC
+from dataclasses import dataclass
 
-from PySplendor.data.Card import Card
+from src.entities.Card import Card
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from PySplendor.Game import Game
-from PySplendor.processing.moves.Move import Move
+    from src.Game import Game
+from .Move import Move
 
 
+@dataclass(slots=True)
 class Reserve(Move, ABC):
-    def __init__(self, tier_index: int):
-        self.tier_index = tier_index
+    tier_index: int
 
     def reserve_card(self, game: "Game", card: Card):
         current_player = game.current_player

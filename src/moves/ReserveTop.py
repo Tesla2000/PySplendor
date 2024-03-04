@@ -1,13 +1,16 @@
-from PySplendor.data.Card import empty_card
+from src.entities.Card import empty_card
 from typing import TYPE_CHECKING
 
+from .Move import Move
+
 if TYPE_CHECKING:
-    from PySplendor.Game import Game
-from PySplendor.processing.moves.Reserve import Reserve
+    from src.Game import Game
+from .Reserve import Reserve
 
 
 class ReserveTop(Reserve):
     def perform(self, game: "Game") -> "Game":
+        Move.perform(self, game)
         tier = game.board.tiers[self.tier_index]
         card = tier.hidden.pop()
         self.reserve_card(game, card)
