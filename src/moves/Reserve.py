@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 from .Move import Move
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, frozen=True)
 class Reserve(Move, ABC):
     tier_index: int
 

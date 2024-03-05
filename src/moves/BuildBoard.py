@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 from .Move import Move
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, frozen=True)
 class BuildBoard(Move):
     tier_index: int
     index: int

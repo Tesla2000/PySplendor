@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 from .Reserve import Reserve
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, frozen=True)
 class ReserveVisible(Reserve):
     index: int
 

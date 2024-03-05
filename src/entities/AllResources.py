@@ -4,7 +4,7 @@ from typing import Self
 from .BasicResources import BasicResources
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, frozen=True)
 class AllResources(BasicResources):
     gold: int = 0
 
@@ -19,12 +19,11 @@ class AllResources(BasicResources):
                 for key, value in self_dict.items()
             )
         )
-        resources.gold += sum(
-            min(0, getattr(resources, field.name)) for field in fields(BasicResources)
-        )
         resources = AllResources(
             *tuple(max(0, resource) for resource in astuple(resources)[:-1]),
-            resources.gold,
+            resources.gold + sum(
+                min(0, getattr(resources, field.name)) for field in fields(BasicResources)
+            ),
         )
         return resources
 

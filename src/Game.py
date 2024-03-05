@@ -3,7 +3,6 @@ from itertools import combinations, starmap, product
 from typing import Self, Type
 
 from dacite import from_dict
-from torch import Tensor
 
 from .StateExtractor import StateExtractor
 from .entities.BasicResources import BasicResources
@@ -61,17 +60,17 @@ class Game:
             not self.get_possible_actions()
         )
 
-    def get_results(self) -> dict[Player, bool]:
+    def get_results(self) -> dict[Player, int]:
         results = {}
         for player in self.players:
             if not all(self._performed_the_last_move.values()):
-                results[player] = player == max(self.players, key=lambda p: (p.points, -len(p.cards)))
+                results[player] = 1 if player == max(self.players, key=lambda p: (p.points, -len(p.cards))) else -1
             else:
                 print("Finished game")
         return results
 
-    def get_state(self) -> Tensor:
-        return Tensor([self._state_extractor.get_state(self)])
+    def get_state(self) -> tuple:
+        return self._state_extractor.get_state(self)
 
     def copy(self) -> Self:
         game = from_dict(Game, asdict(self))

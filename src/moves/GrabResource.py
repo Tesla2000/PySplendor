@@ -5,7 +5,7 @@ from src.entities.BasicResources import BasicResources
 from .Move import Move
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, frozen=True)
 class GrabResource(Move, ABC):
     resources: BasicResources
 
