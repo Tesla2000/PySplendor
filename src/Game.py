@@ -1,13 +1,14 @@
-from dataclasses import astuple, fields, asdict, dataclass, field
+from dataclasses import fields, asdict, dataclass, field
 from itertools import combinations, starmap, product
-from typing import Self, Iterable, Any
-from dacite import from_dict
+from typing import Self, Type
 
+from dacite import from_dict
+from torch import Tensor
+
+from .StateExtractor import StateExtractor
 from .entities.BasicResources import BasicResources
 from .entities.Board import Board
-from .entities.Card import empty_card
 from .entities.Player import Player
-from .entities.Tier import Tier
 from .moves import Move, GrabThreeResource, GrabTwoResource, BuildBoard, BuildReserve, ReserveVisible, ReserveTop, \
     NullMove
 
@@ -22,6 +23,7 @@ class Game:
     _turn_counter: int = 0
     _performed_the_last_move: dict = None
     _last_turn: bool = False
+    _state_extractor: Type[StateExtractor] = StateExtractor
 
     def __post_init__(self):
         if not self.board or not self.players:
@@ -68,20 +70,8 @@ class Game:
                 print("Finished game")
         return results
 
-    def get_state(self) -> tuple:
-        tiers = self.board.tiers
-        self.board.tiers = list(Tier([], tier.visible) for tier in tiers)
-        state = self._flatter_recursively(astuple(self.board))
-        self.board.tiers = tiers
-        for player in self.players:
-            state += astuple(player.resources, tuple_factory=list)
-            state += astuple(player.production, tuple_factory=list)
-            if player != self.current_player:
-                state.append(sum(card != empty_card for card in player.reserve))
-            else:
-                state += self._flatter_recursively(map(astuple, self.current_player.reserve))
-            state.append(player.points)
-        return tuple(state)
+    def get_state(self) -> Tensor:
+        return Tensor([self._state_extractor.get_state(self)])
 
     def copy(self) -> Self:
         game = from_dict(Game, asdict(self))
@@ -90,30 +80,6 @@ class Game:
 
     def get_possible_actions(self) -> list[Move]:
         return list(move for move in self.all_moves if move.is_valid(self))
-
-    def _flatter_recursively(
-        self, iterable: Iterable, output: list = None, expected_length: int = None
-    ) -> list:
-        if output is None:
-            if expected_length:
-                output = expected_length * [None]
-        if not expected_length:
-            return list(self._get_flatten_elements(iterable))
-        index = 0
-        for index, item in enumerate(self._get_flatten_elements(iterable)):
-            if expected_length is None:
-                output[index] = item
-        if index != expected_length - 1:
-            raise ValueError
-        return output
-
-    def _get_flatten_elements(self, iterable: Iterable) -> Any:
-        for element in iterable:
-            if isinstance(element, Iterable):
-                for inner_element in self._get_flatten_elements(element):
-                    yield inner_element
-            else:
-                yield element
 
     combos = combinations([{field.name: 1} for field in fields(BasicResources)], 3)
     all_moves = list(
@@ -130,4 +96,3 @@ class Game:
     all_moves += list(starmap(ReserveVisible, product(range(3), range(4))))
     all_moves += list(map(ReserveTop, range(3)))
     all_moves.append(NullMove())
-    all_moves = tuple(all_moves)

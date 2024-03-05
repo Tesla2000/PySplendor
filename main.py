@@ -1,8 +1,4 @@
-import random
-
-from src.Game import Game
+from agent.train_agent import train_agent
 
 if __name__ == '__main__':
-    game = Game()
-    while not game.is_terminal():
-        game.perform(random.choice(game.get_possible_actions()))
+    train_agent()
