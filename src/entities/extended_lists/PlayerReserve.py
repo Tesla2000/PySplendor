@@ -2,9 +2,10 @@ from itertools import filterfalse
 from typing import Iterable
 
 from ..Card import Card, empty_card
+from .hashablelist import hashablelist
 
 
-class PlayerReserve(list):
+class PlayerReserve(hashablelist):
     def __init__(self, iterable: Iterable = None):
         super().__init__(iterable or (empty_card for _ in range(3)))
 

@@ -2,9 +2,10 @@ import operator
 from functools import reduce
 
 from ..BasicResources import BasicResources
+from .hashablelist import hashablelist
 
 
-class PlayerCards(list):
+class PlayerCards(hashablelist):
     @property
     def production(self) -> BasicResources:
         return reduce(

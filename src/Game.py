@@ -4,6 +4,7 @@ from typing import Self, Type
 
 from dacite import from_dict
 
+from hashabledict import hashabledict
 from .StateExtractor import StateExtractor
 from .entities.BasicResources import BasicResources
 from .entities.Board import Board
@@ -73,8 +74,11 @@ class Game:
         return self._state_extractor.get_state(self)
 
     def copy(self) -> Self:
-        game = from_dict(Game, asdict(self))
+        dict_repr = asdict(self, dict_factory=hashabledict)
+        game = from_dict(Game, dict_repr)
         game.current_player = game.players[0]
+        for player in game.players:
+            game.is_blocked[player] = next(value for key, value in self.is_blocked.items() if key == player)
         return game
 
     def get_possible_actions(self) -> list[Move]:
