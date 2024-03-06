@@ -1,14 +1,18 @@
-import operator
-from functools import reduce
-
+from .hashablelist import hashablelist
 from ..BasicResources import BasicResources
 
 
-class PlayerCards(list):
+class PlayerCards(hashablelist):
     @property
     def production(self) -> BasicResources:
-        return reduce(
-            operator.add, (card.production for card in self), BasicResources()
+        if not self:
+            return BasicResources()
+        return BasicResources(
+            sum(card.production.red for card in self),
+            sum(card.production.green for card in self),
+            sum(card.production.blue for card in self),
+            sum(card.production.black for card in self),
+            sum(card.production.white for card in self),
         )
 
     @property

@@ -1,15 +1,28 @@
-from dataclasses import astuple, fields, asdict, dataclass, field
+from dataclasses import fields, dataclass, field
 from itertools import combinations, starmap, product
-from typing import Self, Iterable, Any
-from dacite import from_dict
+from typing import Self, Type
 
+from Config import Config
+from .StateExtractor import StateExtractor
+from .entities.AllResources import AllResources
 from .entities.BasicResources import BasicResources
 from .entities.Board import Board
-from .entities.Card import empty_card
 from .entities.Player import Player
 from .entities.Tier import Tier
-from .moves import Move, GrabThreeResource, GrabTwoResource, BuildBoard, BuildReserve, ReserveVisible, ReserveTop, \
-    NullMove
+from .entities.extended_lists.Aristocrats import Aristocrats
+from .entities.extended_lists.PlayerAristocrats import PlayerAristocrats
+from .entities.extended_lists.PlayerCards import PlayerCards
+from .entities.extended_lists.PlayerReserve import PlayerReserve
+from .moves import (
+    Move,
+    GrabThreeResource,
+    GrabTwoResource,
+    BuildBoard,
+    BuildReserve,
+    ReserveVisible,
+    ReserveTop,
+    NullMove,
+)
 
 
 @dataclass(slots=True)
@@ -22,24 +35,24 @@ class Game:
     _turn_counter: int = 0
     _performed_the_last_move: dict = None
     _last_turn: bool = False
+    _state_extractor: Type[StateExtractor] = StateExtractor
 
     def __post_init__(self):
-        if not self.board or not self.players:
+        if not self.players:
             self.players = tuple(Player() for _ in range(self.n_players))
+        if not self.board:
             self.board = Board(self.n_players)
+        if not self._performed_the_last_move:
             self._performed_the_last_move = dict(
                 (player, False) for player in self.players
             )
-            self.is_blocked = dict(
-                (player, False) for player in self.players
-            )
-            self._last_turn = False
+            self.is_blocked = dict((player, False) for player in self.players)
         self.current_player = self.players[0]
 
     def perform(self, action: Move) -> Self:
-        action.perform(self)
-        self.next_turn()
-        return self
+        new_state = action.perform(self)
+        new_state.next_turn()
+        return new_state
 
     def next_turn(self) -> None:
         self.players = (*self.players[1:], self.players[0])
@@ -48,72 +61,75 @@ class Game:
                 self.current_player.aristocrats.append(
                     self.board.aristocrats.pop(index)
                 )
-        if self.current_player.points >= 15 or self._last_turn:
+        if self.current_player.points >= Config.min_n_points_to_finish or self._last_turn:
             self._last_turn = True
         self._performed_the_last_move[self.current_player] = self._last_turn
         self.current_player = self.players[0]
-        self._turn_counter += 1
 
     def is_terminal(self) -> bool:
         return all(self._performed_the_last_move.values()) or (
             not self.get_possible_actions()
         )
 
-    def get_results(self) -> dict[Player, bool]:
+    def get_results(self) -> dict[Player, int]:
         results = {}
         for player in self.players:
-            if not all(self._performed_the_last_move.values()):
-                results[player] = player == max(self.players, key=lambda p: (p.points, -len(p.cards)))
-            else:
-                print("Finished game")
+            results[player] = (
+                1
+                if player
+                   == max(self.players, key=lambda p: (p.points, -len(p.cards)))
+                else -1
+            )
         return results
 
     def get_state(self) -> tuple:
-        tiers = self.board.tiers
-        self.board.tiers = list(Tier([], tier.visible) for tier in tiers)
-        state = self._flatter_recursively(astuple(self.board))
-        self.board.tiers = tiers
-        for player in self.players:
-            state += astuple(player.resources, tuple_factory=list)
-            state += astuple(player.production, tuple_factory=list)
-            if player != self.current_player:
-                state.append(sum(card != empty_card for card in player.reserve))
-            else:
-                state += self._flatter_recursively(map(astuple, self.current_player.reserve))
-            state.append(player.points)
-        return tuple(state)
+        return self._state_extractor.get_state(self)
 
     def copy(self) -> Self:
-        game = from_dict(Game, asdict(self))
+        game = Game(
+            players=tuple(
+                Player(
+                    resources=AllResources(
+                        (resources := player.resources).red,
+                        resources.green,
+                        resources.blue,
+                        resources.black,
+                        resources.white,
+                        resources.gold,
+                    ),
+                    cards=PlayerCards(player.cards),
+                    reserve=PlayerReserve(player.reserve),
+                    aristocrats=PlayerAristocrats(player.aristocrats),
+                )
+                for player in self.players
+            ),
+            board=Board(
+                n_players=(board := self.board).n_players,
+                tiers=list(Tier(list(tier.hidden), list(tier.visible)) for tier in board.tiers),
+                aristocrats=Aristocrats(board.aristocrats),
+                resources=AllResources(
+                    board.resources.red,
+                    board.resources.green,
+                    board.resources.blue,
+                    board.resources.black,
+                    board.resources.white,
+                    board.resources.gold,
+                ),
+            ),
+            n_players=self.n_players,
+        )
         game.current_player = game.players[0]
+        for player in game.players:
+            game.is_blocked[player] = next(
+                value for key, value in self.is_blocked.items() if key == player
+            )
+            game._performed_the_last_move[player] = next(
+                value for key, value in self._performed_the_last_move.items() if key == player
+            )
         return game
 
     def get_possible_actions(self) -> list[Move]:
         return list(move for move in self.all_moves if move.is_valid(self))
-
-    def _flatter_recursively(
-        self, iterable: Iterable, output: list = None, expected_length: int = None
-    ) -> list:
-        if output is None:
-            if expected_length:
-                output = expected_length * [None]
-        if not expected_length:
-            return list(self._get_flatten_elements(iterable))
-        index = 0
-        for index, item in enumerate(self._get_flatten_elements(iterable)):
-            if expected_length is None:
-                output[index] = item
-        if index != expected_length - 1:
-            raise ValueError
-        return output
-
-    def _get_flatten_elements(self, iterable: Iterable) -> Any:
-        for element in iterable:
-            if isinstance(element, Iterable):
-                for inner_element in self._get_flatten_elements(element):
-                    yield inner_element
-            else:
-                yield element
 
     combos = combinations([{field.name: 1} for field in fields(BasicResources)], 3)
     all_moves = list(
@@ -130,4 +146,3 @@ class Game:
     all_moves += list(starmap(ReserveVisible, product(range(3), range(4))))
     all_moves += list(map(ReserveTop, range(3)))
     all_moves.append(NullMove())
-    all_moves = tuple(all_moves)

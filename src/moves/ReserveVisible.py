@@ -10,12 +10,12 @@ if TYPE_CHECKING:
 from .Reserve import Reserve
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, frozen=True)
 class ReserveVisible(Reserve):
     index: int
 
     def perform(self, game: "Game") -> "Game":
-        Move.perform(self, game)
+        game = Move.perform(self, game)
         tier = game.board.tiers[self.tier_index]
         card = tier.pop(self.index)
         self.reserve_card(game, card)

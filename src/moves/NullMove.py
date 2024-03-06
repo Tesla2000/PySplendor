@@ -6,7 +6,8 @@ from .Move import Move
 if TYPE_CHECKING:
     from src.Game import Game
 
-@dataclass(slots=True)
+
+@dataclass(slots=True, frozen=True)
 class NullMove(Move):
     def perform(self, game: "Game") -> "Game":
         game.is_blocked[game.current_player] = True
