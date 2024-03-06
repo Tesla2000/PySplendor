@@ -17,7 +17,7 @@ class StateExtractor:
         for player in game.players:
             state += astuple(player.resources, tuple_factory=list)
             state += astuple(player.production, tuple_factory=list)
-            if player != game.current_player:
+            if player is not game.current_player:
                 state.append(sum(card != empty_card for card in player.reserve))
             else:
                 state += cls._flatter_recursively(map(astuple, game.current_player.reserve))

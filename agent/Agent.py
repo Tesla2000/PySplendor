@@ -5,7 +5,7 @@ from torch import nn, Tensor
 
 class Agent(nn.Module):
     _input_size_dictionary = {
-        2: 247
+        2: 215,
     }
 
     def __init__(self, n_players: int, hidden_sizes: tuple = (256, 128, 64, 32), n_moves: int = 46):
