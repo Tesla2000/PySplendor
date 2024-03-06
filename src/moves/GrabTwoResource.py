@@ -20,10 +20,7 @@ class GrabTwoResource(GrabResource):
         return game
 
     def is_valid(self, game: "Game") -> bool:
-        tuple_resources = astuple(self.resources)
-        if sum(astuple(game.current_player.resources)) + sum(tuple_resources) > 10:
-            return False
-        resource = next(compress(asdict(self.resources).keys(), tuple_resources))
+        resource = next(compress(asdict(self.resources).keys(), astuple(self.resources)))
         if getattr(game.board.resources, resource) < 4:
             return False
-        return not (game.board.resources - self.resources).lacks()
+        return super().is_valid(game)

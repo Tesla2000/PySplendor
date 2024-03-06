@@ -1,14 +1,17 @@
-from dataclasses import fields, asdict, dataclass, field
+from dataclasses import fields, dataclass, field
 from itertools import combinations, starmap, product
 from typing import Self, Type
 
-from dacite import from_dict
-
-from hashabledict import hashabledict
 from .StateExtractor import StateExtractor
+from .entities.AllResources import AllResources
 from .entities.BasicResources import BasicResources
 from .entities.Board import Board
 from .entities.Player import Player
+from .entities.Tier import Tier
+from .entities.extended_lists.Aristocrats import Aristocrats
+from .entities.extended_lists.PlayerAristocrats import PlayerAristocrats
+from .entities.extended_lists.PlayerCards import PlayerCards
+from .entities.extended_lists.PlayerReserve import PlayerReserve
 from .moves import (
     Move,
     GrabThreeResource,
@@ -34,14 +37,15 @@ class Game:
     _state_extractor: Type[StateExtractor] = StateExtractor
 
     def __post_init__(self):
-        if not self.board or not self.players:
+        if not self.players:
             self.players = tuple(Player() for _ in range(self.n_players))
+        if not self.board:
             self.board = Board(self.n_players)
+        if not self._performed_the_last_move:
             self._performed_the_last_move = dict(
                 (player, False) for player in self.players
             )
             self.is_blocked = dict((player, False) for player in self.players)
-            self._last_turn = False
         self.current_player = self.players[0]
 
     def perform(self, action: Move) -> Self:
@@ -60,7 +64,6 @@ class Game:
             self._last_turn = True
         self._performed_the_last_move[self.current_player] = self._last_turn
         self.current_player = self.players[0]
-        self._turn_counter += 1
 
     def is_terminal(self) -> bool:
         return all(self._performed_the_last_move.values()) or (
@@ -85,8 +88,38 @@ class Game:
         return self._state_extractor.get_state(self)
 
     def copy(self) -> Self:
-        dict_repr = asdict(self, dict_factory=hashabledict)
-        game = from_dict(Game, dict_repr)
+        game = Game(
+            players=tuple(
+                Player(
+                    resources=AllResources(
+                        (resources := player.resources).red,
+                        resources.green,
+                        resources.blue,
+                        resources.black,
+                        resources.white,
+                        resources.gold,
+                    ),
+                    cards=PlayerCards(tuple(player.cards)),
+                    reserve=PlayerReserve(tuple(player.reserve)),
+                    aristocrats=PlayerAristocrats(tuple(player.aristocrats)),
+                )
+                for player in self.players
+            ),
+            board=Board(
+                n_players=(board := self.board).n_players,
+                tiers=list(Tier(tier.hidden, tier.visible) for tier in board.tiers),
+                aristocrats=Aristocrats(board.aristocrats),
+                resources=AllResources(
+                    board.resources.red,
+                    board.resources.green,
+                    board.resources.blue,
+                    board.resources.black,
+                    board.resources.white,
+                    board.resources.gold,
+                ),
+            ),
+            n_players=self.n_players,
+        )
         game.current_player = game.players[0]
         for player in game.players:
             game.is_blocked[player] = next(

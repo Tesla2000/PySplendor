@@ -7,7 +7,6 @@ from tqdm import tqdm
 
 from Config import Config
 from src.Game import Game
-from src.entities.Player import Player
 from .Agent import Agent
 
 
@@ -39,13 +38,10 @@ def search(
     visited: set,
     P: defaultdict,
     Q: defaultdict,
-    evaluated_player: Player = None,
 ):
-    if evaluated_player is None:
-        evaluated_player = game.current_player
     state = game.get_state()
     if game.is_terminal():
-        return game.get_results()[evaluated_player]
+        return game.get_results()[game.current_player]
     if state not in visited:
         visited.add(state)
         move_scores, v = agent(Tensor([state]))
@@ -62,7 +58,7 @@ def search(
     )
 
     next_game_state = game.perform(action)
-    v = search(next_game_state, agent, c, N, visited, P, Q, evaluated_player)
+    v = search(next_game_state, agent, c, N, visited, P, Q)
 
     Q[state][action] = (N[state][action] * Q[state].get(action, 1) + v) / (
         N[state][action] + 1

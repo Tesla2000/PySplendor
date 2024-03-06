@@ -46,3 +46,6 @@ class AllResources(BasicResources):
 
     def lacks(self) -> bool:
         return self.gold < 0
+
+if __name__ == '__main__':
+    (AllResources(red=0, green=0, blue=0, black=4, white=4, gold=5) - BasicResources(red=1, green=1, blue=0, black=0, white=1))
