@@ -9,8 +9,16 @@ from .StateExtractor import StateExtractor
 from .entities.BasicResources import BasicResources
 from .entities.Board import Board
 from .entities.Player import Player
-from .moves import Move, GrabThreeResource, GrabTwoResource, BuildBoard, BuildReserve, ReserveVisible, ReserveTop, \
-    NullMove
+from .moves import (
+    Move,
+    GrabThreeResource,
+    GrabTwoResource,
+    BuildBoard,
+    BuildReserve,
+    ReserveVisible,
+    ReserveTop,
+    NullMove,
+)
 
 
 @dataclass(slots=True)
@@ -32,9 +40,7 @@ class Game:
             self._performed_the_last_move = dict(
                 (player, False) for player in self.players
             )
-            self.is_blocked = dict(
-                (player, False) for player in self.players
-            )
+            self.is_blocked = dict((player, False) for player in self.players)
             self._last_turn = False
         self.current_player = self.players[0]
 
@@ -65,7 +71,12 @@ class Game:
         results = {}
         for player in self.players:
             if not all(self._performed_the_last_move.values()):
-                results[player] = 1 if player == max(self.players, key=lambda p: (p.points, -len(p.cards))) else -1
+                results[player] = (
+                    1
+                    if player
+                    == max(self.players, key=lambda p: (p.points, -len(p.cards)))
+                    else -1
+                )
             else:
                 print("Finished game")
         return results
@@ -78,7 +89,9 @@ class Game:
         game = from_dict(Game, dict_repr)
         game.current_player = game.players[0]
         for player in game.players:
-            game.is_blocked[player] = next(value for key, value in self.is_blocked.items() if key == player)
+            game.is_blocked[player] = next(
+                value for key, value in self.is_blocked.items() if key == player
+            )
         return game
 
     def get_possible_actions(self) -> list[Move]:

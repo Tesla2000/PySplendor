@@ -21,8 +21,10 @@ class AllResources(BasicResources):
         )
         resources = AllResources(
             *tuple(max(0, resource) for resource in astuple(resources)[:-1]),
-            resources.gold + sum(
-                min(0, getattr(resources, field.name)) for field in fields(BasicResources)
+            resources.gold
+            + sum(
+                min(0, getattr(resources, field.name))
+                for field in fields(BasicResources)
             ),
         )
         return resources

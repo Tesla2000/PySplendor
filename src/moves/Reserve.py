@@ -20,5 +20,17 @@ class Reserve(Move, ABC):
         current_player = game.current_player
         current_player.reserve.append(card)
         if game.board.resources.gold:
-            game.board.resources = AllResources(**dict((field.name, getattr(game.board.resources, field.name)) for field in fields(BasicResources)), gold=game.board.resources.gold - 1)
-            current_player.resources = AllResources(**dict((field.name, getattr(game.board.resources, field.name)) for field in fields(BasicResources)), gold=game.board.resources.gold + 1)
+            game.board.resources = AllResources(
+                **dict(
+                    (field.name, getattr(game.board.resources, field.name))
+                    for field in fields(BasicResources)
+                ),
+                gold=game.board.resources.gold - 1
+            )
+            current_player.resources = AllResources(
+                **dict(
+                    (field.name, getattr(game.board.resources, field.name))
+                    for field in fields(BasicResources)
+                ),
+                gold=game.board.resources.gold + 1
+            )

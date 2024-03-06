@@ -6,7 +6,9 @@ from ..Tier import Tier
 
 
 def generate_tiers() -> list[Tier]:
-    building_data = iter(Path(__file__).parents[2].joinpath('buildings.csv').read_text().splitlines())
+    building_data = iter(
+        Path(__file__).parents[2].joinpath("buildings.csv").read_text().splitlines()
+    )
     next(building_data)
     tiers = list(
         Tier(list(map(Card.from_text, group)))

@@ -3,6 +3,7 @@ from typing import Iterable, Any, TYPE_CHECKING
 
 from .entities.Card import empty_card
 from .entities.Tier import Tier
+
 if TYPE_CHECKING:
     from .Game import Game
 
@@ -20,7 +21,9 @@ class StateExtractor:
             if player is not game.current_player:
                 state.append(sum(card != empty_card for card in player.reserve))
             else:
-                state += cls._flatter_recursively(map(astuple, game.current_player.reserve))
+                state += cls._flatter_recursively(
+                    map(astuple, game.current_player.reserve)
+                )
             state.append(player.points)
         return tuple(state)
 
