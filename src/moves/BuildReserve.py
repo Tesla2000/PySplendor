@@ -15,7 +15,7 @@ class BuildReserve(Move):
     index: int
 
     def perform(self, game: "Game") -> "Game":
-        Move.perform(self, game)
+        game = Move.perform(self, game)
         current_player = game.current_player
         if current_player.resources.lacks():
             raise ValueError()

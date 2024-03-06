@@ -1,8 +1,11 @@
 from abc import ABC
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 
 from src.entities.Card import Card
 from typing import TYPE_CHECKING
+
+from ..entities.AllResources import AllResources
+from ..entities.BasicResources import BasicResources
 
 if TYPE_CHECKING:
     from src.Game import Game
@@ -17,5 +20,5 @@ class Reserve(Move, ABC):
         current_player = game.current_player
         current_player.reserve.append(card)
         if game.board.resources.gold:
-            game.board.resources.gold -= 1
-            current_player.resources.gold += 1
+            game.board.resources = AllResources(**dict((field.name, getattr(game.board.resources, field.name)) for field in fields(BasicResources)), gold=game.board.resources.gold - 1)
+            current_player.resources = AllResources(**dict((field.name, getattr(game.board.resources, field.name)) for field in fields(BasicResources)), gold=game.board.resources.gold + 1)

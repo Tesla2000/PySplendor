@@ -39,9 +39,9 @@ class Game:
         self.current_player = self.players[0]
 
     def perform(self, action: Move) -> Self:
-        action.perform(self)
-        self.next_turn()
-        return self
+        new_state = action.perform(self)
+        new_state.next_turn()
+        return new_state
 
     def next_turn(self) -> None:
         self.players = (*self.players[1:], self.players[0])
