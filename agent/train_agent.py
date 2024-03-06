@@ -1,4 +1,5 @@
 from collections import defaultdict
+from dataclasses import astuple
 from math import sqrt
 
 import numpy as np
@@ -21,6 +22,7 @@ def train_agent():
             pi, action = policy(game, agent, 1, Config.n_simulations)
             examples_per_game.append((game, pi, 0))
             game = game.perform(action)
+            print(len(game.players[1].cards), game.players[1].points)
             if game.is_terminal():
                 for example in examples_per_game:
                     example[2] = game.get_state()

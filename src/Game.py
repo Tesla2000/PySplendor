@@ -2,6 +2,7 @@ from dataclasses import fields, dataclass, field
 from itertools import combinations, starmap, product
 from typing import Self, Type
 
+from Config import Config
 from .StateExtractor import StateExtractor
 from .entities.AllResources import AllResources
 from .entities.BasicResources import BasicResources
@@ -60,7 +61,7 @@ class Game:
                 self.current_player.aristocrats.append(
                     self.board.aristocrats.pop(index)
                 )
-        if self.current_player.points >= 15 or self._last_turn:
+        if self.current_player.points >= Config.min_n_points_to_finish or self._last_turn:
             self._last_turn = True
         self._performed_the_last_move[self.current_player] = self._last_turn
         self.current_player = self.players[0]
@@ -73,15 +74,12 @@ class Game:
     def get_results(self) -> dict[Player, int]:
         results = {}
         for player in self.players:
-            if not all(self._performed_the_last_move.values()):
-                results[player] = (
-                    1
-                    if player
-                    == max(self.players, key=lambda p: (p.points, -len(p.cards)))
-                    else -1
-                )
-            else:
-                print("Finished game")
+            results[player] = (
+                1
+                if player
+                   == max(self.players, key=lambda p: (p.points, -len(p.cards)))
+                else -1
+            )
         return results
 
     def get_state(self) -> tuple:
@@ -99,15 +97,15 @@ class Game:
                         resources.white,
                         resources.gold,
                     ),
-                    cards=PlayerCards(tuple(player.cards)),
-                    reserve=PlayerReserve(tuple(player.reserve)),
-                    aristocrats=PlayerAristocrats(tuple(player.aristocrats)),
+                    cards=PlayerCards(player.cards),
+                    reserve=PlayerReserve(player.reserve),
+                    aristocrats=PlayerAristocrats(player.aristocrats),
                 )
                 for player in self.players
             ),
             board=Board(
                 n_players=(board := self.board).n_players,
-                tiers=list(Tier(tier.hidden, tier.visible) for tier in board.tiers),
+                tiers=list(Tier(list(tier.hidden), list(tier.visible)) for tier in board.tiers),
                 aristocrats=Aristocrats(board.aristocrats),
                 resources=AllResources(
                     board.resources.red,
@@ -124,6 +122,9 @@ class Game:
         for player in game.players:
             game.is_blocked[player] = next(
                 value for key, value in self.is_blocked.items() if key == player
+            )
+            game._performed_the_last_move[player] = next(
+                value for key, value in self._performed_the_last_move.items() if key == player
             )
         return game
 

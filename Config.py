@@ -9,6 +9,7 @@ torch.random.manual_seed(42)
 
 
 class Config:
+    min_n_points_to_finish = 15
     n_simulations = 100
-    n_games = 100
+    n_games = 1
     n_players = 2
