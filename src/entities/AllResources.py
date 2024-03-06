@@ -1,4 +1,4 @@
-from dataclasses import dataclass, asdict, fields, astuple
+from dataclasses import dataclass
 from typing import Self
 
 from .BasicResources import BasicResources
@@ -11,23 +11,35 @@ class AllResources(BasicResources):
     def __sub__(self, other: BasicResources) -> Self:
         if not isinstance(other, BasicResources):
             raise ValueError(f"Other element must be resource is {other.__class__}")
-        self_dict = asdict(self)
-        other_dict = asdict(other)
-        resources = AllResources(
-            **dict(
-                (key, value - other_dict.get(key, 0))
-                for key, value in self_dict.items()
-            )
-        )
-        resources = AllResources(
-            *tuple(max(0, resource) for resource in astuple(resources)[:-1]),
-            resources.gold
+        return AllResources(
+            max(0, self.red - other.red),
+            max(0, self.green - other.green),
+            max(0, self.blue - other.blue),
+            max(0, self.black - other.black),
+            max(0, self.white - other.white),
+            self.gold
             + sum(
-                min(0, getattr(resources, field.name))
-                for field in fields(BasicResources)
+                (
+                    min(0, self.red - other.red),
+                    min(0, self.green - other.green),
+                    min(0, self.blue - other.blue),
+                    min(0, self.black - other.black),
+                    min(0, self.white - other.white),
+                )
             ),
         )
-        return resources
+
+    def __add__(self, other: Self) -> Self:
+        if not isinstance(other, BasicResources):
+            raise ValueError(f"Other element must be resource is {other.__class__}")
+        return AllResources(
+            self.red + other.red,
+            self.green + other.green,
+            self.blue + other.blue,
+            self.black + other.black,
+            self.white + other.white,
+            self.gold + getattr(other, "gold", 0),
+        )
 
     def __rsub__(self, other: BasicResources) -> Self:
         return self.__sub__(other)

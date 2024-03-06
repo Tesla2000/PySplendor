@@ -13,11 +13,10 @@ class BasicResources:
     def __add__(self, other: Self) -> Self:
         if not isinstance(other, BasicResources):
             raise ValueError(f"Other element must be resource is {other.__class__}")
-        self_dict = asdict(self)
-        other_dict = asdict(other)
-        return type(self)(
-            **dict(
-                (key, value + other_dict.get(key, 0))
-                for key, value in self_dict.items()
-            )
+        return BasicResources(
+            self.red + other.red,
+            self.green + other.green,
+            self.blue + other.blue,
+            self.black + other.black,
+            self.white + other.white,
         )

@@ -9,6 +9,6 @@ torch.random.manual_seed(42)
 
 
 class Config:
-    n_simulations = 1000
+    n_simulations = 100
     n_games = 100
     n_players = 2

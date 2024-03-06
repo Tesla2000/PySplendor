@@ -17,13 +17,9 @@ def train_agent():
     examples = []
     examples_per_game = []
     for i in range(Config.n_games):
-        N = defaultdict(lambda: defaultdict(int))
         game = Game(n_players=Config.n_players)
-        visited = set()
-        P = defaultdict(dict)
-        Q = defaultdict(dict)
         while True:
-            pi, action = policy(game, agent, 1, Config.n_simulations, N, visited, P, Q)
+            pi, action = policy(game, agent, 1, Config.n_simulations)
             examples_per_game.append((game, pi, 0))
             game = game.perform(action)
             if game.is_terminal():
@@ -31,6 +27,7 @@ def train_agent():
                     example[2] = game.get_state()
                 break
         examples += examples_per_game
+        break
     return examples
 
 
@@ -52,8 +49,10 @@ def search(
     if state not in visited:
         visited.add(state)
         move_scores, v = agent(Tensor([state]))
-        for index, move in enumerate(game.all_moves):
-            P[state][move] = move_scores[0, index]
+        tuple(
+            P[state].__setitem__(move, move_scores[0, index])
+            for index, move in enumerate(game.all_moves)
+        )
         return -v
 
     action = max(
@@ -77,11 +76,11 @@ def policy(
     agent: nn.Module,
     c: float,
     n_simulations: int,
-    N: defaultdict,
-    visited: set,
-    P: defaultdict,
-    Q: defaultdict,
 ):
+    N = defaultdict(lambda: defaultdict(int))
+    visited = set()
+    P = defaultdict(dict)
+    Q = defaultdict(dict)
     initial_state = game.get_state()
     all_moves = game.get_possible_actions()
     for _ in tqdm(range(n_simulations)):

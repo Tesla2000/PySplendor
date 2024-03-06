@@ -1,8 +1,6 @@
 from dataclasses import astuple
+from itertools import chain
 from typing import Iterable, Any, TYPE_CHECKING
-
-from .entities.Card import empty_card
-from .entities.Tier import Tier
 
 if TYPE_CHECKING:
     from .Game import Game
@@ -11,21 +9,34 @@ if TYPE_CHECKING:
 class StateExtractor:
     @classmethod
     def get_state(cls, game: "Game") -> tuple:
-        tiers = game.board.tiers
-        game.board.tiers = list(Tier([], tier.visible) for tier in tiers)
-        state = cls._flatter_recursively(astuple(game.board))
-        game.board.tiers = tiers
-        for player in game.players:
-            state += astuple(player.resources, tuple_factory=list)
-            state += astuple(player.production, tuple_factory=list)
-            if player is not game.current_player:
-                state.append(sum(card != empty_card for card in player.reserve))
-            else:
-                state += cls._flatter_recursively(
-                    map(astuple, game.current_player.reserve)
+        return tuple(
+            chain.from_iterable(
+                (
+                    chain.from_iterable(
+                        (*astuple(card.cost), *astuple(card.production), card.points)
+                        for tier in game.board.tiers
+                        for card in tier.visible
+                    ),
+                    chain.from_iterable(
+                        (*astuple(card.cost), *astuple(card.production), card.points)
+                        for card in game.current_player.reserve
+                    ),
+                    chain.from_iterable(
+                        astuple(aristocrat.cost)
+                        for aristocrat in game.board.aristocrats
+                    ),
+                    chain.from_iterable(
+                        (
+                            *astuple(player.resources),
+                            *astuple(player.production),
+                            player.points,
+                        )
+                        for player in game.players
+                    ),
+                    (len(player.reserve) for player in game.players[1:]),
                 )
-            state.append(player.points)
-        return tuple(state)
+            )
+        )
 
     @classmethod
     def _flatter_recursively(
