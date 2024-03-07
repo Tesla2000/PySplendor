@@ -80,7 +80,7 @@ class Game:
 
     def is_terminal(self) -> bool:
         return all(self._performed_the_last_move.values()) or (
-            not self.get_possible_actions()
+            not any(move for move in self.all_moves if move.is_valid(self))
         )
 
     def get_results(self) -> dict[int, int]:
