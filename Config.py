@@ -13,6 +13,8 @@ class _ConfigPaths:
     root = Path(__file__).parent
     data_path = root / 'data'
     data_path.mkdir(exist_ok=True)
+    data_path = root / 'models'
+    data_path.mkdir(exist_ok=True)
 
 
 class Config(_ConfigPaths):

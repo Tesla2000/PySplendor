@@ -6,7 +6,7 @@ from torch import nn, Tensor
 
 class Agent(nn.Module):
     _input_size_dictionary = {
-        2: 215,
+        2: 205,
     }
 
     def __init__(
