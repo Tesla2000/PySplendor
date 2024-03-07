@@ -1,5 +1,4 @@
 from collections import defaultdict
-from dataclasses import astuple
 from math import sqrt
 
 import numpy as np
@@ -24,8 +23,10 @@ def train_agent():
             game = game.perform(action)
             print(len(game.players[1].cards), game.players[1].points)
             if game.is_terminal():
+                result = game.get_results()
                 for example in examples_per_game:
-                    example[2] = game.get_state()
+                    player_id = example[0].current_player.id
+                    example[2] = result[player_id]
                 break
         examples += examples_per_game
         break
@@ -41,9 +42,9 @@ def search(
     P: defaultdict,
     Q: defaultdict,
 ):
-    state = game.get_state()
     if game.is_terminal():
-        return game.get_results()[game.current_player]
+        return game.get_results()[game.current_player.id]
+    state = game.get_state()
     if state not in visited:
         visited.add(state)
         move_scores, v = agent(Tensor([state]))

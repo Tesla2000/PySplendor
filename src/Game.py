@@ -71,10 +71,10 @@ class Game:
             not self.get_possible_actions()
         )
 
-    def get_results(self) -> dict[Player, int]:
+    def get_results(self) -> dict[int, int]:
         results = {}
         for player in self.players:
-            results[player] = (
+            results[player.id] = (
                 1
                 if player
                    == max(self.players, key=lambda p: (p.points, -len(p.cards)))
@@ -100,6 +100,7 @@ class Game:
                     cards=PlayerCards(player.cards),
                     reserve=PlayerReserve(player.reserve),
                     aristocrats=PlayerAristocrats(player.aristocrats),
+                    id=player.id,
                 )
                 for player in self.players
             ),
