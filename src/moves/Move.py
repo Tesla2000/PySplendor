@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 class Move(ABC):
     @abstractmethod
     def perform(self, game: "Game") -> "Game":
-        game = game.copy()
+        # game = game.copy()
         game.is_blocked[game.current_player] = False
         return game
 

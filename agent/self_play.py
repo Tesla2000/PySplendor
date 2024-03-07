@@ -2,6 +2,7 @@ from collections import deque
 from itertools import cycle
 
 import numpy as np
+from tqdm import tqdm
 
 from Config import Config
 from .Agent import Agent
@@ -15,7 +16,7 @@ def self_play(agents: deque[Agent]) -> tuple[list[tuple[np.array, np.array, int]
     id_to_agent = dict((player.id, agent) for agent, player in zip(agents, game.players))
     for agent in agents:
         agent.eval()
-    for agent in cycle(agents):
+    for agent in tqdm(cycle(agents)):
         pi, action = policy(game, agent, 1, Config.n_simulations)
         action_index = game.all_moves.index(action)
         onehot_encoded_action = np.zeros(Config.n_actions)

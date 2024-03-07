@@ -1,4 +1,3 @@
-from dataclasses import astuple
 from typing import TYPE_CHECKING
 
 from .GrabResource import GrabResource
@@ -13,6 +12,6 @@ class GrabThreeResource(GrabResource):
         game = Move.perform(self, game)
         game.board.resources -= self.resources
         game.current_player.resources += self.resources
-        if sum(astuple(game.current_player.resources)) > 10:
-            raise ValueError
+        # if sum(astuple(game.current_player.resources)) > 10:
+        #     raise ValueError
         return game

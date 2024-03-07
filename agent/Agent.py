@@ -1,6 +1,5 @@
 from itertools import pairwise, starmap
 
-import numpy as np
 from torch import nn, Tensor
 
 
@@ -27,17 +26,11 @@ class Agent(nn.Module):
         self.fc_v = nn.Linear(hidden_sizes[-1], 1)
         self.fc_p = nn.Linear(hidden_sizes[-1], n_moves)
         self._n_moves = n_moves
-        self.trained = False
 
     def _get_size(self, n_players: int) -> int:
         return self._input_size_dictionary[n_players]
 
     def forward(self, state: Tensor):
-        if not self.training and not self.trained:
-            return self.softmax(Tensor(np.random.random((1, self._n_moves)))), Tensor(
-                np.random.uniform(-1, 1, (1, 1))
-            )
-        self.trained = True
         for layer in self.layers:
             state = layer(state)
             state = self.relu(state)

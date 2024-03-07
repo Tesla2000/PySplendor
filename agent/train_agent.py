@@ -21,7 +21,7 @@ def train_agent(agent: Agent, train_data: deque[tuple[tuple, np.array, int]]):
         state, policy, win_probability = state.float(), policy.float(), win_probability.float()
         optimizer.zero_grad()
         output_policy, output_v = agent(state)
-        bce = binary_cross_entropy(output_v, win_probability)
+        bce = binary_cross_entropy((output_v + 1) / 2, win_probability)
         cce = categorical_cross_entropy(output_policy, policy)
         bce.backward(retain_graph=True)
         cce.backward()

@@ -21,7 +21,6 @@ def main():
         if sum(agent_scores.values()) >= Config.min_games_to_replace_agents and agent_scores[id(agents[-1])] > Config.minimal_relative_agent_improvement * sum(agent_scores.values()) / len(agents):
             torch.save(agent[-1].state_dict(), Config.model_path.joinpath(str(max(map(int, (*re.findall(r'\d+', ''.join(Config.model_path.iterdir())), -1))) + 1) + ".pth"))
             agents.append(Agent(Config.n_players).load_state_dict(deepcopy(agent[-1].state_dict())))
-            agents[-1].trained = True
             agent_scores = defaultdict(int, ((id(agent), 0) for agent in agents))
         print(agent_scores[id(agents[-1])], sum(agent_scores.values()), agent_scores[id(agents[-1])] / sum(agent_scores.values()))
         training_buffer += buffer

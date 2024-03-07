@@ -22,6 +22,8 @@ class ReserveVisible(Reserve):
         return game
 
     def is_valid(self, game: "Game") -> bool:
+        if not self._can_take_gold(game):
+            return False
         tier = game.board.tiers[self.tier_index]
         if tier.visible[self.index] == empty_card:
             return False

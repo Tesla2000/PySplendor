@@ -1,4 +1,3 @@
-from dataclasses import astuple
 from itertools import chain
 from typing import Iterable, Any, TYPE_CHECKING
 
@@ -13,22 +12,22 @@ class StateExtractor:
             chain.from_iterable(
                 (
                     chain.from_iterable(
-                        (*astuple(card.cost), *astuple(card.production), card.points)
+                        (card.cost.red, card.cost.green, card.cost.blue, card.cost.black, card.cost.white, card.production.red, card.production.green, card.production.blue, card.production.black, card.production.white, card.points)
                         for tier in game.board.tiers
                         for card in tier.visible
                     ),
                     chain.from_iterable(
-                        (*astuple(card.cost), *astuple(card.production), card.points)
+                        (card.cost.red, card.cost.green, card.cost.blue, card.cost.black, card.cost.white, card.production.red, card.production.green, card.production.blue, card.production.black, card.production.white, card.points)
                         for card in game.current_player.reserve
                     ),
                     chain.from_iterable(
-                        astuple(aristocrat.cost)
+                        tuple(iter(aristocrat.cost))
                         for aristocrat in game.board.aristocrats
                     ),
                     chain.from_iterable(
                         (
-                            *astuple(player.resources),
-                            *astuple(player.production),
+                            *tuple(iter(player.resources)),
+                            *tuple(iter(player.production)),
                             player.points,
                         )
                         for player in game.players
@@ -37,23 +36,6 @@ class StateExtractor:
                 )
             )
         )
-
-    @classmethod
-    def _flatter_recursively(
-        cls, iterable: Iterable, output: list = None, expected_length: int = None
-    ) -> list:
-        if output is None:
-            if expected_length:
-                output = expected_length * [None]
-        if not expected_length:
-            return list(cls._get_flatten_elements(iterable))
-        index = 0
-        for index, item in enumerate(cls._get_flatten_elements(iterable)):
-            if expected_length is None:
-                output[index] = item
-        if index != expected_length - 1:
-            raise ValueError
-        return output
 
     @classmethod
     def _get_flatten_elements(cls, iterable: Iterable) -> Any:

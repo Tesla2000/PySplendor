@@ -51,6 +51,18 @@ class Game:
 
     def perform(self, action: Move) -> Self:
         new_state = action.perform(self)
+        # if sum(astuple(new_state.current_player.resources)) > 10:
+        #     print(self)
+        #     print(action)
+        #     raise ValueError
+        # if sum(sum(astuple(player.resources)) for player in new_state.players) + sum(astuple(new_state.board.resources)) != 25:
+        #     print(self)
+        #     print(action)
+        #     raise ValueError
+        # if any(any(r for r in astuple(player.resources) if r < 0) for player in new_state.players) or any(r for r in astuple(new_state.board.resources) if r < 0):
+        #     print(self)
+        #     print(action)
+        #     raise ValueError
         new_state.next_turn()
         return new_state
 
@@ -129,8 +141,8 @@ class Game:
             )
         return game
 
-    def get_possible_actions(self) -> list[Move]:
-        return list(move for move in self.all_moves if move.is_valid(self))
+    def get_possible_actions(self) -> tuple[Move, ...]:
+        return tuple(move for move in self.all_moves if move.is_valid(self))
 
     combos = combinations([{field.name: 1} for field in fields(BasicResources)], 3)
     all_moves = list(
