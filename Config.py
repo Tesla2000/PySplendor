@@ -7,8 +7,10 @@ import torch
 
 class _ConfigPaths:
     root = Path(__file__).parent
-    data_path = root / 'data'
-    data_path.mkdir(exist_ok=True)
+    training_data_path = root / 'training_data'
+    training_data_path.mkdir(exist_ok=True)
+    evaluation_data_path = root / 'evaluation_data'
+    evaluation_data_path.mkdir(exist_ok=True)
     model_path = root / 'models'
     model_path.mkdir(exist_ok=True)
 
@@ -26,9 +28,9 @@ class _ConfigAgent:
 class Config(_ConfigPaths, _ConfigAgent):
     max_results_held = 100
     minimal_relative_agent_improvement = 1.1
-    min_games_to_replace_agents = 20
+    min_games_to_replace_agents = 40
     train_batch_size = 64
-    training_buffer_len = 1000
+    training_buffer_len = 100_000
     min_n_points_to_finish = 15
     n_simulations = 100
     n_games = None
