@@ -1,5 +1,5 @@
 import re
-from collections import deque, defaultdict
+from collections import deque
 from copy import deepcopy
 from itertools import count
 
@@ -17,9 +17,10 @@ def main():
     scores = deque(maxlen=Config.max_results_held)
     for _ in (count() if Config.n_games is None else range(Config.n_games)):
         buffer, winner = self_play(agents)
+        Config.data_path.joinpath(str(max((*tuple(map(int, map(str, Config.data_path.iterdir()))), -1)) + 1)).write_text(str((list(buffer[0][0]), list(buffer[0][1]), buffer[0][2])))
         scores.append(agents[-1] is winner)
         if len(scores) >= Config.min_games_to_replace_agents and sum(scores) > Config.minimal_relative_agent_improvement * len(scores) / len(agents):
-            torch.save(agents[-1].state_dict(), Config.model_path.joinpath(str(max(map(int, (*re.findall(r'\d+', ''.join(Config.model_path.iterdir())), -1))) + 1) + ".pth"))
+            torch.save(agents[-1].state_dict(), Config.model_path.joinpath(str(max(map(int, (*re.findall(r'\d+', ''.join(map(str, Config.model_path.iterdir()))), -1))) + 1) + ".pth"))
             agents.append(Agent(Config.n_players).load_state_dict(deepcopy(agents[-1].state_dict())))
             agents[-1].training = True
             scores = deque(maxlen=Config.max_results_held)

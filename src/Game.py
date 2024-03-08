@@ -130,6 +130,7 @@ class Game:
                 ),
             ),
             n_players=self.n_players,
+            _last_turn=self._last_turn,
         )
         game.current_player = game.players[0]
         for player in game.players:

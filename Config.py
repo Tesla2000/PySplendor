@@ -19,6 +19,7 @@ class _ConfigPaths:
 
 class Config(_ConfigPaths):
     # hidden_sizes = (256, 128, 64, 32)
+    c = .1
     hidden_sizes = (256,)
     # hidden_sizes = tuple()
     learning_rate = 1e-3

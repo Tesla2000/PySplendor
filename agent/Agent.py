@@ -23,7 +23,7 @@ class Agent(nn.Module):
         first_size = self._get_size(n_players)
         sizes = first_size, *hidden_sizes
         self.layers = nn.ModuleList(starmap(nn.Linear, pairwise(sizes)))
-        self.trained = False
+        self.trained = True
         self.fc_v = nn.Linear(sizes[-1], 1)
         self.fc_p = nn.Linear(sizes[-1], n_moves)
         self._n_moves = n_moves
