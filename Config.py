@@ -30,7 +30,7 @@ class Config(_ConfigPaths, _ConfigAgent):
     train_batch_size = 64
     training_buffer_len = 1000
     min_n_points_to_finish = 15
-    n_simulations = 250
+    n_simulations = 100
     n_games = None
     n_players = 2
     n_actions = 46
