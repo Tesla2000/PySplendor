@@ -1,4 +1,4 @@
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from typing import Self
 
 
@@ -20,3 +20,6 @@ class BasicResources:
             self.black + other.black,
             self.white + other.white,
         )
+
+    def __iter__(self):
+        return (self.red, self.green, self.blue, self.black, self.white).__iter__()

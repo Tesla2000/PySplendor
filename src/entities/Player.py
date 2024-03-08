@@ -1,3 +1,4 @@
+import random
 from dataclasses import dataclass, field
 
 from .AllResources import AllResources
@@ -17,6 +18,7 @@ class Player:
     aristocrats: PlayerAristocrats[Aristocrat] = field(
         default_factory=PlayerAristocrats
     )
+    id: int = field(default_factory=lambda: random.randint(0, 10**12))
 
     def __post_init__(self):
         if isinstance(self.resources, dict):

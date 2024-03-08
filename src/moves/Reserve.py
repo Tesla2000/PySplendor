@@ -34,3 +34,6 @@ class Reserve(Move, ABC):
                 current_player.resources.white,
                 current_player.resources.gold + 1
             )
+
+    def _can_take_gold(self, game: "Game"):
+        return sum(iter(game.current_player.resources)) < 10

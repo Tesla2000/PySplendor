@@ -1,5 +1,5 @@
 from abc import ABC
-from dataclasses import dataclass, astuple
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from src.entities.BasicResources import BasicResources
@@ -19,7 +19,7 @@ class GrabResource(Move, ABC):
 
     def is_valid(self, game: "Game") -> bool:
         if (
-            sum(astuple(game.current_player.resources)) + sum(astuple(self.resources))
+            sum(iter(game.current_player.resources)) + sum(iter(self.resources))
             > 10
         ):
             return False
