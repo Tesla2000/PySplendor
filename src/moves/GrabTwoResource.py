@@ -20,7 +20,7 @@ class GrabTwoResource(GrabResource):
         return game
 
     def is_valid(self, game: "Game") -> bool:
-        resource = next(compress(asdict(self.resources).keys(), iter(self.resources)))
+        resource = next(compress(('red', 'green', 'blue', 'black', 'white'), iter(self.resources)))
         if getattr(game.board.resources, resource) < 4:
             return False
         return super().is_valid(game)

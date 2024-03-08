@@ -13,7 +13,7 @@ def train_agent(agent: Agent, train_data: deque[tuple[tuple, np.array, int]]):
     agent.train()
     categorical_cross_entropy = nn.CrossEntropyLoss()
     binary_cross_entropy = nn.BCELoss()
-    optimizer = optim.Adam(agent.parameters())
+    optimizer = optim.Adam(agent.parameters(), lr=Config.learning_rate)
     dataset = RLDataset(train_data)
     loader = DataLoader(dataset, batch_size=Config.train_batch_size)
     for batch in loader:
