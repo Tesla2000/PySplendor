@@ -12,4 +12,4 @@ class RLDataset(Dataset):
         return len(self.examples)
 
     def __getitem__(self, index) -> tuple[np.array, ...]:
-        return np.array(self.examples[index][0]), self.examples[index][1], np.array([self.examples[index][2]])
+        return np.array(self.examples[index][0]), np.array(self.examples[index][1]), np.array([self.examples[index][2]])
