@@ -17,7 +17,8 @@ def self_play(agents: deque[Agent]) -> tuple[list[tuple[np.array, np.array, int]
     for agent in agents:
         agent.eval()
     for _ in tqdm(count()):
-        pi, action = policy(game, id_to_agent, Config.c, Config.n_simulations)
+        agent = id_to_agent[game.current_player.id]
+        pi, action = policy(game, agent, Config.c, Config.n_simulations)
         action_index = game.all_moves.index(action)
         onehot_encoded_action = np.zeros(Config.n_actions)
         onehot_encoded_action[action_index] = 1

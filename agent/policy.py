@@ -9,7 +9,7 @@ from src.Game import Game
 
 def policy(
     game: Game,
-    agents: dict[int, nn.Module],
+    agent: nn.Module,
     c: float,
     n_simulations: int,
 ):
@@ -20,6 +20,6 @@ def policy(
     initial_state = game.get_state()
     all_moves = game.get_possible_actions()
     for _ in range(n_simulations):
-        search(game.copy(), agents, c, N, visited, P, Q)
+        search(game.copy(), agent, c, N, visited, P, Q)
     pi = [N[initial_state][a] for a in all_moves]
     return pi, all_moves[np.argmax(pi)]

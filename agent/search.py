@@ -8,7 +8,7 @@ from src.Game import Game
 
 def search(
     game: Game,
-    agents: dict[int, nn.Module],
+    agent: nn.Module,
     c: float,
     N: defaultdict,
     visited: set,
@@ -16,9 +16,8 @@ def search(
     Q: defaultdict,
 ):
     if game.is_terminal():
-        return game.get_results()[game.current_player.id]
+        return -game.get_results()[game.current_player.id]
     state = game.get_state()
-    agent = agents[game.current_player.id]
     if state not in visited:
         visited.add(state)
         move_scores, v = agent(Tensor([state]))
@@ -35,7 +34,7 @@ def search(
     )
 
     next_game_state = game.perform(action)
-    v = search(next_game_state, agents, c, N, visited, P, Q)
+    v = search(next_game_state, agent, c, N, visited, P, Q)
 
     Q[state][action] = (N[state][action] * Q[state].get(action, 1) + v) / (
         N[state][action] + 1
