@@ -18,15 +18,15 @@ class GrabResource(Move, ABC):
         return self.resources.__repr__()
 
     def is_valid(self, game: "Game") -> bool:
-        if (
-            sum(iter(game.current_player.resources)) + sum(iter(self.resources))
-            > 10
-        ):
+        if sum(iter(game.current_player.resources)) + sum(iter(self.resources)) > 10:
             return False
-        return not (AllResources(
-            game.board.resources.red,
-            game.board.resources.green,
-            game.board.resources.blue,
-            game.board.resources.black,
-            game.board.resources.white,
-        ) - self.resources).lacks()
+        return not (
+            AllResources(
+                game.board.resources.red,
+                game.board.resources.green,
+                game.board.resources.blue,
+                game.board.resources.black,
+                game.board.resources.white,
+            )
+            - self.resources
+        ).lacks()

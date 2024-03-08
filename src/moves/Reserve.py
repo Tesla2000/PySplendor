@@ -24,7 +24,7 @@ class Reserve(Move, ABC):
                 game.board.resources.blue,
                 game.board.resources.black,
                 game.board.resources.white,
-                game.board.resources.gold - 1
+                game.board.resources.gold - 1,
             )
             current_player.resources = AllResources(
                 current_player.resources.red,
@@ -32,7 +32,7 @@ class Reserve(Move, ABC):
                 current_player.resources.blue,
                 current_player.resources.black,
                 current_player.resources.white,
-                current_player.resources.gold + 1
+                current_player.resources.gold + 1,
             )
 
     def _can_take_gold(self, game: "Game"):

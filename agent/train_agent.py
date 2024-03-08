@@ -18,7 +18,11 @@ def train_agent(agent: Agent, train_data: deque[tuple[tuple, np.array, int]]):
     loader = DataLoader(dataset, batch_size=Config.train_batch_size)
     for batch in loader:
         state, policy, win_probability = batch
-        state, policy, win_probability = state.float(), policy.float(), win_probability.float()
+        state, policy, win_probability = (
+            state.float(),
+            policy.float(),
+            win_probability.float(),
+        )
         optimizer.zero_grad()
         output_policy, output_v = agent(state)
         bce = mse(output_v, win_probability)

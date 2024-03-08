@@ -7,11 +7,11 @@ import torch
 
 class _ConfigPaths:
     root = Path(__file__).parent
-    training_data_path = root / 'training_data'
+    training_data_path = root / "training_data"
     training_data_path.mkdir(exist_ok=True)
-    evaluation_data_path = root / 'evaluation_data'
+    evaluation_data_path = root / "evaluation_data"
     evaluation_data_path.mkdir(exist_ok=True)
-    model_path = root / 'models'
+    model_path = root / "models"
     model_path.mkdir(exist_ok=True)
 
 
@@ -19,10 +19,10 @@ class _ConfigAgent:
     # hidden_sizes = (256, 128, 64, 32)
     hidden_sizes = (256,)
     # hidden_sizes = tuple()
-    c = .1
-    learning_rate = 1e-3
-    debug = False
-    pretrain = True
+    c = 0.1
+    learning_rate = 1e-4
+    debug = True
+    pretrain = False
 
 
 class Config(_ConfigPaths, _ConfigAgent):
@@ -35,10 +35,11 @@ class Config(_ConfigPaths, _ConfigAgent):
     n_simulations = 100
     n_games = None
     n_players = 2
-    n_actions = 46
+    n_actions = 45
+    eval_rate = 0.2
 
 
 if Config.debug:
-    random.seed(42)
-    np.random.seed(42)
-    torch.random.manual_seed(42)
+    random.seed(69)
+    np.random.seed(69)
+    torch.random.manual_seed(69)
