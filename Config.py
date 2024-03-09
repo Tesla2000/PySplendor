@@ -21,8 +21,8 @@ class _ConfigAgent:
     # hidden_sizes = tuple()
     c = 0.1
     learning_rate = 1e-4
-    debug = True
-    pretrain = False
+    debug = False
+    pretrain = True
 
 
 class Config(_ConfigPaths, _ConfigAgent):
@@ -40,6 +40,6 @@ class Config(_ConfigPaths, _ConfigAgent):
 
 
 if Config.debug:
-    random.seed(69)
-    np.random.seed(69)
-    torch.random.manual_seed(69)
+    random.seed(42)
+    np.random.seed(42)
+    torch.random.manual_seed(42)

@@ -36,7 +36,7 @@ class Game:
     _performed_the_last_move: dict = None
     _last_turn: bool = False
     _state_extractor: Type[StateExtractor] = StateExtractor
-    _null_move: NullMove = NullMove()
+    null_move: NullMove = NullMove()
 
     def __post_init__(self):
         if not self.players:
@@ -84,7 +84,8 @@ class Game:
 
     def is_terminal(self) -> bool:
         return all(self._performed_the_last_move.values()) or (
-            not any(move for move in self.all_moves if move.is_valid(self))
+            not self.null_move.is_valid(self)
+            or not any(move for move in self.all_moves if move.is_valid(self))
         )
 
     def get_results(self) -> dict[int, int]:
@@ -150,7 +151,9 @@ class Game:
         return game
 
     def get_possible_actions(self) -> tuple[Move, ...]:
-        return tuple(move for move in self.all_moves if move.is_valid(self)) or ((self._null_move,) if self._null_move.is_valid(self) else tuple())
+        return tuple(move for move in self.all_moves if move.is_valid(self)) or (
+            (self.null_move,) if self.null_move.is_valid(self) else tuple()
+        )
 
     combos = combinations([{field.name: 1} for field in fields(BasicResources)], 3)
     all_moves = list(
