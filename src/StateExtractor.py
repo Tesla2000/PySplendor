@@ -12,12 +12,36 @@ class StateExtractor:
             chain.from_iterable(
                 (
                     chain.from_iterable(
-                        (card.cost.red, card.cost.green, card.cost.blue, card.cost.black, card.cost.white, card.production.red, card.production.green, card.production.blue, card.production.black, card.production.white, card.points)
+                        (
+                            card.cost.red,
+                            card.cost.green,
+                            card.cost.blue,
+                            card.cost.black,
+                            card.cost.white,
+                            card.production.red,
+                            card.production.green,
+                            card.production.blue,
+                            card.production.black,
+                            card.production.white,
+                            card.points,
+                        )
                         for tier in game.board.tiers
                         for card in tier.visible
                     ),
                     chain.from_iterable(
-                        (card.cost.red, card.cost.green, card.cost.blue, card.cost.black, card.cost.white, card.production.red, card.production.green, card.production.blue, card.production.black, card.production.white, card.points)
+                        (
+                            card.cost.red,
+                            card.cost.green,
+                            card.cost.blue,
+                            card.cost.black,
+                            card.cost.white,
+                            card.production.red,
+                            card.production.green,
+                            card.production.blue,
+                            card.production.black,
+                            card.production.white,
+                            card.points,
+                        )
                         for card in game.current_player.reserve
                     ),
                     chain.from_iterable(

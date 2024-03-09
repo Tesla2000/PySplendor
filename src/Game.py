@@ -36,6 +36,7 @@ class Game:
     _performed_the_last_move: dict = None
     _last_turn: bool = False
     _state_extractor: Type[StateExtractor] = StateExtractor
+    null_move: NullMove = NullMove()
 
     def __post_init__(self):
         if not self.players:
@@ -73,14 +74,18 @@ class Game:
                 self.current_player.aristocrats.append(
                     self.board.aristocrats.pop(index)
                 )
-        if self.current_player.points >= Config.min_n_points_to_finish or self._last_turn:
+        if (
+            self.current_player.points >= Config.min_n_points_to_finish
+            or self._last_turn
+        ):
             self._last_turn = True
         self._performed_the_last_move[self.current_player] = self._last_turn
         self.current_player = self.players[0]
 
     def is_terminal(self) -> bool:
         return all(self._performed_the_last_move.values()) or (
-            not any(move for move in self.all_moves if move.is_valid(self))
+            not self.null_move.is_valid(self)
+            or not any(move for move in self.all_moves if move.is_valid(self))
         )
 
     def get_results(self) -> dict[int, int]:
@@ -88,8 +93,7 @@ class Game:
         for player in self.players:
             results[player.id] = (
                 1
-                if player
-                   == max(self.players, key=lambda p: (p.points, -len(p.cards)))
+                if player == max(self.players, key=lambda p: (p.points, -len(p.cards)))
                 else -1
             )
         return results
@@ -118,7 +122,9 @@ class Game:
             ),
             board=Board(
                 n_players=(board := self.board).n_players,
-                tiers=list(Tier(list(tier.hidden), list(tier.visible)) for tier in board.tiers),
+                tiers=list(
+                    Tier(list(tier.hidden), list(tier.visible)) for tier in board.tiers
+                ),
                 aristocrats=Aristocrats(board.aristocrats),
                 resources=AllResources(
                     board.resources.red,
@@ -138,12 +144,16 @@ class Game:
                 value for key, value in self.is_blocked.items() if key == player
             )
             game._performed_the_last_move[player] = next(
-                value for key, value in self._performed_the_last_move.items() if key == player
+                value
+                for key, value in self._performed_the_last_move.items()
+                if key == player
             )
         return game
 
     def get_possible_actions(self) -> tuple[Move, ...]:
-        return tuple(move for move in self.all_moves if move.is_valid(self))
+        return tuple(move for move in self.all_moves if move.is_valid(self)) or (
+            (self.null_move,) if self.null_move.is_valid(self) else tuple()
+        )
 
     combos = combinations([{field.name: 1} for field in fields(BasicResources)], 3)
     all_moves = list(
@@ -159,4 +169,3 @@ class Game:
     all_moves += list(map(BuildReserve, range(3)))
     all_moves += list(starmap(ReserveVisible, product(range(3), range(4))))
     all_moves += list(map(ReserveTop, range(3)))
-    all_moves.append(NullMove())

@@ -15,7 +15,7 @@ class Agent(nn.Module):
         self,
         n_players: int,
         hidden_sizes: tuple = Config.hidden_sizes,
-        n_moves: int = 46,
+        n_moves: int = Config.n_actions,
     ):
         super().__init__()
         self.tanh = nn.Tanh()

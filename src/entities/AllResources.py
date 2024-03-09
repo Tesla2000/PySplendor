@@ -48,9 +48,18 @@ class AllResources(BasicResources):
         return self.gold < 0
 
     def __iter__(self):
-        return (self.red, self.green, self.blue, self.black, self.white, self.gold).__iter__()
+        return (
+            self.red,
+            self.green,
+            self.blue,
+            self.black,
+            self.white,
+            self.gold,
+        ).__iter__()
 
 
-if __name__ == '__main__':
-    (AllResources(red=0, green=0, blue=0, black=4, white=4, gold=5) - BasicResources(red=1, green=1, blue=0, black=0,
-                                                                                     white=1))
+if __name__ == "__main__":
+    (
+        AllResources(red=0, green=0, blue=0, black=4, white=4, gold=5)
+        - BasicResources(red=1, green=1, blue=0, black=0, white=1)
+    )

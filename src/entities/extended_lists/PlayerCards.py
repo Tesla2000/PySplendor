@@ -1,8 +1,7 @@
-from .hashablelist import hashablelist
 from ..BasicResources import BasicResources
 
 
-class PlayerCards(hashablelist):
+class PlayerCards(list):
     @property
     def production(self) -> BasicResources:
         if not self:
