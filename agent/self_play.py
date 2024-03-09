@@ -20,7 +20,8 @@ def self_play(
     for agent in agents:
         agent.eval()
     id_to_agent = dict(
-        (player.id, agent) for agent, player in zip(random.sample(agents, Config.n_players), game.players)
+        (player.id, agent)
+        for agent, player in zip(random.sample(agents, Config.n_players), game.players)
     )
     results, winner = _perform_game(game, [], id_to_agent)
     states += results
@@ -48,7 +49,8 @@ def _perform_game(
                         np.eye(Config.n_actions)[game.all_moves.index(state[1])],
                         int(result[state[0].current_player.id] == 1),
                     )
-                    for state in states if state[1] != game.null_move
+                    for state in states
+                    if state[1] != game.null_move
                 ),
                 id_to_agent[
                     next(player.id for player in game.players if result[player.id])

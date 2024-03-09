@@ -16,20 +16,26 @@ class _ConfigPaths:
 
 
 class _ConfigAgent:
-    # hidden_sizes = (256, 128, 64, 32)
-    hidden_sizes = (256,)
-    # hidden_sizes = tuple()
-    c = 0.1
-    learning_rate = 1e-4
+    # hidden_sizes = (
+    #     256,
+    #     128,
+    #     64,
+    #     32,
+    # )
+    # hidden_sizes = (256,)
+    hidden_sizes = tuple()
+    c = 0.2
+    learning_rate = 1e-5
     debug = False
     pretrain = True
 
 
 class Config(_ConfigPaths, _ConfigAgent):
+    train = False
     max_results_held = 100
     minimal_relative_agent_improvement = 1.1
     min_games_to_replace_agents = 40
-    train_batch_size = 64
+    train_batch_size = 128
     training_buffer_len = 100_000
     min_n_points_to_finish = 15
     n_simulations = 100

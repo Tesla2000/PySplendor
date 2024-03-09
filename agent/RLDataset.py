@@ -1,11 +1,11 @@
-from collections import deque
+from typing import Sequence
 
 import numpy as np
 from torch.utils.data import Dataset
 
 
 class RLDataset(Dataset):
-    def __init__(self, examples: deque[tuple[tuple, np.array, int]]):
+    def __init__(self, examples: Sequence[tuple[tuple, np.array, int]]):
         self.examples = examples
 
     def __len__(self):

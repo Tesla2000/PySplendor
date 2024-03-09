@@ -1,7 +1,9 @@
+import operator
 import random
 import re
 from collections import deque
 from copy import deepcopy
+from functools import reduce
 from itertools import count
 
 import torch
@@ -11,10 +13,10 @@ from agent.Agent import Agent
 from agent.pretrain import pretrain
 from agent.save import save_temp_buffer
 from agent.self_play import self_play
-from agent.train_agent import train_agent
+from agent.train_agent import train_agent, eval_agent
 
 
-def main():
+def train_loop():
     training_buffer = deque(maxlen=Config.training_buffer_len)
     agents = deque(
         (Agent(Config.n_players) for _ in range(Config.n_players)),
@@ -72,6 +74,33 @@ def main():
         if to_train:
             training_buffer += buffer
             train_agent(agents[-1], training_buffer)
+
+
+def evaluation():
+    agent = Agent(Config.n_players)
+    train_set = reduce(
+        operator.add,
+        (eval(path.read_text()) for path in Config.training_data_path.iterdir()),
+    )
+    eval_set = reduce(
+        operator.add,
+        (eval(path.read_text()) for path in Config.evaluation_data_path.iterdir()),
+    )
+    prev_bce, prev_cce = float("inf"), float("inf")
+    while True:
+        train_agent(agent, train_set)
+        bce, cce = eval_agent(agent, eval_set)
+        if bce >= prev_bce and cce >= prev_bce:
+            break
+        prev_bce = bce
+        prev_cce = cce
+
+
+def main():
+    if Config.train:
+        train_loop()
+    else:
+        evaluation()
 
 
 if __name__ == "__main__":
