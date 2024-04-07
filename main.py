@@ -92,8 +92,27 @@ def evaluation():
         bce, cce = eval_agent(agent, eval_set)
         if bce >= prev_bce and cce >= prev_bce:
             break
-        prev_bce = bce
-        prev_cce = cce
+        prev_bce = min(prev_bce, bce)
+        prev_cce = min(prev_cce, cce)
+
+
+# def evaluation():
+#     v_agent = LogisticRegression()
+#     p_agent = LogisticRegression()
+#     train_set = reduce(
+#         operator.add,
+#         (eval(path.read_text()) for path in Config.training_data_path.iterdir()),
+#     )
+#     eval_set = reduce(
+#         operator.add,
+#         (eval(path.read_text()) for path in Config.evaluation_data_path.iterdir()),
+#     )
+#     v_agent.fit(tuple(sample[0] for sample in train_set), tuple(sample[2] for sample in train_set))
+#     p_agent.fit(tuple(sample[0] for sample in train_set), np.argmax(np.array(tuple(sample[1] for sample in train_set)), axis=1))
+#     print(
+#         v_agent.score(tuple(sample[0] for sample in eval_set), tuple(sample[2] for sample in eval_set)),
+#         p_agent.score(tuple(sample[0] for sample in eval_set), np.argmax(np.array(tuple(sample[1] for sample in eval_set)), axis=1)),
+#     )
 
 
 def main():

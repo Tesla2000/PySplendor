@@ -35,10 +35,7 @@ def _perform_game(
     for turn in tqdm(count()):
         agent = id_to_agent[game.current_player.id]
         pi, action = policy(game, agent, Config.c, Config.n_simulations)
-        action_index = game.all_moves.index(action)
-        onehot_encoded_action = np.zeros(Config.n_actions)
-        onehot_encoded_action[action_index] = 1
-        states.append((game, action, 0))
+        states.append((game, pi / pi.sum(), 0))
         game = game.perform(action)
         if game.is_terminal():
             result = game.get_results()
@@ -46,7 +43,7 @@ def _perform_game(
                 list(
                     (
                         state[0].get_state(),
-                        np.eye(Config.n_actions)[game.all_moves.index(state[1])],
+                        state[1],
                         int(result[state[0].current_player.id] == 1),
                     )
                     for state in states

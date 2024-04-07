@@ -21,5 +21,5 @@ def policy(
     all_moves = game.get_possible_actions()
     for _ in range(n_simulations):
         search(game.copy(), agent, c, N, visited, P, Q)
-    pi = [N[initial_state][a] for a in all_moves]
+    pi = np.array([N[initial_state][a] for a in all_moves])
     return pi, all_moves[np.argmax(pi)]
