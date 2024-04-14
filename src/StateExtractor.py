@@ -48,6 +48,7 @@ class StateExtractor:
                         tuple(iter(aristocrat.cost))
                         for aristocrat in game.board.aristocrats
                     ),
+                    iter(game.board.resources),
                     chain.from_iterable(
                         (
                             *tuple(iter(player.resources)),

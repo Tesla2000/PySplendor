@@ -27,7 +27,8 @@ class _ConfigAgent:
     c = 0.2
     learning_rate = 1e-5
     debug = False
-    pretrain = True
+    # pretrain = True
+    pretrain = False
 
 
 class Config(_ConfigPaths, _ConfigAgent):

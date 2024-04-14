@@ -13,10 +13,10 @@ def policy(
     c: float,
     n_simulations: int,
 ):
-    N = defaultdict(lambda: defaultdict(int))
+    N = defaultdict(list)
     visited = set()
-    P = defaultdict(dict)
-    Q = defaultdict(dict)
+    P = defaultdict(list)
+    Q = defaultdict(list)
     initial_state = game.get_state()
     all_moves = game.get_possible_actions()
     for _ in range(n_simulations):

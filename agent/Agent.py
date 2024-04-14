@@ -8,7 +8,7 @@ from Config import Config
 
 class Agent(nn.Module):
     _input_size_dictionary = {
-        2: 205,
+        2: 211,
     }
 
     def __init__(
