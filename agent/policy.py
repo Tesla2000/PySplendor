@@ -18,7 +18,7 @@ def policy(
     P = defaultdict(dict)
     Q = defaultdict(dict)
     initial_state = game.get_state()
-    all_moves = game.get_possible_actions()
+    all_moves = game.all_moves
     for _ in range(n_simulations):
         search(game.copy(), agent, c, N, visited, P, Q)
     pi = np.array([N[initial_state][a] for a in all_moves])

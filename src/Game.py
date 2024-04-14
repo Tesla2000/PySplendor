@@ -155,6 +155,11 @@ class Game:
             (self.null_move,) if self.null_move.is_valid(self) else tuple()
         )
 
+    def get_possible_action_indexes(self) -> tuple[int, ...]:
+        return tuple(index for index, move in enumerate(self.all_moves) if move.is_valid(self)) or (
+            (self.null_move,) if self.null_move.is_valid(self) else tuple()
+        )
+
     combos = combinations([{field.name: 1} for field in fields(BasicResources)], 3)
     all_moves = list(
         GrabThreeResource(BasicResources(**res_1, **res_2, **res_3))

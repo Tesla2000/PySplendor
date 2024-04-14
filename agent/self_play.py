@@ -32,7 +32,7 @@ def self_play(
 def _perform_game(
     game: Game, states: list, id_to_agent: dict[int, Agent]
 ) -> tuple[list[tuple[np.array, np.array, int]], Agent]:
-    for turn in tqdm(count()):
+    for _ in tqdm(count()):
         agent = id_to_agent[game.current_player.id]
         pi, action = policy(game, agent, Config.c, Config.n_simulations)
         states.append((game, pi / pi.sum(), 0))
@@ -47,7 +47,6 @@ def _perform_game(
                         int(result[state[0].current_player.id] == 1),
                     )
                     for state in states
-                    if state[1] != game.null_move
                 ),
                 id_to_agent[
                     next(player.id for player in game.players if result[player.id])
