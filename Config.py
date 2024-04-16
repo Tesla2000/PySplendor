@@ -28,6 +28,8 @@ class _ConfigAgent:
 
 
 class Config(_ConfigPaths, _ConfigAgent):
+    dirichlet_alpha = .3
+    dirichlet_epsilon = .25
     test_size = .2
     db_name = "splendor"
     train = True

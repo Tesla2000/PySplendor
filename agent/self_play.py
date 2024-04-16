@@ -3,12 +3,13 @@ from collections import deque
 from itertools import count
 
 import numpy as np
+from numpy import argmax
 from tqdm import tqdm
 
 from Config import Config
 from src.Game import Game
 from .Agent import Agent
-from .policy import policy
+from .MCTS import MCTS
 
 
 def self_play(
@@ -20,7 +21,7 @@ def self_play(
     for agent in agents:
         agent.eval()
     id_to_agent = dict(
-        (player.id, agent)
+        (player.id, MCTS(game, agent))
         for agent, player in zip(random.sample(agents, Config.n_players), game.players)
     )
     results, winner = _perform_game(game, [], id_to_agent)
@@ -30,12 +31,13 @@ def self_play(
 
 
 def _perform_game(
-    game: Game, states: list, id_to_agent: dict[int, Agent]
-) -> tuple[list[tuple[np.array, np.array, int]], Agent]:
+    game: Game, states: list, id_to_mcts: dict[int, MCTS]
+) -> tuple[list[tuple[np.array, np.array, int]], MCTS]:
     for _ in tqdm(count()):
-        agent = id_to_agent[game.current_player.id]
-        pi, action = policy(game, agent, Config.c, Config.n_simulations)
-        states.append((game, pi / pi.sum(), 0))
+        mcts = id_to_mcts[game.current_player.id]
+        mcts_probs = mcts.search(game.get_state())
+        states.append((game, mcts_probs, 0))
+        action = game.all_moves[argmax(mcts_probs)]
         game = game.perform(action)
         if game.is_terminal():
             result = game.get_results()
@@ -48,7 +50,7 @@ def _perform_game(
                     )
                     for state in states
                 ),
-                id_to_agent[
+                id_to_mcts[
                     next(player.id for player in game.players if result[player.id])
                 ],
             )

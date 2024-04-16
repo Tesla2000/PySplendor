@@ -174,3 +174,9 @@ class Game:
     all_moves += list(map(BuildReserve, range(3)))
     all_moves += list(starmap(ReserveVisible, product(range(3), range(4))))
     all_moves += list(map(ReserveTop, range(3)))
+    action_size = len(all_moves)
+    def get_value_and_terminated(self, action_taken: Move):
+        game = action_taken.perform(self)
+        if game.is_terminal():
+            return 1, True
+        return 0, False
