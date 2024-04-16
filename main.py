@@ -1,5 +1,4 @@
 import operator
-import random
 import re
 from collections import deque
 from copy import deepcopy
@@ -11,7 +10,7 @@ import torch
 from Config import Config
 from agent.Agent import Agent
 from agent.pretrain import pretrain
-from agent.save import save_temp_buffer
+from agent.save_train_buffer import save_train_buffer
 from agent.self_play import self_play
 from agent.train_agent import train_agent, eval_agent
 
@@ -27,8 +26,7 @@ def train_loop():
     scores = deque(maxlen=Config.max_results_held)
     for _ in count() if Config.n_games is None else range(Config.n_games):
         buffer, winners = self_play(agents)
-        to_train = random.random() > Config.eval_rate
-        save_temp_buffer(buffer, to_train)
+        save_train_buffer(buffer)
         for winner in winners:
             scores.append(agents[-1] is winner)
         if (
@@ -71,9 +69,8 @@ def train_loop():
             print(f"{len(scores)} {sum(scores) / len(scores):.2f}")
         else:
             print(f"{len(scores)} {sum(scores)}/{len(scores)}")
-        if to_train:
-            training_buffer += buffer
-            train_agent(agents[-1], training_buffer)
+        training_buffer += buffer
+        train_agent(agents[-1], training_buffer)
 
 
 def evaluation():

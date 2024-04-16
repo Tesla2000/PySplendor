@@ -2,15 +2,24 @@ from typing import Sequence
 
 import numpy as np
 from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
+from sqlalchemy import func, select
 from torch import nn, optim
 from torch.utils.data import DataLoader
 
 from Config import Config
+from db.Game import Game
+from db.Sample import Sample
+from db.session import session
 from .Agent import Agent
 from .RLDataset import RLDataset
 
 
-def train_agent(agent: Agent, train_data: Sequence[tuple[tuple, np.array, int]]):
+def train_agent(agent: Agent):
+    session.execute(select(Sample)).fetchall()
+    n_games = session.query(func.max(Game.id)).scalar()
+    train_indexes, test_indexes = train_test_split(range(n_games), test_size=Config.test_size)
+    RLDataset(test_indexes)
     agent.train()
     optimizer = optim.Adam(agent.parameters(), lr=Config.learning_rate)
     _loop(agent, train_data, optimizer)

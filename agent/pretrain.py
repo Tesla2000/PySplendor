@@ -18,23 +18,19 @@ def pretrain(agents: deque[Agent]):
             reverse=True,
         ),
     ):
-        agent.load_state_dict(
-            torch.load(Config.model_path.joinpath(f"{checkpoint_index}.pth"))
-        )
+        try:
+            agent.load_state_dict(
+                torch.load(Config.model_path.joinpath(f"{checkpoint_index}.pth"))
+            )
+        except RuntimeError:
+            pass
     newest = Config.model_path.joinpath(
         f"{max((*tuple(int(path.name.split('.')[0]) for path in Config.model_path.iterdir()), 0))}.pth"
     )
     if newest.exists():
-        agents[-1].load_state_dict(torch.load(newest))
-    training_buffer = reduce(
-        operator.add,
-        (
-            deque(eval(path.read_text()))
-            for path in sorted(
-                Config.training_data_path.iterdir(), key=lambda path: int(path.name)
-            )
-        ),
-        deque(maxlen=Config.training_buffer_len),
-    )
-    train_agent(agents[-1], training_buffer)
-    return training_buffer
+        try:
+            agents[-1].load_state_dict(torch.load(newest))
+        except RuntimeError:
+            pass
+    train_agent(agents[-1])
+

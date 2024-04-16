@@ -14,14 +14,14 @@ class Agent(nn.Module):
     def __init__(
         self,
         n_players: int,
-        hidden_sizes: tuple = Config.hidden_sizes,
+        hidden_size: tuple = Config.hidden_size,
         n_moves: int = Config.n_actions,
     ):
         super().__init__()
         self.tanh = nn.Tanh()
         self.softmax = nn.Softmax(dim=1)
         first_size = self._get_size(n_players)
-        sizes = first_size, *hidden_sizes
+        sizes = first_size, *hidden_size
         self.layers = nn.ModuleList(starmap(nn.Linear, pairwise(sizes)))
         self.trained = True
         self.fc_v = nn.Linear(sizes[-1], 1)

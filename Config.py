@@ -13,25 +13,23 @@ class _ConfigPaths:
     evaluation_data_path.mkdir(exist_ok=True)
     model_path = root / "models"
     model_path.mkdir(exist_ok=True)
+    db_password = (root / "db_password").read_text().strip()
 
 
 class _ConfigAgent:
-    # hidden_sizes = (
-    #     256,
-    #     128,
-    #     64,
-    #     32,
-    # )
-    hidden_sizes = (256,)
-    # hidden_sizes = tuple()
-    c = 0.2
-    learning_rate = 1e-5
+    hidden_size = (
+        256,
+    )
+    c = 0.5
+    learning_rate = 5e-6
     debug = False
-    # pretrain = True
     pretrain = False
+    # pretrain = True
 
 
 class Config(_ConfigPaths, _ConfigAgent):
+    test_size = .2
+    db_name = "splendor"
     train = True
     max_results_held = 100
     minimal_relative_agent_improvement = 1.1
@@ -39,7 +37,7 @@ class Config(_ConfigPaths, _ConfigAgent):
     train_batch_size = 128
     training_buffer_len = 100_000
     min_n_points_to_finish = 15
-    n_simulations = 1000
+    n_simulations = 100
     n_games = None
     n_players = 2
     n_actions = 45
