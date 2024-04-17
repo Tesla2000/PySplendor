@@ -1,6 +1,4 @@
-import operator
 from collections import deque
-from functools import reduce
 from itertools import islice
 
 import torch

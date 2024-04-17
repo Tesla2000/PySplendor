@@ -1,8 +1,6 @@
-import operator
 import re
 from collections import deque
 from copy import deepcopy
-from functools import reduce
 from itertools import count
 
 import torch
@@ -12,7 +10,7 @@ from agent.Agent import Agent
 from agent.pretrain import pretrain
 from agent.save_train_buffer import save_train_buffer
 from agent.self_play import self_play
-from agent.train_agent import train_agent, eval_agent
+from agent.train_agent import train_agent
 
 
 def train_loop():
@@ -73,24 +71,24 @@ def train_loop():
         train_agent(agents[-1], training_buffer)
 
 
-def evaluation():
-    agent = Agent(Config.n_players)
-    train_set = reduce(
-        operator.add,
-        (eval(path.read_text()) for path in Config.training_data_path.iterdir()),
-    )
-    eval_set = reduce(
-        operator.add,
-        (eval(path.read_text()) for path in Config.evaluation_data_path.iterdir()),
-    )
-    prev_bce, prev_cce = float("inf"), float("inf")
-    while True:
-        train_agent(agent, train_set)
-        bce, cce = eval_agent(agent, eval_set)
-        if bce >= prev_bce and cce >= prev_bce:
-            break
-        prev_bce = min(prev_bce, bce)
-        prev_cce = min(prev_cce, cce)
+# def evaluation():
+#     agent = Agent(Config.n_players)
+#     train_set = reduce(
+#         operator.add,
+#         (eval(path.read_text()) for path in Config.training_data_path.iterdir()),
+#     )
+#     eval_set = reduce(
+#         operator.add,
+#         (eval(path.read_text()) for path in Config.evaluation_data_path.iterdir()),
+#     )
+#     prev_bce, prev_cce = float("inf"), float("inf")
+#     while True:
+#         train_agent(agent, train_set)
+#         bce, cce = eval_agent(agent, eval_set)
+#         if bce >= prev_bce and cce >= prev_bce:
+#             break
+#         prev_bce = min(prev_bce, bce)
+#         prev_cce = min(prev_cce, cce)
 
 
 # def evaluation():

@@ -1,3 +1,4 @@
+from collections import deque
 from typing import Sequence
 
 import numpy as np
@@ -12,34 +13,41 @@ from db.Game import Game
 from db.Sample import Sample
 from db.session import session
 from .Agent import Agent
+from .PretrainDataset import PretrainDataset
 from .RLDataset import RLDataset
 
 
-def train_agent(agent: Agent):
+def train_agent(agent: Agent, train_data: deque[tuple[tuple, np.array, int]] = None):
     session.execute(select(Sample)).fetchall()
     n_games = session.query(func.max(Game.id)).scalar()
     train_indexes, test_indexes = train_test_split(range(n_games), test_size=Config.test_size)
-    RLDataset(test_indexes)
+    if train_data is None:
+        train_data = PretrainDataset(train_indexes)
+    else:
+        train_data = RLDataset(train_data)
     agent.train()
     optimizer = optim.Adam(agent.parameters(), lr=Config.learning_rate)
     _loop(agent, train_data, optimizer)
 
 
-def eval_agent(agent: Agent, eval_set: Sequence[tuple[tuple, np.array, int]]):
+def eval_agent(agent: Agent, eval_set: Sequence[tuple[tuple, np.array, int]] = None):
     agent.eval()
+    if eval_set is None:
+        eval_set = PretrainDataset(test_indexes)
+    else:
+        eval_set = RLDataset(eval_set)
     return _loop(agent, eval_set, batch_size=len(eval_set))
 
 
 def _loop(
     agent: Agent,
-    dataset: Sequence[tuple[tuple, np.array, int]],
+    dataset: RLDataset,
     optimizer: optim.Optimizer = None,
     batch_size=Config.train_batch_size,
 ):
     is_optimizer = optimizer is not None
     categorical_cross_entropy = nn.CrossEntropyLoss()
     mse = nn.MSELoss()
-    dataset = RLDataset(dataset)
     loader = DataLoader(dataset, batch_size=batch_size)
     for index, (state, policy, win_probability) in enumerate(loader):
         state, policy, win_probability = (

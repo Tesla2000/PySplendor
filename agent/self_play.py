@@ -21,7 +21,7 @@ def self_play(
     for agent in agents:
         agent.eval()
     id_to_agent = dict(
-        (player.id, MCTS(game, agent))
+        (player.id, MCTS(agent))
         for agent, player in zip(random.sample(agents, Config.n_players), game.players)
     )
     results, winner = _perform_game(game, [], id_to_agent)
@@ -35,9 +35,11 @@ def _perform_game(
 ) -> tuple[list[tuple[np.array, np.array, int]], MCTS]:
     for _ in tqdm(count()):
         mcts = id_to_mcts[game.current_player.id]
-        mcts_probs = mcts.search(game.get_state())
+        mcts_probs = mcts.search(game)
         states.append((game, mcts_probs, 0))
-        action = game.all_moves[argmax(mcts_probs)]
+        action = game.null_move
+        if np.sum(mcts_probs):
+            action = game.all_moves[argmax(mcts_probs)]
         game = game.perform(action)
         if game.is_terminal():
             result = game.get_results()

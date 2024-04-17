@@ -4,11 +4,11 @@ from typing import Self, Literal
 import numpy as np
 
 from src.Game import Game
-from src.moves import Move
+from src.moves import NullMove
 
 
 class Node:
-    def __init__(self, game: Game, c: float, state: np.array, parent: Self = None, action_taken: Move = None,
+    def __init__(self, game: Game, c: float, state: np.array, parent: Self = None, action_taken: int = None,
                  prior: int = 0, visit_count: int = 0):
         self.game = game
         self.c = c
@@ -26,7 +26,6 @@ class Node:
         return len(self.children) > 0
 
     def select(self) -> Self:
-        best_child = None
         best_ucb = -np.inf
 
         for child in self.children:
@@ -45,17 +44,21 @@ class Node:
         return q_value + self.c * (math.sqrt(self.visit_count) / (child.visit_count + 1)) * child.prior
 
     def expand(self, policy: np.array) -> Self:
-        for action, prob in enumerate(policy):
+        for action_index, prob in enumerate(policy):
             if prob > 0:
-                action = self.game.all_moves[action]
-                child_game = self.game.perform(action)
+                action = self.game.all_moves[action_index]
+                child_game = action.perform(self.game)
 
-                child = Node(child_game, self.c, child_game, self, action, prob)
+                child = Node(child_game, self.c, child_game.get_state(), self, action_index, prob)
                 self.children.append(child)
-
+        if not self.children:
+            action = self.game.null_move
+            child_game = action.perform(self.game)
+            child = Node(child_game, self.c, child_game.get_state(), self)
+            self.children.append(child)
         return child
 
-    def backpropagate(self, value: Literal[1, -1]):
+    def backpropagate(self, value: float):
         self.value_sum += value
         self.visit_count += 1
 

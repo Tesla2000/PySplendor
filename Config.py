@@ -22,12 +22,14 @@ class _ConfigAgent:
     )
     c = 0.5
     learning_rate = 5e-6
-    debug = False
+    debug = True
+    # debug = False
     pretrain = False
     # pretrain = True
 
 
 class Config(_ConfigPaths, _ConfigAgent):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     dirichlet_alpha = .3
     dirichlet_epsilon = .25
     test_size = .2
@@ -39,7 +41,7 @@ class Config(_ConfigPaths, _ConfigAgent):
     train_batch_size = 128
     training_buffer_len = 100_000
     min_n_points_to_finish = 15
-    n_simulations = 100
+    n_simulations = 1000
     n_games = None
     n_players = 2
     n_actions = 45
