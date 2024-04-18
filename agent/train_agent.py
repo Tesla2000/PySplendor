@@ -37,7 +37,8 @@ def train_agent(agent: Agent, train_data: deque[tuple[tuple, np.array, int]] = N
         train_data = RLDataset(train_data)
     for _ in count():
         agent.train()
-        optimizer = optim.Adam(agent.parameters(), lr=Config.pretrain_learning_rate if test_data else Config.train_learning_rate)
+        optimizer = optim.Adam(agent.parameters(),
+                               lr=Config.pretrain_learning_rate if test_data is not None else Config.train_learning_rate)
         _loop(agent, train_data, optimizer)
         if test_data is None:
             return
@@ -59,16 +60,27 @@ def train_agent(agent: Agent, train_data: deque[tuple[tuple, np.array, int]] = N
             return
 
 
+_i = 0
+
+
 def _loop(
     agent: Agent,
     dataset: Dataset,
     optimizer: optim.Optimizer = None,
     batch_size=Config.train_batch_size,
 ):
+    global _i
     is_optimizer = optimizer is not None
+    if not is_optimizer:
+        _i += 1
     categorical_cross_entropy = nn.CrossEntropyLoss()
     mse = nn.MSELoss()
     loader = DataLoader(dataset, batch_size=batch_size)
+    total_bce, total_cce = 0, 0
+    win_probabilities = np.empty(len(dataset))
+    predicted_win_probabilities = np.empty(len(dataset))
+    moves = np.empty(len(dataset))
+    predicted_moves = np.empty(len(dataset))
     for index, (state, policy, win_probability) in enumerate(loader):
         state, policy, win_probability = (
             state.float().to(Config.device),
@@ -79,18 +91,24 @@ def _loop(
             optimizer.zero_grad()
         with (nullcontext() if is_optimizer else torch.no_grad()):
             output_policy, output_v = agent(state)
+        win_probabilities[batch_size * index: batch_size * (index + 1)] = win_probability.flatten()
+        predicted_win_probabilities[batch_size * index: batch_size * (index + 1)] = np.sign(
+            output_v.detach().numpy()).clip(0, 1).flatten()
+        moves[batch_size * index: batch_size * (index + 1)] = np.argmax(policy.detach().numpy(), axis=1)
+        predicted_moves[batch_size * index: batch_size * (index + 1)] = np.argmax(output_policy.detach().numpy(),
+                                                                                  axis=1)
         bce = mse(output_v, win_probability)
         cce = categorical_cross_entropy(output_policy, policy)
+        total_bce += bce.item()
+        total_cce += cce.item()
         loss = bce + cce
         if is_optimizer:
             loss.backward()
             optimizer.step()
-        else:
-            print(
-                round(accuracy_score(win_probability, np.sign(output_v.detach().numpy()).clip(0, 1)), 2),
-                round(accuracy_score(
-                    np.argmax(policy.detach().numpy(), axis=1),
-                    np.argmax(output_policy.detach().numpy(), axis=1),
-                ), 2),
-            )
-            return [bce.item(), cce.item()]
+    if not is_optimizer and _i % 10 == 0:
+        print(
+            round(accuracy_score(win_probabilities, predicted_win_probabilities), 2),
+            round(accuracy_score(moves, predicted_moves), 2),
+        )
+        print(total_bce, total_cce)
+    return [total_bce, total_cce]
