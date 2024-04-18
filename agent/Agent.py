@@ -14,7 +14,7 @@ class Agent(nn.Module):
 
     def __init__(
         self,
-        n_players: int,
+        n_players: int = Config.n_players,
         hidden_size: tuple = Config.hidden_size,
         n_moves: int = Config.n_actions,
     ):

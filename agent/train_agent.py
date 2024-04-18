@@ -2,7 +2,7 @@ import random
 from collections import deque
 from contextlib import nullcontext
 from copy import deepcopy
-from itertools import count, compress
+from itertools import compress
 
 import numpy as np
 import torch
@@ -35,10 +35,10 @@ def train_agent(agent: Agent, train_data: deque[tuple[tuple, np.array, int]] = N
         test_data = PretrainDataset(test_indexes)
     else:
         train_data = RLDataset(train_data)
-    for _ in count():
+    for _ in range(Config.max_retrain_iterations):
         agent.train()
         optimizer = optim.Adam(agent.parameters(),
-                               lr=Config.pretrain_learning_rate if test_data is not None else Config.train_learning_rate)
+                               lr=Config.retrain_learning_rate if test_data is not None else Config.train_learning_rate)
         _loop(agent, train_data, optimizer)
         if test_data is None:
             return
@@ -56,8 +56,8 @@ def train_agent(agent: Agent, train_data: deque[tuple[tuple, np.array, int]] = N
             continue
         no_improvement_counter += 1
         if no_improvement_counter == Config.no_improvement_limit:
-            agent.load_state_dict(random.choice(best_models))
-            return
+            break
+    agent.load_state_dict(random.choice(best_models))
 
 
 _i = 0
@@ -68,7 +68,7 @@ def _loop(
     dataset: Dataset,
     optimizer: optim.Optimizer = None,
     batch_size=Config.train_batch_size,
-):
+) -> list[float]:
     global _i
     is_optimizer = optimizer is not None
     if not is_optimizer:
@@ -105,10 +105,9 @@ def _loop(
         if is_optimizer:
             loss.backward()
             optimizer.step()
-    if not is_optimizer and _i % 10 == 0:
+    if not is_optimizer and _i % 99 == 0:
         print(
             round(accuracy_score(win_probabilities, predicted_win_probabilities), 2),
             round(accuracy_score(moves, predicted_moves), 2),
         )
-        print(total_bce, total_cce)
     return [total_bce, total_cce]

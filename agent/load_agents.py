@@ -9,13 +9,15 @@ from agent.Agent import Agent
 from agent.train_agent import train_agent
 
 
-def load_agents(pretrain: bool = Config.pretrain) -> deque[Agent]:
+def load_agents(retrain: bool = Config.retrain) -> deque[Agent]:
     agents = deque(islice(map(_load_agent, chain.from_iterable((sorted(
         (int(path.name.split(".")[0]) for path in Config.model_path.iterdir()),
         reverse=True,
-    ), repeat(-1)))), Config.n_players), maxlen=Config.n_players)
-    if pretrain:
-        train_agent(agents[-1])
+    ), repeat(-1)))), Config.n_players - retrain), maxlen=Config.n_players)
+    if retrain:
+        agent = Agent()
+        train_agent(agent)
+        agents.append(agent)
     return agents
 
 

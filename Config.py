@@ -22,14 +22,15 @@ class _ConfigAgent:
     )
     c = 0.5
     train_learning_rate = 5e-5
-    pretrain_learning_rate = 1e-3
+    retrain_learning_rate = 1e-3
     debug = True
     # debug = False
-    # pretrain = False
-    pretrain = True
+    # retrain = False
+    retrain = True
 
 
 class Config(_ConfigPaths, _ConfigAgent):
+    max_retrain_iterations = 1000
     no_improvement_limit = 3
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     dirichlet_alpha = .3
