@@ -9,7 +9,7 @@ from Config import Config
 class Agent(nn.Module):
     device = Config.device
     _input_size_dictionary = {
-        2: 211,
+        2: 256,
     }
 
     def __init__(

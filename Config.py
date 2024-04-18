@@ -25,8 +25,8 @@ class _ConfigAgent:
     retrain_learning_rate = 1e-3
     debug = True
     # debug = False
-    # retrain = False
-    retrain = True
+    retrain = False
+    # retrain = True
     # pareto_optimize = True
     pareto_optimize = False
 

@@ -58,6 +58,7 @@ class StateExtractor:
                         for player in game.players
                     ),
                     (len(player.reserve) for player in game.players[1:]),
+                    map(game.get_possible_actions().__contains__, game.all_moves),
                 )
             )
         )

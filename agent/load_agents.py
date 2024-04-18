@@ -23,14 +23,14 @@ def load_agents(retrain: bool = Config.retrain) -> deque[Agent]:
 
 def _load_agent(agent_number: int) -> Agent:
     if agent_number == -1:
-        agent = Agent(Config.n_players)
+        agent = Agent()
         agent.to(Config.device)
         return agent
     agent_number = str(agent_number)
     hidden_size = eval(Config.model_path.joinpath(
         agent_number
     ).with_suffix(".txt").read_text())
-    agent = Agent(Config.n_players, hidden_size)
+    agent = Agent(hidden_size=hidden_size)
     agent.load_state_dict(torch.load(
         Config.model_path.joinpath(
             agent_number
