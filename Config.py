@@ -21,14 +21,16 @@ class _ConfigAgent:
         256,
     )
     c = 0.5
-    learning_rate = 5e-6
+    train_learning_rate = 5e-5
+    pretrain_learning_rate = 1e-4
     debug = True
     # debug = False
-    pretrain = False
-    # pretrain = True
+    # pretrain = False
+    pretrain = True
 
 
 class Config(_ConfigPaths, _ConfigAgent):
+    no_improvement_limit = 3
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     dirichlet_alpha = .3
     dirichlet_epsilon = .25

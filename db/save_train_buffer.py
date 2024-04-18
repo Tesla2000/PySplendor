@@ -2,12 +2,13 @@ import numpy as np
 from sqlalchemy import func
 
 from Config import Config
+from agent.GameSample import GameSample
 from db.Game import Game
 from db.Sample import Sample
 from db.session import session
 
 
-def save_train_buffer(buffer: list[tuple[tuple[int, ...], np.array, int]]):
+def save_train_buffer(buffer: list[GameSample]):
     session.add(Game(c=Config.c, n_simulations=Config.n_simulations))
     session.commit()
     game_id = session.execute(func.max(Game.id)).scalar()

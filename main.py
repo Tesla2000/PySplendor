@@ -8,13 +8,14 @@ import torch
 from Config import Config
 from agent.Agent import Agent
 from agent.pretrain import pretrain
-from agent.save_train_buffer import save_train_buffer
+from db.load_train_buffer import load_train_buffer
+from db.save_train_buffer import save_train_buffer
 from agent.self_play import self_play
 from agent.train_agent import train_agent
 
 
 def train_loop():
-    training_buffer = deque(maxlen=Config.training_buffer_len)
+    training_buffer = load_train_buffer()
     agents = deque(
         (Agent(Config.n_players) for _ in range(Config.n_players)),
         maxlen=Config.n_players,
