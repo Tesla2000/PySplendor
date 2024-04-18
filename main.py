@@ -1,27 +1,20 @@
-import re
 from collections import deque
 from copy import deepcopy
 from itertools import count
 
-import torch
-
 from Config import Config
 from agent.Agent import Agent
-from agent.pretrain import pretrain
-from db.load_train_buffer import load_train_buffer
-from db.save_train_buffer import save_train_buffer
+from agent.load_agents import load_agents
+from agent.save_agent import save_agent
 from agent.self_play import self_play
 from agent.train_agent import train_agent
+from db.load_train_buffer import load_train_buffer
+from db.save_train_buffer import save_train_buffer
 
 
 def train_loop():
     training_buffer = load_train_buffer()
-    agents = deque(
-        (Agent(Config.n_players) for _ in range(Config.n_players)),
-        maxlen=Config.n_players,
-    )
-    if Config.pretrain:
-        pretrain(agents)
+    agents = load_agents()
     scores = deque(maxlen=Config.max_results_held)
     for _ in count() if Config.n_games is None else range(Config.n_games):
         buffer, winners = self_play(agents)
@@ -39,27 +32,7 @@ def train_loop():
             and sum(scores)
             >= Config.minimal_relative_agent_improvement * len(scores) / len(agents)
         ):
-            torch.save(
-                agents[-1].state_dict(),
-                Config.model_path.joinpath(
-                    str(
-                        max(
-                            map(
-                                int,
-                                (
-                                    *re.findall(
-                                        r"\d+",
-                                        "".join(map(str, Config.model_path.iterdir())),
-                                    ),
-                                    -1,
-                                ),
-                            )
-                        )
-                        + 1
-                    )
-                    + ".pth"
-                ),
-            )
+            save_agent(agents[-1])
             agents.append(Agent(Config.n_players))
             agents[-1].load_state_dict(deepcopy(agents[-2].state_dict()))
             agents[-1].training = True

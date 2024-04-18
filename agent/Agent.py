@@ -22,6 +22,7 @@ class Agent(nn.Module):
         self.tanh = nn.Tanh()
         self.softmax = nn.Softmax(dim=1)
         first_size = self._get_size(n_players)
+        self.hidden_sizes = hidden_size
         sizes = first_size, *hidden_size
         self.layers = nn.ModuleList(starmap(nn.Linear, pairwise(sizes)))
         self.trained = True
