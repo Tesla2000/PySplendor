@@ -27,9 +27,13 @@ class _ConfigAgent:
     # debug = False
     # retrain = False
     retrain = True
+    # pareto_optimize = True
+    pareto_optimize = False
 
 
 class Config(_ConfigPaths, _ConfigAgent):
+    print_interval = 1
+    win_prob_weight = 30
     max_retrain_iterations = 1000
     no_improvement_limit = 3
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -55,3 +59,4 @@ if Config.debug:
     random.seed(42)
     np.random.seed(42)
     torch.random.manual_seed(42)
+    torch.cuda.random.manual_seed(42)

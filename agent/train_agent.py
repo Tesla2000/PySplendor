@@ -22,13 +22,15 @@ from .PretrainDataset import PretrainDataset
 from .RLDataset import RLDataset
 
 
-def train_agent(agent: Agent, train_data: deque[tuple[tuple, np.array, int]] = None):
+def train_agent(agent: Agent, train_data: deque[tuple[tuple, np.array, int]] = None, pareto_optimize: bool = Config.pareto_optimize):
     session.execute(select(Sample)).fetchall()
     n_games = session.query(func.max(Game.id)).scalar()
     train_indexes, test_indexes = train_test_split(range(n_games), test_size=Config.test_size)
     test_data = None
-    results = []
-    best_models = []
+    results = deque(maxlen=None if pareto_optimize else 1)
+    if not pareto_optimize:
+        results.append(float("inf"))
+    best_models = deque(maxlen=None if pareto_optimize else 1)
     no_improvement_counter = 0
     if train_data is None:
         train_data = PretrainDataset(train_indexes)
@@ -45,15 +47,22 @@ def train_agent(agent: Agent, train_data: deque[tuple[tuple, np.array, int]] = N
         agent.eval()
         with torch.no_grad():
             result = _loop(agent, test_data)
-        results.append(result)
-        best_models.append(deepcopy(agent.state_dict()))
-        results = np.array(results)
-        pareto_set_mask = paretoset(results, use_numba=False)
-        results = list(results[pareto_set_mask])
-        best_models = list(compress(best_models, pareto_set_mask))
-        if any(map(result.__eq__, results)):
-            no_improvement_counter = 0
-            continue
+        if pareto_optimize:
+            results.append(result)
+            best_models.append(deepcopy(agent.state_dict()))
+            results = np.array(results)
+            pareto_set_mask = paretoset(results, use_numba=False)
+            results = list(results[pareto_set_mask])
+            best_models = list(compress(best_models, pareto_set_mask))
+            if any(map(result.__eq__, results)):
+                no_improvement_counter = 0
+                continue
+        else:
+            if result < results[-1]:
+                no_improvement_counter = 0
+                best_models.append(deepcopy(agent.state_dict()))
+                results.append(result)
+                continue
         no_improvement_counter += 1
         if no_improvement_counter == Config.no_improvement_limit:
             break
@@ -68,6 +77,8 @@ def _loop(
     dataset: Dataset,
     optimizer: optim.Optimizer = None,
     batch_size=Config.train_batch_size,
+    pareto_optimize=Config.pareto_optimize,
+    win_prob_weight=Config.win_prob_weight
 ) -> list[float]:
     global _i
     is_optimizer = optimizer is not None
@@ -105,9 +116,9 @@ def _loop(
         if is_optimizer:
             loss.backward()
             optimizer.step()
-    if not is_optimizer and _i % 99 == 0:
+    if not is_optimizer and _i % Config.print_interval == 0:
         print(
             round(accuracy_score(win_probabilities, predicted_win_probabilities), 2),
             round(accuracy_score(moves, predicted_moves), 2),
         )
-    return [total_bce, total_cce]
+    return [total_bce, total_cce] if pareto_optimize else total_bce * win_prob_weight + total_cce

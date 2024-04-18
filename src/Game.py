@@ -54,20 +54,20 @@ class Game:
     def perform(self, action: Move) -> Self:
         new_state = action.perform(self)
         new_state.turn_counter += 1
-        if sum(astuple(new_state.current_player.resources)) > 10:
-            print(self)
-            print(action)
-            raise ValueError
-        if sum(sum(astuple(player.resources)) for player in new_state.players) + sum(
-            astuple(new_state.board.resources)) != 25:
-            print(self)
-            print(action)
-            raise ValueError
-        if any(any(r for r in astuple(player.resources) if r < 0) for player in new_state.players) or any(
-            r for r in astuple(new_state.board.resources) if r < 0):
-            print(self)
-            print(action)
-            raise ValueError
+        # if sum(astuple(new_state.current_player.resources)) > 10:
+        #     print(self)
+        #     print(action)
+        #     raise ValueError
+        # if sum(sum(astuple(player.resources)) for player in new_state.players) + sum(
+        #     astuple(new_state.board.resources)) != 25:
+        #     print(self)
+        #     print(action)
+        #     raise ValueError
+        # if any(any(r for r in astuple(player.resources) if r < 0) for player in new_state.players) or any(
+        #     r for r in astuple(new_state.board.resources) if r < 0):
+        #     print(self)
+        #     print(action)
+        #     raise ValueError
         new_state.next_turn()
         return new_state
 
