@@ -13,25 +13,34 @@ class _ConfigPaths:
     evaluation_data_path.mkdir(exist_ok=True)
     model_path = root / "models"
     model_path.mkdir(exist_ok=True)
+    db_password = (root / "db_password").read_text().strip()
 
 
 class _ConfigAgent:
-    # hidden_sizes = (
-    #     256,
-    #     128,
-    #     64,
-    #     32,
-    # )
-    hidden_sizes = (256,)
-    # hidden_sizes = tuple()
-    c = 0.2
-    learning_rate = 1e-5
-    debug = False
-    # pretrain = True
-    pretrain = False
+    hidden_size = (
+        256,
+    )
+    c = 0.5
+    train_learning_rate = 5e-5
+    retrain_learning_rate = 1e-3
+    debug = True
+    # debug = False
+    retrain = False
+    # retrain = True
+    # pareto_optimize = True
+    pareto_optimize = False
 
 
 class Config(_ConfigPaths, _ConfigAgent):
+    print_interval = 1
+    win_prob_weight = 30
+    max_retrain_iterations = 1000
+    no_improvement_limit = 3
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    dirichlet_alpha = .3
+    dirichlet_epsilon = .25
+    test_size = .2
+    db_name = "splendor"
     train = True
     max_results_held = 100
     minimal_relative_agent_improvement = 1.1
@@ -50,3 +59,4 @@ if Config.debug:
     random.seed(42)
     np.random.seed(42)
     torch.random.manual_seed(42)
+    torch.cuda.random.manual_seed(42)

@@ -58,15 +58,7 @@ class StateExtractor:
                         for player in game.players
                     ),
                     (len(player.reserve) for player in game.players[1:]),
+                    map(game.get_possible_actions().__contains__, game.all_moves),
                 )
             )
         )
-
-    @classmethod
-    def _get_flatten_elements(cls, iterable: Iterable) -> Any:
-        for element in iterable:
-            if isinstance(element, Iterable):
-                for inner_element in cls._get_flatten_elements(element):
-                    yield inner_element
-            else:
-                yield element

@@ -1,4 +1,4 @@
-from dataclasses import fields, dataclass, field
+from dataclasses import fields, dataclass, field, astuple
 from itertools import combinations, starmap, product
 from typing import Self, Type
 
@@ -32,10 +32,12 @@ class Game:
     n_players: int = field(default=2)
     current_player: Player = field(init=False)
     is_blocked: dict = None
-    _turn_counter: int = 0
+    turn_counter: int = 0
     _performed_the_last_move: dict = None
     _last_turn: bool = False
     _state_extractor: Type[StateExtractor] = StateExtractor
+    _possible_actions: tuple[Move, ...] = field(default=None, init=False)
+    _state: tuple[int, ...] = field(default=None, init=False)
     null_move: NullMove = NullMove()
 
     def __post_init__(self):
@@ -52,15 +54,18 @@ class Game:
 
     def perform(self, action: Move) -> Self:
         new_state = action.perform(self)
+        new_state.turn_counter += 1
         # if sum(astuple(new_state.current_player.resources)) > 10:
         #     print(self)
         #     print(action)
         #     raise ValueError
-        # if sum(sum(astuple(player.resources)) for player in new_state.players) + sum(astuple(new_state.board.resources)) != 25:
+        # if sum(sum(astuple(player.resources)) for player in new_state.players) + sum(
+        #     astuple(new_state.board.resources)) != 25:
         #     print(self)
         #     print(action)
         #     raise ValueError
-        # if any(any(r for r in astuple(player.resources) if r < 0) for player in new_state.players) or any(r for r in astuple(new_state.board.resources) if r < 0):
+        # if any(any(r for r in astuple(player.resources) if r < 0) for player in new_state.players) or any(
+        #     r for r in astuple(new_state.board.resources) if r < 0):
         #     print(self)
         #     print(action)
         #     raise ValueError
@@ -98,8 +103,10 @@ class Game:
             )
         return results
 
-    def get_state(self) -> tuple:
-        return self._state_extractor.get_state(self)
+    def get_state(self) -> tuple[int, ...]:
+        if self._state is None:
+            self._state = self._state_extractor.get_state(self)
+        return self._state
 
     def copy(self) -> Self:
         game = Game(
@@ -137,6 +144,7 @@ class Game:
             ),
             n_players=self.n_players,
             _last_turn=self._last_turn,
+            turn_counter=self.turn_counter,
         )
         game.current_player = game.players[0]
         for player in game.players:
@@ -151,14 +159,11 @@ class Game:
         return game
 
     def get_possible_actions(self) -> tuple[Move, ...]:
-        return tuple(move for move in self.all_moves if move.is_valid(self)) or (
-            (self.null_move,) if self.null_move.is_valid(self) else tuple()
-        )
-
-    def get_possible_action_indexes(self) -> tuple[int, ...]:
-        return tuple(index for index, move in enumerate(self.all_moves) if move.is_valid(self)) or (
-            (self.null_move,) if self.null_move.is_valid(self) else tuple()
-        )
+        if self._possible_actions is None:
+            self._possible_actions = tuple(move for move in self.all_moves if move.is_valid(self)) or (
+                (self.null_move,) if self.null_move.is_valid(self) else tuple()
+            )
+        return self._possible_actions
 
     combos = combinations([{field.name: 1} for field in fields(BasicResources)], 3)
     all_moves = list(
@@ -174,3 +179,9 @@ class Game:
     all_moves += list(map(BuildReserve, range(3)))
     all_moves += list(starmap(ReserveVisible, product(range(3), range(4))))
     all_moves += list(map(ReserveTop, range(3)))
+    action_size = len(all_moves)
+
+    def get_value_and_terminated(self):
+        if self.is_terminal():
+            return 1, True
+        return 0, False
