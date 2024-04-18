@@ -62,12 +62,3 @@ class StateExtractor:
                 )
             )
         )
-
-    @classmethod
-    def _get_flatten_elements(cls, iterable: Iterable) -> Any:
-        for element in iterable:
-            if isinstance(element, Iterable):
-                for inner_element in cls._get_flatten_elements(element):
-                    yield inner_element
-            else:
-                yield element

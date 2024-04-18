@@ -23,9 +23,6 @@ from .RLDataset import RLDataset
 
 
 def train_agent(agent: Agent, train_data: deque[tuple[tuple, np.array, int]] = None, pareto_optimize: bool = Config.pareto_optimize):
-    session.execute(select(Sample)).fetchall()
-    n_games = session.query(func.max(Game.id)).scalar()
-    train_indexes, test_indexes = train_test_split(range(n_games), test_size=Config.test_size)
     test_data = None
     results = deque(maxlen=None if pareto_optimize else 1)
     if not pareto_optimize:
@@ -33,6 +30,9 @@ def train_agent(agent: Agent, train_data: deque[tuple[tuple, np.array, int]] = N
     best_models = deque(maxlen=None if pareto_optimize else 1)
     no_improvement_counter = 0
     if train_data is None:
+        session.execute(select(Sample)).fetchall()
+        n_games = session.query(func.max(Game.id)).scalar()
+        train_indexes, test_indexes = train_test_split(range(n_games), test_size=Config.test_size)
         train_data = PretrainDataset(train_indexes)
         test_data = PretrainDataset(test_indexes)
     else:

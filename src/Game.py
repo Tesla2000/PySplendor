@@ -37,6 +37,7 @@ class Game:
     _last_turn: bool = False
     _state_extractor: Type[StateExtractor] = StateExtractor
     _possible_actions: tuple[Move, ...] = field(default=None, init=False)
+    _state: tuple[int, ...] = field(default=None, init=False)
     null_move: NullMove = NullMove()
 
     def __post_init__(self):
@@ -102,8 +103,10 @@ class Game:
             )
         return results
 
-    def get_state(self) -> tuple:
-        return self._state_extractor.get_state(self)
+    def get_state(self) -> tuple[int, ...]:
+        if self._state is None:
+            self._state = self._state_extractor.get_state(self)
+        return self._state
 
     def copy(self) -> Self:
         game = Game(
@@ -161,11 +164,6 @@ class Game:
                 (self.null_move,) if self.null_move.is_valid(self) else tuple()
             )
         return self._possible_actions
-
-    def get_possible_action_indexes(self) -> tuple[int, ...]:
-        return tuple(index for index, move in enumerate(self.all_moves) if move.is_valid(self)) or (
-            (self.null_move,) if self.null_move.is_valid(self) else tuple()
-        )
 
     combos = combinations([{field.name: 1} for field in fields(BasicResources)], 3)
     all_moves = list(

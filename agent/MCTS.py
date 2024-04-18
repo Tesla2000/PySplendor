@@ -18,10 +18,10 @@ class MCTS:
 
     @torch.no_grad()
     def search(self, game: Game):
-        root = Node(game, self.c, game.get_state(), visit_count=1)
+        root = Node(game, self.c, visit_count=1)
 
         policy, _ = self.model(
-            torch.tensor(root.state, device=self.model.device).unsqueeze(0).float()
+            torch.tensor(root.game.get_state(), device=self.model.device).unsqueeze(0).float()
         )
         policy = torch.softmax(policy, axis=1).squeeze(0).cpu().numpy()
         policy = (1 - self.dirichlet_epsilon) * policy + self.dirichlet_epsilon \
@@ -48,7 +48,7 @@ class MCTS:
 
             if not is_terminal:
                 policy, value = self.model(
-                    torch.tensor(node.state, device=self.model.device).unsqueeze(0).float()
+                    torch.tensor(node.game.get_state(), device=self.model.device).unsqueeze(0).float()
                 )
                 policy = torch.softmax(policy, axis=1).squeeze(0).cpu().numpy()
                 valid_moves = np.array(tuple(map(node.game.get_possible_actions().__contains__, Game.all_moves)))
