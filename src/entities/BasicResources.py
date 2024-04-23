@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Self
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(slots=True, frozen=True, order=True)
 class BasicResources:
     red: int = 0
     green: int = 0

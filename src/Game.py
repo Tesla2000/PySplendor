@@ -75,7 +75,7 @@ class Game:
     def next_turn(self) -> None:
         self.players = (*self.players[1:], self.players[0])
         for index, aristocrat in enumerate(self.board.aristocrats):
-            if not (self.current_player.resources - aristocrat.cost).lacks():
+            if not (AllResources(*self.current_player.production) - aristocrat.cost).lacks():
                 self.current_player.aristocrats.append(
                     self.board.aristocrats.pop(index)
                 )

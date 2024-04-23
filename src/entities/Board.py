@@ -22,3 +22,4 @@ class Board:
             )
         if len(self.aristocrats) > self.n_players + 1:
             self.aristocrats = Aristocrats(self.aristocrats[: self.n_players + 1])
+        self.aristocrats.sort()

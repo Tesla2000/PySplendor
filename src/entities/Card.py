@@ -2,7 +2,7 @@ from .BasicResources import BasicResources
 from dataclasses import dataclass
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, order=True)
 class Card:
     production: BasicResources
     cost: BasicResources
