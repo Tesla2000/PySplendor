@@ -1,3 +1,4 @@
+import atexit
 import re
 from collections import deque
 from dataclasses import dataclass
@@ -16,7 +17,7 @@ from agent.SpeedRLDataset import SpeedRLDataset
 from src.Game import Game
 
 agent = SpeedAgent()
-agent.load_state_dict(torch.load(Config.model_path.joinpath('speed_game_4000.pth')))
+agent.load_state_dict(torch.load(Config.model_path.joinpath('speed_game.pth')))
 
 
 @dataclass
@@ -30,6 +31,7 @@ def _get_new_games(games: list[GameState], results_over_time: deque[float], beta
     while True:
         games = list(game for game in games if not game.game_instance.is_terminal())
         if not games:
+            print("No valid results")
             break
         game_states = list(game.game_instance.get_state() for game in games)
         with torch.no_grad():
@@ -61,17 +63,16 @@ def _get_new_games(games: list[GameState], results_over_time: deque[float], beta
                 if len(new_games) == beta:
                     break
         games = new_games
-    print("No valid results")
 
 
 def train_to_go_fast():
     train_buffer = deque(maxlen=10_000)
     loss_function = nn.MSELoss()
-    optimizer = Adam(agent.parameters(), lr=1e-6)
+    optimizer = Adam(agent.parameters(), lr=5e-7)
     dataset = SpeedRLDataset(train_buffer)
     results_over_time = deque(maxlen=100)
-    beta = 20
-    for epoch in count(max(int(re.findall(r'\d', path.name)[0]) for path in Config.model_path.glob("speed_game_*"))):
+    beta = 100
+    for epoch in count(max(int(re.findall(r'\d+', path.name)[0]) for path in Config.model_path.glob("speed_game_*"))):
         agent.eval()
         games = [GameState(Game())]
         _get_new_games(games, results_over_time, beta, train_buffer)
@@ -94,6 +95,6 @@ def train_to_go_fast():
             optimizer.step()
 
 
-# @atexit.register
-# def _save():
-#     torch.save(agent.state_dict(), Config.model_path.joinpath('speed_game.pth'))
+@atexit.register
+def _save():
+    torch.save(agent.state_dict(), Config.model_path.joinpath('speed_game.pth'))
