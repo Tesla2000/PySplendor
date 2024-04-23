@@ -19,6 +19,14 @@ class _ConfigPaths:
 class _ConfigAgent:
     hidden_size = (
         256,
+        128,
+        64,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
     )
     c = 0.5
     train_learning_rate = 5e-5
@@ -46,7 +54,7 @@ class Config(_ConfigPaths, _ConfigAgent):
     minimal_relative_agent_improvement = 1.1
     min_games_to_replace_agents = 40
     train_batch_size = 128
-    training_buffer_len = 100_000
+    training_buffer_len = 100000
     min_n_points_to_finish = 15
     n_simulations = 1000
     n_games = None

@@ -67,7 +67,7 @@ class Node:
             self.parent.backpropagate(value)
 
 
-@jit
+@jit(nopython=True)
 def _get_ucb(child_visit_count: int, child_value_sum: int, child_prior: float, c: float, visit_count: int):
     if child_visit_count == 0:
         q_value = 0

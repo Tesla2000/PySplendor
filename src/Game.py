@@ -1,4 +1,4 @@
-from dataclasses import fields, dataclass, field, astuple
+from dataclasses import fields, dataclass, field
 from itertools import combinations, starmap, product
 from typing import Self, Type
 

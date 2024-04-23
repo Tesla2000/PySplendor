@@ -10,85 +10,12 @@ from agent.self_play import self_play
 from agent.train_agent import train_agent
 from db.load_train_buffer import load_train_buffer
 from db.save_train_buffer import save_train_buffer
-
-
-def train_loop():
-    training_buffer = load_train_buffer()
-    agents = load_agents()
-    scores = deque(maxlen=Config.max_results_held)
-    for _ in count() if Config.n_games is None else range(Config.n_games):
-        buffer, winners = self_play(agents)
-        save_train_buffer(buffer)
-        for winner in winners:
-            scores.append(agents[-1] is winner)
-        if (
-            len(scores) < Config.min_games_to_replace_agents
-            and sum(scores)
-            > Config.minimal_relative_agent_improvement
-            * Config.min_games_to_replace_agents
-            / len(agents)
-        ) or (
-            len(scores) > Config.min_games_to_replace_agents
-            and sum(scores)
-            >= Config.minimal_relative_agent_improvement * len(scores) / len(agents)
-        ):
-            save_agent(agents[-1])
-            agents.append(Agent(Config.n_players))
-            agents[-1].load_state_dict(deepcopy(agents[-2].state_dict()))
-            agents[-1].training = True
-            scores = deque(maxlen=Config.max_results_held)
-        elif len(scores) >= Config.min_games_to_replace_agents:
-            print(f"{len(scores)} {sum(scores) / len(scores):.2f}")
-        else:
-            print(f"{len(scores)} {sum(scores)}/{len(scores)}")
-        training_buffer += buffer
-        train_agent(agents[-1], training_buffer)
-
-
-# def evaluation():
-#     agent = Agent(Config.n_players)
-#     train_set = reduce(
-#         operator.add,
-#         (eval(path.read_text()) for path in Config.training_data_path.iterdir()),
-#     )
-#     eval_set = reduce(
-#         operator.add,
-#         (eval(path.read_text()) for path in Config.evaluation_data_path.iterdir()),
-#     )
-#     prev_bce, prev_cce = float("inf"), float("inf")
-#     while True:
-#         train_agent(agent, train_set)
-#         bce, cce = eval_agent(agent, eval_set)
-#         if bce >= prev_bce and cce >= prev_bce:
-#             break
-#         prev_bce = min(prev_bce, bce)
-#         prev_cce = min(prev_cce, cce)
-
-
-# def evaluation():
-#     v_agent = LogisticRegression()
-#     p_agent = LogisticRegression()
-#     train_set = reduce(
-#         operator.add,
-#         (eval(path.read_text()) for path in Config.training_data_path.iterdir()),
-#     )
-#     eval_set = reduce(
-#         operator.add,
-#         (eval(path.read_text()) for path in Config.evaluation_data_path.iterdir()),
-#     )
-#     v_agent.fit(tuple(sample[0] for sample in train_set), tuple(sample[2] for sample in train_set))
-#     p_agent.fit(tuple(sample[0] for sample in train_set), np.argmax(np.array(tuple(sample[1] for sample in train_set)), axis=1))
-#     print(
-#         v_agent.score(tuple(sample[0] for sample in eval_set), tuple(sample[2] for sample in eval_set)),
-#         p_agent.score(tuple(sample[0] for sample in eval_set), np.argmax(np.array(tuple(sample[1] for sample in eval_set)), axis=1)),
-#     )
+from training_variants.train_to_go_fast import train_to_go_fast
 
 
 def main():
-    if Config.train:
-        train_loop()
-    else:
-        evaluation()
+    # train_loop()
+    train_to_go_fast()
 
 
 if __name__ == "__main__":
