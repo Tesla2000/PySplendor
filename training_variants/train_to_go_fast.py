@@ -71,14 +71,14 @@ def train_to_go_fast():
     optimizer = Adam(agent.parameters(), lr=5e-7)
     dataset = SpeedRLDataset(train_buffer)
     results_over_time = deque(maxlen=100)
-    beta = 100
-    for epoch in count(max(int(re.findall(r'\d+', path.name)[0]) for path in Config.model_path.glob("speed_game_*"))):
+    beta = 10
+    for epoch in count(max(int(re.findall(r'\d+', path.name)[0]) for path in Config.model_path.glob("speed_game_*")) + 1):
         agent.eval()
         games = [GameState(Game())]
         _get_new_games(games, results_over_time, beta, train_buffer)
         if not train_buffer:
             continue
-        if epoch % 5 == 0:
+        if epoch % 1 == 0:
             print(epoch, fmean(results_over_time), sorted(results_over_time))
         if epoch % 1000 == 0:
             torch.save(agent.state_dict(),
@@ -95,6 +95,6 @@ def train_to_go_fast():
             optimizer.step()
 
 
-@atexit.register
-def _save():
-    torch.save(agent.state_dict(), Config.model_path.joinpath('speed_game.pth'))
+# @atexit.register
+# def _save():
+#     torch.save(agent.state_dict(), Config.model_path.joinpath('speed_game.pth'))
