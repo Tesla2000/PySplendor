@@ -12,8 +12,8 @@ if TYPE_CHECKING:
 class BuildReserve(Build):
     index: int
 
-    def perform(self, game: "Game") -> "Game":
-        game = Build.perform(self, game)
+    def _perform(self, game: "Game") -> "Game":
+        game = Build._perform(self, game)
         current_player = game.current_player
         card = current_player.reserve.pop(self.index)
         return Build._build(game, card)

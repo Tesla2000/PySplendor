@@ -13,8 +13,8 @@ class BuildBoard(Build):
     tier_index: int
     index: int
 
-    def perform(self, game: "Game") -> "Game":
-        game = Build.perform(self, game)
+    def _perform(self, game: "Game") -> "Game":
+        game = Build._perform(self, game)
         tier = game.board.tiers[self.tier_index]
         card = tier.pop(self.index)
         return Build._build(game, card)

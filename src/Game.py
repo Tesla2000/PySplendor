@@ -53,7 +53,7 @@ class Game:
         self.current_player = self.players[0]
 
     def perform(self, action: Move) -> Self:
-        new_state = action.perform(self)
+        new_state = action._perform(self)
         new_state.turn_counter += 1
         # if sum(astuple(new_state.current_player.resources)) > 10:
         #     print(self)

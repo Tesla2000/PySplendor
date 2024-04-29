@@ -47,13 +47,13 @@ class Node:
         for action_index, prob in enumerate(policy):
             if prob > 0:
                 action = self.game.all_moves[action_index]
-                child_game = action.perform(self.game)
+                child_game = action._perform(self.game)
 
                 child = Node(child_game, self.c, self, action_index, prob)
                 self.children.append(child)
         if not self.children:
             action = self.game.null_move
-            child_game = action.perform(self.game)
+            child_game = action._perform(self.game)
             child = Node(child_game, self.c, self)
             self.children.append(child)
         return child
