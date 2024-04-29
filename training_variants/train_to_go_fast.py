@@ -1,4 +1,5 @@
 import atexit
+import re
 from collections import deque
 from dataclasses import dataclass
 from itertools import count
@@ -16,7 +17,7 @@ from agent.SpeedRLDataset import SpeedRLDataset
 from src.Game import Game
 
 agent = SpeedAgent()
-agent.load_state_dict(torch.load(Config.model_path.joinpath('speed_game_reference.pth')))
+agent.load_state_dict(torch.load(Config.model_path.joinpath('speed_game.pth')))
 
 
 @dataclass
@@ -30,6 +31,7 @@ def _get_new_games(games: list[GameState], results_over_time: deque[float], beta
     while True:
         games = list(game for game in games if not game.game_instance.is_terminal())
         if not games:
+            print("No valid results")
             break
         game_states = list(game.game_instance.get_state() for game in games)
         with torch.no_grad():
@@ -48,6 +50,7 @@ def _get_new_games(games: list[GameState], results_over_time: deque[float], beta
                     results_over_time.append(new_game.game_instance.turn_counter / 2)
                     prev_state = game.prev_state
                     player_id = new_game.game_instance.players[-1].id
+                    # game_instances = []
                     for moves_till_end in count():
                         prev_state = prev_state.prev_state
                         if prev_state is None:
@@ -55,6 +58,7 @@ def _get_new_games(games: list[GameState], results_over_time: deque[float], beta
                         if prev_state.game_instance.current_player.id == player_id:
                             train_buffer.append(
                                 (prev_state.game_instance.get_state(), moves_till_end, prev_state.move_index))
+                            # game_instances.append(prev_state.game_instance)
                 new_games.append(new_game)
                 if len(new_games) == beta:
                     break
@@ -64,20 +68,21 @@ def _get_new_games(games: list[GameState], results_over_time: deque[float], beta
 def train_to_go_fast():
     train_buffer = deque(maxlen=10_000)
     loss_function = nn.MSELoss()
-    optimizer = Adam(agent.parameters(), lr=1e-6)
+    optimizer = Adam(agent.parameters(), lr=5e-7)
     dataset = SpeedRLDataset(train_buffer)
     results_over_time = deque(maxlen=100)
     beta = 10
-    for epoch in count(1):
+    for epoch in count(max(int(re.findall(r'\d+', path.name)[0]) for path in Config.model_path.glob("speed_game_*")) + 1):
         agent.eval()
         games = [GameState(Game())]
         _get_new_games(games, results_over_time, beta, train_buffer)
         if not train_buffer:
             continue
-        if epoch % 5 == 0:
-            print(epoch, fmean(results_over_time))
+        if epoch % 1 == 0:
+            print(epoch, fmean(results_over_time), sorted(results_over_time))
         if epoch % 1000 == 0:
-            torch.save(agent.state_dict(), Config.model_path.joinpath(f'speed_game_{epoch}.pth'))
+            torch.save(agent.state_dict(),
+                       Config.model_path.joinpath(f'speed_game_{epoch}_{fmean(results_over_time)}.pth'))
         agent.train()
         loader = DataLoader(dataset, batch_size=128)
         for state, moves_till_end, move_indexes in loader:
@@ -90,6 +95,6 @@ def train_to_go_fast():
             optimizer.step()
 
 
-@atexit.register
-def _save():
-    torch.save(agent.state_dict(), Config.model_path.joinpath('speed_game.pth'))
+# @atexit.register
+# def _save():
+#     torch.save(agent.state_dict(), Config.model_path.joinpath('speed_game.pth'))

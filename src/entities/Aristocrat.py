@@ -4,7 +4,7 @@ from typing import Self
 from .BasicResources import BasicResources
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, order=True)
 class Aristocrat:
     points: int
     cost: BasicResources

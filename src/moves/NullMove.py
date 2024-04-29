@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 @dataclass(slots=True, frozen=True)
 class NullMove(Move):
-    def perform(self, game: "Game") -> "Game":
+    def _perform(self, game: "Game") -> "Game":
         game.is_blocked[game.current_player] = True
         return game
 

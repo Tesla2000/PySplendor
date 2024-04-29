@@ -9,8 +9,8 @@ from .Reserve import Reserve
 
 
 class ReserveTop(Reserve):
-    def perform(self, game: "Game") -> "Game":
-        game = Move.perform(self, game)
+    def _perform(self, game: "Game") -> "Game":
+        game = Move._perform(self, game)
         tier = game.board.tiers[self.tier_index]
         card = tier.hidden.pop()
         self.reserve_card(game, card)

@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 @dataclass(slots=True, frozen=True)
 class Move(ABC):
     @abstractmethod
-    def perform(self, game: "Game") -> "Game":
+    def _perform(self, game: "Game") -> "Game":
         game = game.copy()
         game.is_blocked[game.current_player] = False
         return game

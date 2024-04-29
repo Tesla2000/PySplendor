@@ -14,6 +14,7 @@ class Tier:
             random.shuffle(self.hidden)
             for _ in range(4):
                 self.visible.append(self.hidden.pop())
+        self.visible.sort()
 
     def pop(self, index: int) -> Card:
         card = self.visible.pop(index)
@@ -21,4 +22,5 @@ class Tier:
             self.visible.append(self.hidden.pop())
         else:
             self.visible.append(empty_card)
+        self.visible.sort()
         return card

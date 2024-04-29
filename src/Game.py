@@ -53,7 +53,7 @@ class Game:
         self.current_player = self.players[0]
 
     def perform(self, action: Move) -> Self:
-        new_state = action.perform(self)
+        new_state = action._perform(self)
         new_state.turn_counter += 1
         # if sum(astuple(new_state.current_player.resources)) > 10:
         #     print(self)
@@ -75,7 +75,7 @@ class Game:
     def next_turn(self) -> None:
         self.players = (*self.players[1:], self.players[0])
         for index, aristocrat in enumerate(self.board.aristocrats):
-            if not (self.current_player.resources - aristocrat.cost).lacks():
+            if not (AllResources(*self.current_player.production) - aristocrat.cost).lacks():
                 self.current_player.aristocrats.append(
                     self.board.aristocrats.pop(index)
                 )

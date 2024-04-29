@@ -31,8 +31,12 @@ class _ConfigAgent:
     c = 0.5
     train_learning_rate = 5e-5
     retrain_learning_rate = 1e-3
+    random_state = 42
     # debug = True
     debug = False
+    if not debug:
+        random_state = random.randint(0, 2**32)
+        print(f"{random_state=}")
     retrain = False
     # retrain = True
     # pareto_optimize = True
@@ -63,8 +67,7 @@ class Config(_ConfigPaths, _ConfigAgent):
     eval_rate = 0.2
 
 
-if Config.debug:
-    random.seed(42)
-    np.random.seed(42)
-    torch.random.manual_seed(42)
-    torch.cuda.random.manual_seed(42)
+random.seed(Config.random_state)
+np.random.seed(42)
+torch.random.manual_seed(42)
+torch.cuda.random.manual_seed(42)
