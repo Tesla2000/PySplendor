@@ -19,5 +19,6 @@ for _ in tqdm(count()):
     try:
         Base.metadata.create_all(engine)
         break
-    except:
-        sleep(1)
+    except Exception as e:
+        break
+        # sleep(1)
