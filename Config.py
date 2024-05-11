@@ -44,6 +44,7 @@ class _ConfigAgent:
 
 
 class Config(_ConfigPaths, _ConfigAgent):
+    beta = 100
     print_interval = 1
     win_prob_weight = 30
     max_retrain_iterations = 1000
