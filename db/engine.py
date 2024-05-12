@@ -8,4 +8,4 @@ os.system(
     f"docker container start {Config.db_name}"
 )
 
-engine = create_engine(f'postgresql://postgres:{Config.db_password}@localhost:5432/{Config.db_name}')
+engine = create_engine(Config.db_url)
