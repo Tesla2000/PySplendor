@@ -1,8 +1,19 @@
+import os
 import random
 from pathlib import Path
 
 import numpy as np
 import torch
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
+class _DBConfig:
+    db_name = os.getenv("POSTGRES_DB")
+    db_password = os.getenv("POSTGRES_PASSWORD")
+    db_username = os.getenv("POSTGRES_USER")
+    db_url = f"postgresql://{db_username}:{db_password}@localhost:5432/{db_name}"
 
 
 class _ConfigPaths:
@@ -13,7 +24,6 @@ class _ConfigPaths:
     evaluation_data_path.mkdir(exist_ok=True)
     model_path = root / "models"
     model_path.mkdir(exist_ok=True)
-    db_password = (root / "db_password").read_text().strip()
 
 
 class _ConfigAgent:
@@ -35,7 +45,7 @@ class _ConfigAgent:
     # debug = True
     debug = False
     if not debug:
-        random_state = random.randint(0, 2**32)
+        random_state = random.randint(0, 2 ** 32)
         print(f"{random_state=}")
     retrain = False
     # retrain = True
@@ -43,7 +53,7 @@ class _ConfigAgent:
     pareto_optimize = False
 
 
-class Config(_ConfigPaths, _ConfigAgent):
+class Config(_ConfigPaths, _ConfigAgent, _DBConfig):
     beta = 100
     print_interval = 1
     win_prob_weight = 30
@@ -53,7 +63,6 @@ class Config(_ConfigPaths, _ConfigAgent):
     dirichlet_alpha = .3
     dirichlet_epsilon = .25
     test_size = .2
-    db_name = "splendor"
     train = True
     max_results_held = 100
     minimal_relative_agent_improvement = 1.1
