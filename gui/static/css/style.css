@@ -1,0 +1,84 @@
+body{
+    background-image: url('https://t3.ftcdn.net/jpg/05/78/01/18/360_F_578011852_K9oS4JmyFsj5RVsUeqVHcIULzFNpygbd.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+.game-container {
+    color: goldenrod;
+    font-family: "Times New Roman", sans-serif;
+}
+
+h1 {
+    color: #333;
+}
+
+/* Resource Fields */
+.resource {
+    background-color: #ddd;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    margin: 5px;
+    text-align: center;
+}
+
+/* Top Resource Fields */
+.top-resources {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+/* Bottom Resource Fields */
+.bottom-resources {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+/* Right Resource Fields */
+.card-grid-container {
+    display: flex;
+}
+
+.right-resources {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-left: 20px;
+}
+
+.card-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex-grow: 1;
+}
+
+.card-row {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.card {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 200px;
+    text-align: left;
+}
+
+.card h2 {
+    font-size: 1.5em;
+    margin: 0 0 10px;
+}
+
+.card p {
+    font-size: 1em;
+    color: #666;
+}
+
