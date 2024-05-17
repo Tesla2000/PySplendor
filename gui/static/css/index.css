@@ -22,32 +22,32 @@
   align-self: center;
   align-items: flex-start;
 }
-.home-image {
+.image {
   width: 15%;
   height: 100%;
   object-fit: cover;
 }
-.home-image01 {
+.image01 {
   width: 15%;
   height: 100%;
   object-fit: cover;
 }
-.home-image02 {
+.image02 {
   width: 15%;
   height: 100%;
   object-fit: cover;
 }
-.home-image03 {
+.image03 {
   width: 15%;
   height: 100%;
   object-fit: cover;
 }
-.home-image04 {
+.image04 {
   width: 15%;
   height: 100%;
   object-fit: cover;
 }
-.home-image05 {
+.image05 {
   width: 15%;
   height: 100%;
   object-fit: cover;
@@ -76,17 +76,17 @@
   align-items: flex-start;
   flex-direction: column;
 }
-.home-image06 {
+.image06 {
   width: 100%;
   height: 30%;
   object-fit: cover;
 }
-.home-image07 {
+.image07 {
   width: 100%;
   height: 30%;
   object-fit: cover;
 }
-.home-image08 {
+.image08 {
   width: 100%;
   height: 30%;
   object-fit: cover;
@@ -99,27 +99,27 @@
   align-items: flex-start;
   flex-direction: column;
 }
-.home-image09 {
+.image09 {
   width: 100%;
   height: 20%;
   object-fit: cover;
 }
-.home-image10 {
+.image10 {
   width: 100%;
   height: 20%;
   object-fit: cover;
 }
-.home-image11 {
+.image11 {
   width: 100%;
   height: 20%;
   object-fit: cover;
 }
-.home-image12 {
+.image12 {
   width: 100%;
   height: 20%;
   object-fit: cover;
 }
-.home-image13 {
+.image13 {
   width: 100%;
   height: 20%;
   object-fit: cover;
@@ -132,27 +132,27 @@
   align-items: flex-start;
   flex-direction: column;
 }
-.home-image14 {
+.image14 {
   width: 100%;
   height: 20%;
   object-fit: cover;
 }
-.home-image15 {
+.image15 {
   width: 100%;
   height: 20%;
   object-fit: cover;
 }
-.home-image16 {
+.image16 {
   width: 100%;
   height: 20%;
   object-fit: cover;
 }
-.home-image17 {
+.image17 {
   width: 100%;
   height: 20%;
   object-fit: cover;
 }
-.home-image18 {
+.image18 {
   width: 100%;
   height: 20%;
   object-fit: cover;
@@ -165,27 +165,27 @@
   align-items: flex-start;
   flex-direction: column;
 }
-.home-image19 {
+.image19 {
   width: 100%;
   height: 20%;
   object-fit: cover;
 }
-.home-image20 {
+.image20 {
   width: 100%;
   height: 20%;
   object-fit: cover;
 }
-.home-image21 {
+.image21 {
   width: 100%;
   height: 20%;
   object-fit: cover;
 }
-.home-image22 {
+.image22 {
   width: 100%;
   height: 20%;
   object-fit: cover;
 }
-.home-image23 {
+.image23 {
   width: 100%;
   height: 20%;
   object-fit: cover;
@@ -198,32 +198,32 @@
   align-items: flex-start;
   flex-direction: column;
 }
-.home-image24 {
+.image24 {
   width: 100%;
   height: 15%;
   object-fit: cover;
 }
-.home-image25 {
+.image25 {
   width: 100%;
   height: 15%;
   object-fit: cover;
 }
-.home-image26 {
+.image26 {
   width: 100%;
   height: 15%;
   object-fit: cover;
 }
-.home-image27 {
+.image27 {
   width: 100%;
   height: 15%;
   object-fit: cover;
 }
-.home-image28 {
+.image28 {
   width: 100%;
   height: 15%;
   object-fit: cover;
 }
-.home-image29 {
+.image29 {
   width: 100%;
   height: 15%;
   object-fit: cover;
@@ -236,33 +236,51 @@
   align-self: center;
   align-items: flex-start;
 }
-.home-image30 {
+.image30 {
   width: 15%;
   height: 100%;
   object-fit: cover;
 }
-.home-image31 {
+.image31 {
   width: 15%;
   height: 100%;
   object-fit: cover;
 }
-.home-image32 {
+.image32 {
   width: 15%;
   height: 100%;
   object-fit: cover;
 }
-.home-image33 {
+.image33 {
   width: 15%;
   height: 100%;
   object-fit: cover;
 }
-.home-image34 {
+.image34 {
   width: 15%;
   height: 100%;
   object-fit: cover;
 }
-.home-image35 {
+.image35 {
   width: 15%;
   height: 100%;
   object-fit: cover;
+}
+.home-image36 {
+  width: 200px;
+  height: 30%;
+  object-fit: cover;
+  border-width: 1px;
+}
+.home-image37 {
+  width: 200px;
+  height: 30%;
+  object-fit: cover;
+  border-width: 1px;
+}
+.home-image38 {
+  width: 200px;
+  height: 30%;
+  object-fit: cover;
+  border-width: 1px;
 }
