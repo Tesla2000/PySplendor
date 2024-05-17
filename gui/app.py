@@ -13,7 +13,7 @@ game = Game()
 app = Flask(__name__, template_folder=Config.templates)
 
 
-def get_building_name(tier: int, building: Card) -> str:
+def get_building_name(building: Card) -> str:
     prod2str = {
         BasicResources(red=1): "RED",
         BasicResources(green=1): "GREEN",
@@ -21,7 +21,10 @@ def get_building_name(tier: int, building: Card) -> str:
         BasicResources(black=1): "BLACK",
         BasicResources(white=1): "WHITE",
     }
-    return prod2str[building.production] + "".join(map(str, astuple(building.cost)))
+    try:
+        return "buildings/" + prod2str[building.production] + "".join(map(str, astuple(building.cost)))
+    except KeyError:
+        return "tier_1"
 
 
 images = {}
@@ -43,31 +46,31 @@ def home():
         'image_path_8': url_for('static',
                                 filename=f'components/aristocrats/{"".join(map(str, astuple(game.board.aristocrats[2].cost)))}.png'),
         'image_path_9': url_for('static',
-                                filename=f'components/buildings/{get_building_name(3, game.board.tiers[2].visible[0])}.png'),
+                                filename=f'components/{get_building_name(game.board.tiers[2].visible[0])}.png'),
         'image_path_10': url_for('static',
-                                 filename=f'components/buildings/{get_building_name(3, game.board.tiers[2].visible[1])}.png'),
+                                 filename=f'components/{get_building_name(game.board.tiers[2].visible[1])}.png'),
         'image_path_11': url_for('static',
-                                 filename=f'components/buildings/{get_building_name(3, game.board.tiers[2].visible[2])}.png'),
+                                 filename=f'components/{get_building_name(game.board.tiers[2].visible[2])}.png'),
         'image_path_12': url_for('static',
-                                 filename=f'components/buildings/{get_building_name(3, game.board.tiers[2].visible[3])}.png'),
+                                 filename=f'components/{get_building_name(game.board.tiers[2].visible[3])}.png'),
         'image_path_13': url_for('static', filename='components/tier_3.png'),
         'image_path_14': url_for('static',
-                                 filename=f'components/buildings/{get_building_name(2, game.board.tiers[1].visible[0])}.png'),
+                                 filename=f'components/{get_building_name(game.board.tiers[1].visible[0])}.png'),
         'image_path_15': url_for('static',
-                                 filename=f'components/buildings/{get_building_name(2, game.board.tiers[1].visible[1])}.png'),
+                                 filename=f'components/{get_building_name(game.board.tiers[1].visible[1])}.png'),
         'image_path_16': url_for('static',
-                                 filename=f'components/buildings/{get_building_name(2, game.board.tiers[1].visible[2])}.png'),
+                                 filename=f'components/{get_building_name(game.board.tiers[1].visible[2])}.png'),
         'image_path_17': url_for('static',
-                                 filename=f'components/buildings/{get_building_name(2, game.board.tiers[1].visible[3])}.png'),
+                                 filename=f'components/{get_building_name(game.board.tiers[1].visible[3])}.png'),
         'image_path_18': url_for('static', filename='components/tier_2.png'),
         'image_path_19': url_for('static',
-                                 filename=f'components/buildings/{get_building_name(1, game.board.tiers[0].visible[0])}.png'),
+                                 filename=f'components/{get_building_name(game.board.tiers[0].visible[0])}.png'),
         'image_path_20': url_for('static',
-                                 filename=f'components/buildings/{get_building_name(1, game.board.tiers[0].visible[1])}.png'),
+                                 filename=f'components/{get_building_name(game.board.tiers[0].visible[1])}.png'),
         'image_path_21': url_for('static',
-                                 filename=f'components/buildings/{get_building_name(1, game.board.tiers[0].visible[2])}.png'),
+                                 filename=f'components/{get_building_name(game.board.tiers[0].visible[2])}.png'),
         'image_path_22': url_for('static',
-                                 filename=f'components/buildings/{get_building_name(1, game.board.tiers[0].visible[3])}.png'),
+                                 filename=f'components/{get_building_name(game.board.tiers[0].visible[3])}.png'),
         'image_path_23': url_for('static', filename='components/tier_1.png'),
         'image_path_24': url_for('static', filename='components/resource/red.png'),
         'image_path_25': url_for('static', filename='components/resource/green.png'),
@@ -81,48 +84,50 @@ def home():
         'image_path_33': url_for('static', filename='components/resource/black.png'),
         'image_path_34': url_for('static', filename='components/resource/white.png'),
         'image_path_35': url_for('static', filename='components/resource/gold.png'),
-        'image_path_36': url_for('static', filename=f'components/buildings/{get_building_name(1, game.current_player.reserve[0])}.png'),
-        'image_path_37': url_for('static', filename=f'components/buildings/{get_building_name(1, game.current_player.reserve[1])}.png'),
-        'image_path_38': url_for('static', filename=f'components/buildings/{get_building_name(1, game.current_player.reserve[2])}.png'),
+        'image_path_36': url_for('static', filename=f'components/{get_building_name(game.current_player.reserve[0])}.png'),
+        'image_path_37': url_for('static', filename=f'components/{get_building_name(game.current_player.reserve[1])}.png'),
+        'image_path_38': url_for('static', filename=f'components/{get_building_name(game.current_player.reserve[2])}.png'),
+        'points_current_player': game.current_player.points,
+        'points_other_player': game.players[-1].points,
     })
     return render_template('new_index.html', **images)
 
 
 image2build = {
-    "image9": game.all_moves,
-    "image10": lambda: game.board.tiers[2].visible[1],
-    "image11": lambda: game.board.tiers[2].visible[2],
-    "image12": lambda: game.board.tiers[2].visible[3],
-    "image13": lambda: game.board.tiers[2].hidden[0],
-    "image14": lambda: game.board.tiers[1].visible[0],
-    "image15": lambda: game.board.tiers[1].visible[1],
-    "image16": lambda: game.board.tiers[1].visible[2],
-    "image17": lambda: game.board.tiers[1].visible[3],
-    "image18": lambda: game.board.tiers[1].hidden[0],
-    "image19": lambda: game.board.tiers[0].visible[0],
-    "image20": lambda: game.board.tiers[0].visible[1],
-    "image21": lambda: game.board.tiers[0].visible[2],
-    "image22": lambda: game.board.tiers[0].visible[3],
-    "image23": lambda: game.board.tiers[0].hidden[3],
+    "image9": game.all_moves[23],
+    "image10": game.all_moves[24],
+    "image11": game.all_moves[25],
+    "image12": game.all_moves[26],
+    "image36": game.all_moves[29],
+    "image14": game.all_moves[19],
+    "image15": game.all_moves[20],
+    "image16": game.all_moves[21],
+    "image17": game.all_moves[22],
+    "image37": game.all_moves[28],
+    "image19": game.all_moves[15],
+    "image20": game.all_moves[16],
+    "image21": game.all_moves[17],
+    "image22": game.all_moves[18],
+    "image38": game.all_moves[27],
 }
 
 
 image2reserve = {
-    "image9": lambda: game.board.tiers[2].visible[0],
-    "image10": lambda: game.board.tiers[2].visible[1],
-    "image11": lambda: game.board.tiers[2].visible[2],
-    "image12": lambda: game.board.tiers[2].visible[3],
-    "image13": lambda: game.board.tiers[2].hidden[0],
-    "image14": lambda: game.board.tiers[1].visible[0],
-    "image15": lambda: game.board.tiers[1].visible[1],
-    "image16": lambda: game.board.tiers[1].visible[2],
-    "image17": lambda: game.board.tiers[1].visible[3],
-    "image18": lambda: game.board.tiers[1].hidden[0],
-    "image19": lambda: game.board.tiers[0].visible[0],
-    "image20": lambda: game.board.tiers[0].visible[1],
-    "image21": lambda: game.board.tiers[0].visible[2],
-    "image22": lambda: game.board.tiers[0].visible[3],
-    "image23": lambda: game.board.tiers[0].hidden[3],
+    "image9": game.all_moves[38],
+    "image10": game.all_moves[39],
+    "image11": game.all_moves[40],
+    "image12": game.all_moves[41],
+    "image13": game.all_moves[44],
+    "image14": game.all_moves[34],
+    "image15": game.all_moves[35],
+    "image16": game.all_moves[36],
+    "image17": game.all_moves[37],
+    "image18": game.all_moves[43],
+    "image19": game.all_moves[30],
+    "image20": game.all_moves[31],
+    "image21": game.all_moves[32],
+    "image22": game.all_moves[33],
+    "image23": game.all_moves[42],
 }
 
 image2resource = {
@@ -142,7 +147,13 @@ def click():
     image_class = data.get('class')
     right_click = data.get('clickType') == "right"
     if image_class in image2build:
-
+        if right_click:
+            action = image2reserve[image_class]
+        else:
+            action = image2build[image_class]
+        if not action.is_valid(game) or astuple(grabbed_resources):
+            return jsonify(success=False)
+        game.perform(action)
         return jsonify(success=True)
     if image_class in image2resource:
         chosen_resource = image2resource[image_class]
