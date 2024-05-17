@@ -1,0 +1,268 @@
+.home-container {
+  width: 100%;
+  display: flex;
+  overflow: auto;
+  min-height: 100vh;
+  align-items: center;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+.home-container01 {
+  width: 100%;
+  height: 1014px;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+}
+.home-container02 {
+  flex: 0 0 auto;
+  width: 100%;
+  height: 10%;
+  display: flex;
+  align-self: center;
+  align-items: flex-start;
+}
+.home-image {
+  width: 15%;
+  height: 100%;
+  object-fit: cover;
+}
+.home-image01 {
+  width: 15%;
+  height: 100%;
+  object-fit: cover;
+}
+.home-image02 {
+  width: 15%;
+  height: 100%;
+  object-fit: cover;
+}
+.home-image03 {
+  width: 15%;
+  height: 100%;
+  object-fit: cover;
+}
+.home-image04 {
+  width: 15%;
+  height: 100%;
+  object-fit: cover;
+}
+.home-image05 {
+  width: 15%;
+  height: 100%;
+  object-fit: cover;
+}
+.home-container03 {
+  flex: 0 0 auto;
+  width: 100%;
+  height: 80%;
+  display: flex;
+  align-items: flex-start;
+}
+.home-container04 {
+  flex: 0 0 auto;
+  width: 200px;
+  border: 2px dashed rgba(120, 120, 120, 0.4);
+  height: 100%;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+}
+.home-container05 {
+  flex: 0 0 auto;
+  width: 200px;
+  height: 100%;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+}
+.home-image06 {
+  width: 100%;
+  height: 30%;
+  object-fit: cover;
+}
+.home-image07 {
+  width: 100%;
+  height: 30%;
+  object-fit: cover;
+}
+.home-image08 {
+  width: 100%;
+  height: 30%;
+  object-fit: cover;
+}
+.home-container06 {
+  flex: 0 0 auto;
+  width: 15%;
+  height: 100%;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+}
+.home-image09 {
+  width: 100%;
+  height: 20%;
+  object-fit: cover;
+}
+.home-image10 {
+  width: 100%;
+  height: 20%;
+  object-fit: cover;
+}
+.home-image11 {
+  width: 100%;
+  height: 20%;
+  object-fit: cover;
+}
+.home-image12 {
+  width: 100%;
+  height: 20%;
+  object-fit: cover;
+}
+.home-image13 {
+  width: 100%;
+  height: 20%;
+  object-fit: cover;
+}
+.home-container07 {
+  flex: 0 0 auto;
+  width: 15%;
+  height: 100%;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+}
+.home-image14 {
+  width: 100%;
+  height: 20%;
+  object-fit: cover;
+}
+.home-image15 {
+  width: 100%;
+  height: 20%;
+  object-fit: cover;
+}
+.home-image16 {
+  width: 100%;
+  height: 20%;
+  object-fit: cover;
+}
+.home-image17 {
+  width: 100%;
+  height: 20%;
+  object-fit: cover;
+}
+.home-image18 {
+  width: 100%;
+  height: 20%;
+  object-fit: cover;
+}
+.home-container08 {
+  flex: 0 0 auto;
+  width: 15%;
+  height: 100%;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+}
+.home-image19 {
+  width: 100%;
+  height: 20%;
+  object-fit: cover;
+}
+.home-image20 {
+  width: 100%;
+  height: 20%;
+  object-fit: cover;
+}
+.home-image21 {
+  width: 100%;
+  height: 20%;
+  object-fit: cover;
+}
+.home-image22 {
+  width: 100%;
+  height: 20%;
+  object-fit: cover;
+}
+.home-image23 {
+  width: 100%;
+  height: 20%;
+  object-fit: cover;
+}
+.home-container09 {
+  flex: 0 0 auto;
+  width: 200px;
+  height: 100%;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+}
+.home-image24 {
+  width: 100%;
+  height: 15%;
+  object-fit: cover;
+}
+.home-image25 {
+  width: 100%;
+  height: 15%;
+  object-fit: cover;
+}
+.home-image26 {
+  width: 100%;
+  height: 15%;
+  object-fit: cover;
+}
+.home-image27 {
+  width: 100%;
+  height: 15%;
+  object-fit: cover;
+}
+.home-image28 {
+  width: 100%;
+  height: 15%;
+  object-fit: cover;
+}
+.home-image29 {
+  width: 100%;
+  height: 15%;
+  object-fit: cover;
+}
+.home-container10 {
+  flex: 0 0 auto;
+  width: 100%;
+  height: 10%;
+  display: flex;
+  align-self: center;
+  align-items: flex-start;
+}
+.home-image30 {
+  width: 15%;
+  height: 100%;
+  object-fit: cover;
+}
+.home-image31 {
+  width: 15%;
+  height: 100%;
+  object-fit: cover;
+}
+.home-image32 {
+  width: 15%;
+  height: 100%;
+  object-fit: cover;
+}
+.home-image33 {
+  width: 15%;
+  height: 100%;
+  object-fit: cover;
+}
+.home-image34 {
+  width: 15%;
+  height: 100%;
+  object-fit: cover;
+}
+.home-image35 {
+  width: 15%;
+  height: 100%;
+  object-fit: cover;
+}

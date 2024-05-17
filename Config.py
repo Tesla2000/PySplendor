@@ -24,6 +24,8 @@ class _ConfigPaths:
     evaluation_data_path.mkdir(exist_ok=True)
     model_path = root / "models"
     model_path.mkdir(exist_ok=True)
+    gui = root / "gui"
+    templates = gui / "template"
 
 
 class _ConfigAgent:
