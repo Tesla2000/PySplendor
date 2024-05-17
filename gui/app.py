@@ -18,10 +18,10 @@ def get_building_name(tier: int, building: Card) -> str:
         BasicResources(red=1): "RED",
         BasicResources(green=1): "GREEN",
         BasicResources(blue=1): "BLUE",
-        BasicResources(black=1): "BROWN",
+        BasicResources(black=1): "BLACK",
         BasicResources(white=1): "WHITE",
     }
-    return str(tier) + prod2str[building.production] + "".join(map(str, astuple(building.cost)))
+    return prod2str[building.production] + "".join(map(str, astuple(building.cost)))
 
 
 images = {}
@@ -33,7 +33,7 @@ def home():
         'image_path_0': url_for('static', filename='components/resource/red.png'),
         'image_path_1': url_for('static', filename='components/resource/green.png'),
         'image_path_2': url_for('static', filename='components/resource/blue.png'),
-        'image_path_3': url_for('static', filename='components/resource/brown.png'),
+        'image_path_3': url_for('static', filename='components/resource/black.png'),
         'image_path_4': url_for('static', filename='components/resource/white.png'),
         'image_path_5': url_for('static', filename='components/resource/gold.png'),
         'image_path_6': url_for('static',
@@ -72,13 +72,13 @@ def home():
         'image_path_24': url_for('static', filename='components/resource/red.png'),
         'image_path_25': url_for('static', filename='components/resource/green.png'),
         'image_path_26': url_for('static', filename='components/resource/blue.png'),
-        'image_path_27': url_for('static', filename='components/resource/brown.png'),
+        'image_path_27': url_for('static', filename='components/resource/black.png'),
         'image_path_28': url_for('static', filename='components/resource/white.png'),
         'image_path_29': url_for('static', filename='components/resource/gold.png'),
         'image_path_30': url_for('static', filename='components/resource/red.png'),
         'image_path_31': url_for('static', filename='components/resource/green.png'),
         'image_path_32': url_for('static', filename='components/resource/blue.png'),
-        'image_path_33': url_for('static', filename='components/resource/brown.png'),
+        'image_path_33': url_for('static', filename='components/resource/black.png'),
         'image_path_34': url_for('static', filename='components/resource/white.png'),
         'image_path_35': url_for('static', filename='components/resource/gold.png'),
         'image_path_36': url_for('static', filename=f'components/buildings/{get_building_name(1, game.current_player.reserve[0])}.png'),
