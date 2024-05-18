@@ -3,6 +3,7 @@ from dataclasses import astuple
 from flask import Flask, render_template, request, jsonify, url_for
 
 from Config import Config
+from gui.get_building_name import get_building_name
 from gui.perform_move import perform_move
 from src.Game import Game
 from src.entities.AllResources import AllResources
@@ -12,20 +13,6 @@ from src.moves import GrabThreeResource, GrabTwoResource
 
 game = Game()
 app = Flask(__name__, template_folder=Config.templates)
-
-
-def get_building_name(building: Card) -> str:
-    prod2str = {
-        BasicResources(red=1): "RED",
-        BasicResources(green=1): "GREEN",
-        BasicResources(blue=1): "BLUE",
-        BasicResources(black=1): "BLACK",
-        BasicResources(white=1): "WHITE",
-    }
-    try:
-        return "buildings/" + prod2str[building.production] + "".join(map(str, astuple(building.cost)))
-    except KeyError:
-        return "tier_1"
 
 
 images = {}
