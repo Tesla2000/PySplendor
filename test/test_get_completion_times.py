@@ -5,7 +5,7 @@ from src.Game import Game
 
 def test_get_completion_times():
     game = Game()
-    game_end_checker = EndOnSecondPlayer(game)
+    game_end_checker = EndOnSecondPlayer()
     for game_state in get_shortest_game((game, None,), 10, game_end_checker):
         pass
     # game = game.perform(GrabTwoResource(BasicResources(black=2)))

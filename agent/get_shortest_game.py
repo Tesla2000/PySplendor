@@ -1,44 +1,21 @@
 from copy import deepcopy
-from typing import Generator, Optional, NamedTuple
+from typing import Generator
 
 import numpy as np
 import torch
 
 from agent.Agent import Agent
+from agent.entities import GameState, NoValidMove
 from agent.services.game_end_checker import GameEndChecker
 from src.Game import Game
-from src.moves import Move
-
-
-class GameMovePair(NamedTuple):
-    game: Game
-    move: Move
-
-
-GameMovePairs = list[GameMovePair]
-
-
-class GameState(NamedTuple):
-    game: Game
-    move: Optional[Move] = None
-    previous_state: Optional["GameState"] = None
-
-    def to_list(self) -> GameMovePairs:
-        output = [GameMovePair(self.previous_state.game, self.move)]
-        prev_state = self.previous_state
-        while prev_state.previous_state:
-            output.append(GameMovePair(prev_state.previous_state.game, prev_state.move))
-            prev_state = prev_state.previous_state
-        return output
 
 
 @torch.no_grad()
-def get_shortest_game(game_states: list[GameState], beta: int, game_end_checker: GameEndChecker,
-                      agent: Agent) -> Generator[GameState, None, None]:
-    game_states = list(filter(lambda game_state: not game_state.game.is_terminal(), game_states))
+def get_shortest_game(raw_game_states: list[GameState], beta: int, game_end_checker: GameEndChecker,
+                      agent: Agent) -> Generator[GameState, None, int]:
+    game_states = list(filter(lambda game_state: not game_state.game.is_terminal(), raw_game_states))
     if not game_states:
-        print("No valid moves")
-        return
+        raise NoValidMove(raw_game_states[0].game.current_player.id)
     board_states = tuple(game.get_state() for game, _, _ in game_states)
     move_probs = agent(torch.tensor(board_states).float()).flatten().numpy()
     move_indexes = np.argsort(move_probs)

@@ -6,7 +6,7 @@ import torch
 from torch.utils.data import Dataset
 
 from Config import Config
-from agent.get_shortest_game import GameMovePairs
+from agent.entities import GameMovePairs
 from src.Game import Game
 
 

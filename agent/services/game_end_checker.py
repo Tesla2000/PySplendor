@@ -17,11 +17,5 @@ class EndOnFirstPlayer(GameEndChecker):
 
 
 class EndOnSecondPlayer(GameEndChecker):
-    def __init__(self, game: Game):
-        self.players = set(player.id for player in game.players)
-
     def is_end(self, game: Game) -> bool:
-        for player in game.players:
-            if Config.min_n_points_to_finish <= player.points and player.id in self.players:
-                self.players.remove(player.id)
-        return not self.players
+        return all(player.points >= Config.min_n_points_to_finish for player in game.players)

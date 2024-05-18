@@ -3,6 +3,7 @@ import random
 import re
 import warnings
 from collections import deque
+from contextlib import suppress
 from itertools import count
 from statistics import fmean
 
@@ -13,8 +14,9 @@ from torch.utils.data import DataLoader
 from Config import Config
 from agent.Agent import Agent
 from agent.RLDataset import RLDataset
+from agent.entities import NoValidMove
 from agent.get_shortest_games import get_shortest_games
-from agent.services.game_end_checker import EndOnSecondPlayer, EndOnFirstPlayer
+from agent.services.game_end_checker import EndOnSecondPlayer
 from src.Game import Game
 
 warnings.filterwarnings("ignore")
@@ -27,9 +29,9 @@ agent.load_state_dict(torch.load(next(Config.model_path.glob(f'speed_game_{last_
 def _train_epoch(beta: int, results_over_time: deque[float], train_buffer: RLDataset, epoch: int, trainer: pl.Trainer):
     agent.eval()
     root = Game()
-    # game_end_checker = EndOnSecondPlayer(root)
-    game_end_checker = EndOnFirstPlayer()
-    shortest_games = get_shortest_games(root, game_end_checker, beta, agent)
+    game_end_checker = EndOnSecondPlayer()
+    with suppress(NoValidMove):
+        shortest_games = get_shortest_games(root, game_end_checker, beta, agent)
     if not shortest_games:
         return
     shortest_game = random.choice(shortest_games)
