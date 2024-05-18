@@ -3,6 +3,8 @@ from dataclasses import astuple
 from flask import Flask, render_template, request, jsonify, url_for
 
 from Config import Config
+from gui.get_building_name import get_building_name
+from gui.perform_move import perform_move
 from src.Game import Game
 from src.entities.AllResources import AllResources
 from src.entities.BasicResources import BasicResources
@@ -11,20 +13,6 @@ from src.moves import GrabThreeResource, GrabTwoResource
 
 game = Game()
 app = Flask(__name__, template_folder=Config.templates)
-
-
-def get_building_name(building: Card) -> str:
-    prod2str = {
-        BasicResources(red=1): "RED",
-        BasicResources(green=1): "GREEN",
-        BasicResources(blue=1): "BLUE",
-        BasicResources(black=1): "BLACK",
-        BasicResources(white=1): "WHITE",
-    }
-    try:
-        return "buildings/" + prod2str[building.production] + "".join(map(str, astuple(building.cost)))
-    except KeyError:
-        return "tier_1"
 
 
 images = {}
@@ -79,14 +67,22 @@ def home():
         'image_path_28': url_for('static', filename=f'components/resource/white{game.board.resources.white}.png'),
         'image_path_29': url_for('static', filename=f'components/resource/gold{game.board.resources.gold}.png'),
         'image_path_30': url_for('static', filename=f'components/resource/red{game.current_player.resources.red}.png'),
-        'image_path_31': url_for('static', filename=f'components/resource/green{game.current_player.resources.green}.png'),
-        'image_path_32': url_for('static', filename=f'components/resource/blue{game.current_player.resources.blue}.png'),
-        'image_path_33': url_for('static', filename=f'components/resource/black.{game.current_player.resources.black}png'),
-        'image_path_34': url_for('static', filename=f'components/resource/white{game.current_player.resources.white}.png'),
-        'image_path_35': url_for('static', filename=f'components/resource/gold{game.current_player.resources.gold}.png'),
-        'image_path_36': url_for('static', filename=f'components/{get_building_name(game.current_player.reserve[0])}.png'),
-        'image_path_37': url_for('static', filename=f'components/{get_building_name(game.current_player.reserve[1])}.png'),
-        'image_path_38': url_for('static', filename=f'components/{get_building_name(game.current_player.reserve[2])}.png'),
+        'image_path_31': url_for('static',
+                                 filename=f'components/resource/green{game.current_player.resources.green}.png'),
+        'image_path_32': url_for('static',
+                                 filename=f'components/resource/blue{game.current_player.resources.blue}.png'),
+        'image_path_33': url_for('static',
+                                 filename=f'components/resource/black.{game.current_player.resources.black}png'),
+        'image_path_34': url_for('static',
+                                 filename=f'components/resource/white{game.current_player.resources.white}.png'),
+        'image_path_35': url_for('static',
+                                 filename=f'components/resource/gold{game.current_player.resources.gold}.png'),
+        'image_path_36': url_for('static',
+                                 filename=f'components/{get_building_name(game.current_player.reserve[0])}.png'),
+        'image_path_37': url_for('static',
+                                 filename=f'components/{get_building_name(game.current_player.reserve[1])}.png'),
+        'image_path_38': url_for('static',
+                                 filename=f'components/{get_building_name(game.current_player.reserve[2])}.png'),
         'points_current_player': game.current_player.points,
         'points_other_player': game.players[-1].points,
     })
@@ -110,7 +106,6 @@ image2build = {
     "image22": game.all_moves[18],
     "image38": game.all_moves[27],
 }
-
 
 image2reserve = {
     "image9": game.all_moves[38],
@@ -142,7 +137,7 @@ grabbed_resources = BasicResources()
 
 @app.route('/click', methods=['POST'])
 def click():
-    global grabbed_resources
+    global grabbed_resources, game
     data = request.json
     image_class = data.get('class')
     right_click = data.get('clickType') == "right"
@@ -153,8 +148,8 @@ def click():
             action = image2build[image_class]
         if not action.is_valid(game) or astuple(grabbed_resources):
             return jsonify(success=False)
-        game.perform(action)
-        return jsonify(success=True)
+        game = perform_move(game, action)
+        return jsonify(success=True, turn_finished=True)
     if image_class in image2resource:
         chosen_resource = image2resource[image_class]
         if right_click:
@@ -165,12 +160,18 @@ def click():
         else:
             grabbed_resources += chosen_resource
         if sum(grabbed_resources) == 3:
-            game.perform(GrabThreeResource(grabbed_resources))
+            game = perform_move(game, GrabThreeResource(grabbed_resources))
+            return jsonify(success=True, turn_finished=True)
+        if max(grabbed_resources) == 2 and game.board.resources[
+            astuple(grabbed_resources).index(max(grabbed_resources))
+        ] < 2:
+            return jsonify(success=False)
         if max(grabbed_resources) == 2 and sum(grabbed_resources) == 3:
             return jsonify(success=False)
         if max(grabbed_resources) == 2 and sum(grabbed_resources) != 3:
-            game.perform(GrabTwoResource(grabbed_resources))
-        return jsonify(success=True)
+            game = perform_move(game, GrabTwoResource(grabbed_resources))
+            return jsonify(success=True, turn_finished=True)
+        return jsonify(success=True, turn_finished=False)
 
     return jsonify(success=False)
 

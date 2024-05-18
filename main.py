@@ -1,18 +1,9 @@
-import random
-
-from src.Game import Game
+from agent.train_to_go_fast import train_to_go_fast
 
 
 def main():
-    print(len(Game().get_state()) - 45)
-    print(len(Game(n_players=3).get_state()) - 45)
-    print(len(Game(n_players=4).get_state()) - 45)
-    game = Game()
-    # while not game.is_terminal():
-    #     actions = game.get_possible_actions()
-    #     action = random.choice(actions)
-    #     game = game.perform(action)
+    train_to_go_fast()
 
 
 if __name__ == "__main__":
-    main()
+    exit(main())

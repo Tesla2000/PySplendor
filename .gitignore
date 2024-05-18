@@ -1,7 +1,4 @@
 /sandbox.py
-/data/
 /models/
-/evaluation_data/
-/training_data/
-/db_password
 /.venv
+/.env

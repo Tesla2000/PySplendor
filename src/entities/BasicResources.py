@@ -23,3 +23,6 @@ class BasicResources:
 
     def __iter__(self):
         return (self.red, self.green, self.blue, self.black, self.white).__iter__()
+
+    def __getitem__(self, item):
+        return (self.red, self.green, self.blue, self.black, self.white)[item]
