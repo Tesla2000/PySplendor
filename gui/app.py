@@ -162,7 +162,7 @@ def click():
         if not action.is_valid(game) or astuple(grabbed_resources):
             return jsonify(success=False)
         game = perform_move(game, action)
-        return jsonify(success=True)
+        return jsonify(success=True, turn_finished=True)
     if image_class in image2resource:
         chosen_resource = image2resource[image_class]
         if right_click:
@@ -174,6 +174,7 @@ def click():
             grabbed_resources += chosen_resource
         if sum(grabbed_resources) == 3:
             game = perform_move(game, GrabThreeResource(grabbed_resources))
+            return jsonify(success=True, turn_finished=True)
         if max(grabbed_resources) == 2 and game.board.resources[
             astuple(grabbed_resources).index(max(grabbed_resources))
         ] < 2:
@@ -182,7 +183,8 @@ def click():
             return jsonify(success=False)
         if max(grabbed_resources) == 2 and sum(grabbed_resources) != 3:
             game = perform_move(game, GrabTwoResource(grabbed_resources))
-        return jsonify(success=True)
+            return jsonify(success=True, turn_finished=True)
+        return jsonify(success=True, turn_finished=False)
 
     return jsonify(success=False)
 
