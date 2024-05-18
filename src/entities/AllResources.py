@@ -8,6 +8,18 @@ from .BasicResources import BasicResources
 class AllResources(BasicResources):
     gold: int = 0
 
+    def lacks(self) -> bool:
+        return self.gold < 0
+
+    def get_basic(self) -> BasicResources:
+        return BasicResources(
+            self.red,
+            self.green,
+            self.blue,
+            self.black,
+            self.white,
+        )
+
     def __sub__(self, other: BasicResources) -> Self:
         if not isinstance(other, BasicResources):
             raise ValueError(f"Other element must be resource is {other.__class__}")
@@ -44,9 +56,6 @@ class AllResources(BasicResources):
     def __rsub__(self, other: BasicResources) -> Self:
         return self.__sub__(other)
 
-    def lacks(self) -> bool:
-        return self.gold < 0
-
     def __iter__(self):
         return (
             self.red,
@@ -57,14 +66,8 @@ class AllResources(BasicResources):
             self.gold,
         ).__iter__()
 
-    def get_basic(self) -> BasicResources:
-        return BasicResources(
-            self.red,
-            self.green,
-            self.blue,
-            self.black,
-            self.white,
-        )
+    def __getitem__(self, item):
+        return (self.red, self.green, self.blue, self.black, self.white, self.gold)[item]
 
 
 if __name__ == "__main__":

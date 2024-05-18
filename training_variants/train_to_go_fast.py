@@ -1,4 +1,3 @@
-import atexit
 import re
 from collections import deque
 from dataclasses import dataclass
@@ -27,17 +26,23 @@ class GameState:
     move_index: int = None
 
 
-def _get_new_games(games: list[GameState], results_over_time: deque[float], beta: int, train_buffer):
+@torch.no_grad()
+def get_expected_completion_times(games: list[GameState], beta: int, results_over_time: deque[float] = None,
+                                  train_buffer: deque = None) -> dict[int, int]:
+    if results_over_time is None:
+        results_over_time = deque()
+    if train_buffer is None:
+        train_buffer = deque()
     players = list(player.id for player in games[0].game_instance.players)
+    finish_times = {}
     move_log = []
     while True:
         games = list(game for game in games if not game.game_instance.is_terminal())
         if not games:
             print("No valid results")
-            break
+            return finish_times
         game_states = list(game.game_instance.get_state() for game in games)
-        with torch.no_grad():
-            move_probs = agent(torch.tensor(game_states).float()).flatten().numpy()
+        move_probs = agent(torch.tensor(game_states).float()).flatten().numpy()
         move_indexes = np.argsort(move_probs)
         new_games = []
         for move_index in move_indexes:
@@ -48,8 +53,10 @@ def _get_new_games(games: list[GameState], results_over_time: deque[float], beta
                 game.move_index = move_index
                 new_game = GameState(game.game_instance.perform(move), game)
                 # if any(map(Config.min_n_points_to_finish.__le__, map(attrgetter("points"), new_game.game_instance.players))):
-                if new_game.game_instance.players[-1].points >= Config.min_n_points_to_finish and (player_id := new_game.game_instance.players[-1].id) in players:
+                if new_game.game_instance.players[-1].points >= Config.min_n_points_to_finish and (
+                player_id := new_game.game_instance.players[-1].id) in players:
                     players.remove(player_id)
+                    finish_times[player_id] = new_game.game_instance.turn_counter
                     if not move_log:
                         results_over_time.append(new_game.game_instance.turn_counter / 2)
                     prev_state = new_game
@@ -58,13 +65,14 @@ def _get_new_games(games: list[GameState], results_over_time: deque[float], beta
                         if prev_state is None:
                             break
                         if prev_state.game_instance.current_player.id == player_id:
-                            move_log.append((prev_state.game_instance, prev_state.game_instance.all_moves[prev_state.move_index]))
+                            move_log.append(
+                                (prev_state.game_instance, prev_state.game_instance.all_moves[prev_state.move_index]))
                             train_buffer.append(
                                 (prev_state.game_instance.get_state(), moves_till_end, prev_state.move_index))
                         prev_state = prev_state.prev_state
-                            # game_instances.append(prev_state.game_instance)
+                        # game_instances.append(prev_state.game_instance)
                     if not players:
-                        return
+                        return finish_times
                 new_games.append(new_game)
                 if len(new_games) == beta:
                     break
@@ -78,10 +86,11 @@ def train_to_go_fast():
     dataset = SpeedRLDataset(train_buffer)
     results_over_time = deque(maxlen=100)
     beta = Config.beta
-    for epoch in count(max(int(re.findall(r'\d+', path.name)[0]) for path in Config.model_path.glob("speed_game_*")) + 1):
+    for epoch in count(
+        max(int(re.findall(r'\d+', path.name)[0]) for path in Config.model_path.glob("speed_game_*")) + 1):
         agent.eval()
         games = [GameState(Game())]
-        _get_new_games(games, results_over_time, beta, train_buffer)
+        get_expected_completion_times(games, beta, results_over_time, train_buffer)
         if not train_buffer:
             continue
         if epoch % 1 == 0:
@@ -99,7 +108,6 @@ def train_to_go_fast():
             # print(loss.item())
             loss.backward()
             optimizer.step()
-
 
 # @atexit.register
 # def _save():

@@ -56,6 +56,7 @@ class _ConfigAgent:
 
 
 class Config(_ConfigPaths, _ConfigAgent, _DBConfig):
+    play_beta = 10
     beta = 100
     print_interval = 1
     win_prob_weight = 30
