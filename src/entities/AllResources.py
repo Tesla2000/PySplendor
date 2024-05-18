@@ -57,6 +57,15 @@ class AllResources(BasicResources):
             self.gold,
         ).__iter__()
 
+    def get_basic(self) -> BasicResources:
+        return BasicResources(
+            self.red,
+            self.green,
+            self.blue,
+            self.black,
+            self.white,
+        )
+
 
 if __name__ == "__main__":
     (
