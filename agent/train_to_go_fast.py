@@ -1,114 +1,61 @@
+import logging
+import random
 import re
+import sys
+import warnings
 from collections import deque
-from dataclasses import dataclass
 from itertools import count
 from statistics import fmean
 
-import numpy as np
+import pytorch_lightning as pl
 import torch
-from torch import nn
-from torch.optim import Adam
 from torch.utils.data import DataLoader
 
 from Config import Config
 from agent.Agent import Agent
 from agent.RLDataset import RLDataset
+from agent.get_shortest_game import get_shortest_game, GameSequence, GameState
+from agent.services.game_end_checker import EndOnSecondPlayer, GameEndChecker
 from src.Game import Game
 
+warnings.filterwarnings("ignore")
+logging.getLogger("pytorch_lightning").setLevel(logging.WARNING)
+last_saved_epoch = max(int(re.findall(r'\d+', path.name)[0]) for path in Config.model_path.glob("speed_game_*"))
 agent = Agent()
-agent.load_state_dict(torch.load(Config.model_path.joinpath('speed_game.pth')))
+agent.load_state_dict(torch.load(next(Config.model_path.glob(f'speed_game_{last_saved_epoch}*'))))
 
 
-@dataclass
-class GameState:
-    game_instance: Game
-    prev_state: "GameState" = None
-    move_index: int = None
-
-
-@torch.no_grad()
-def get_expected_completion_times(games: list[GameState], beta: int, results_over_time: deque[float] = None,
-                                  train_buffer: deque = None) -> dict[int, int]:
-    if results_over_time is None:
-        results_over_time = deque()
-    if train_buffer is None:
-        train_buffer = deque()
-    players = list(player.id for player in games[0].game_instance.players)
-    finish_times = {}
-    move_log = []
-    while True:
-        games = list(game for game in games if not game.game_instance.is_terminal())
-        if not games:
-            print("No valid results")
-            return finish_times
-        game_states = list(game.game_instance.get_state() for game in games)
-        move_probs = agent(torch.tensor(game_states).float()).flatten().numpy()
-        move_indexes = np.argsort(move_probs)
-        new_games = []
-        for move_index in move_indexes:
-            game_index, move_index = divmod(move_index, Game.action_size)
-            game = games[game_index]
-            move = Game.all_moves[move_index]
-            if move.is_valid(game.game_instance):
-                game.move_index = move_index
-                new_game = GameState(game.game_instance.perform(move), game)
-                # if any(map(Config.min_n_points_to_finish.__le__, map(attrgetter("points"), new_game.game_instance.players))):
-                if new_game.game_instance.players[-1].points >= Config.min_n_points_to_finish and (
-                player_id := new_game.game_instance.players[-1].id) in players:
-                    players.remove(player_id)
-                    finish_times[player_id] = new_game.game_instance.turn_counter
-                    if not move_log:
-                        results_over_time.append(new_game.game_instance.turn_counter / 2)
-                    prev_state = new_game
-                    # game_instances = []
-                    for moves_till_end in count():
-                        if prev_state is None:
-                            break
-                        if prev_state.game_instance.current_player.id == player_id:
-                            move_log.append(
-                                (prev_state.game_instance, prev_state.game_instance.all_moves[prev_state.move_index]))
-                            train_buffer.append(
-                                (prev_state.game_instance.get_state(), moves_till_end, prev_state.move_index))
-                        prev_state = prev_state.prev_state
-                        # game_instances.append(prev_state.game_instance)
-                    if not players:
-                        return finish_times
-                new_games.append(new_game)
-                if len(new_games) == beta:
-                    break
-        games = new_games
+def get_shortest_games(root: Game, game_end_checker: GameEndChecker, beta: int) -> list[GameSequence]:
+    shortest_game_length = sys.maxsize
+    shorted_games = []
+    for shortest_game in get_shortest_game(GameState(root, None), beta, game_end_checker, agent):
+        if len(shortest_game) <= shortest_game_length:
+            shortest_game_length = len(shortest_game)
+        else:
+            break
+        shorted_games.append(shortest_game)
+    return shorted_games
 
 
 def train_to_go_fast():
-    train_buffer = deque(maxlen=10_000)
-    loss_function = nn.MSELoss()
-    optimizer = Adam(agent.parameters(), lr=5e-7)
-    dataset = RLDataset(train_buffer)
+    train_buffer = RLDataset()
+    trainer = pl.Trainer(max_epochs=1)
     results_over_time = deque(maxlen=100)
     beta = Config.beta
-    for epoch in count(
-        max(int(re.findall(r'\d+', path.name)[0]) for path in Config.model_path.glob("speed_game_*")) + 1):
+    for epoch in count(last_saved_epoch + 1):
         agent.eval()
-        games = [GameState(Game())]
-        get_expected_completion_times(games, beta, results_over_time, train_buffer)
-        if not train_buffer:
+        root = Game()
+        game_end_checker = EndOnSecondPlayer(root)
+        shortest_games = get_shortest_games(root, game_end_checker, beta)
+        if not shortest_games:
             continue
+        shortest_game = random.choice(shortest_games)
+        results_over_time.append(len(shortest_game) / 2)
+        train_buffer.append(shortest_game)
         if epoch % 1 == 0:
             print(epoch, fmean(results_over_time), sorted(results_over_time))
         if epoch % 1000 == 0:
             torch.save(agent.state_dict(),
                        Config.model_path.joinpath(f'speed_game_{epoch}_{fmean(results_over_time)}.pth'))
-        agent.train()
-        loader = DataLoader(dataset, batch_size=128)
-        for state, moves_till_end, move_indexes in loader:
-            optimizer.zero_grad()
-            outputs = agent(state)
-            loss = sum(loss_function(output[move_index], move_till_end.float()) for move_index, move_till_end, output in
-                       zip(move_indexes, moves_till_end, outputs))
-            # print(loss.item())
-            loss.backward()
-            optimizer.step()
-
-# @atexit.register
-# def _save():
-#     torch.save(agent.state_dict(), Config.model_path.joinpath('speed_game.pth'))
+        train_loader = DataLoader(train_buffer, batch_size=128, num_workers=4)
+        trainer.fit(agent, train_loader)
