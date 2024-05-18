@@ -32,6 +32,7 @@ def perform_move_ai(game: Game, beta: int = Config.play_beta) -> Game:
 def perform_move(game: Game, move: Move) -> Game:
     game = game.perform(move)
     game = perform_move_ai(game)
+    print("performed move AI")
     return game
 
 
