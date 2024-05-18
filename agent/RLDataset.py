@@ -6,7 +6,7 @@ import torch
 from torch.utils.data import Dataset
 
 from Config import Config
-from agent.get_shortest_game import GameSequence
+from agent.get_shortest_game import GameMovePairs
 from src.Game import Game
 
 
@@ -21,7 +21,7 @@ class RLDataset(Dataset):
         state, turns_till_end, move_index = self.train_buffer[item]
         return torch.tensor(state).to(Config.device).float(), turns_till_end, move_index,
 
-    def append(self, game_sequence: GameSequence):
+    def append(self, game_sequence: GameMovePairs):
         player_ids = list(map(attrgetter("id"), game_sequence[0][0].players))
         for player_id in player_ids:
             for turns_till_end, (game, move) in enumerate(

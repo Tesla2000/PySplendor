@@ -10,35 +10,49 @@ from src.Game import Game
 from src.moves import Move
 
 
+class GameMovePair(NamedTuple):
+    game: Game
+    move: Move
+
+
+GameMovePairs = list[GameMovePair]
+
+
 class GameState(NamedTuple):
     game: Game
-    move: Optional[Move]
+    move: Optional[Move] = None
+    previous_state: Optional["GameState"] = None
 
-
-GameSequence = list[GameState]
+    def to_list(self) -> GameMovePairs:
+        output = [GameMovePair(self.previous_state.game, self.move)]
+        prev_state = self.previous_state
+        while prev_state.previous_state:
+            output.append(GameMovePair(prev_state.previous_state.game, prev_state.move))
+            prev_state = prev_state.previous_state
+        return output
 
 
 @torch.no_grad()
-def get_shortest_game(game_move_pair: GameState, beta: int, game_end_checker: GameEndChecker,
-                      agent: Agent) -> Generator[
-    GameSequence, None, None]:
-    game = game_move_pair[0]
-    if game.is_terminal():
+def get_shortest_game(game_states: list[GameState], beta: int, game_end_checker: GameEndChecker,
+                      agent: Agent) -> Generator[GameState, None, None]:
+    game_states = list(filter(lambda game_state: not game_state.game.is_terminal(), game_states))
+    if not game_states:
+        print("No valid moves")
         return
-    game_state = game.get_state()
-    move_probs = agent(torch.tensor(game_state).float()).flatten().numpy()
+    board_states = tuple(game.get_state() for game, _, _ in game_states)
+    move_probs = agent(torch.tensor(board_states).float()).flatten().numpy()
     move_indexes = np.argsort(move_probs)
     new_games = []
     for move_index in move_indexes:
+        game_index, move_index = divmod(move_index, Game.action_size)
+        game_state = game_states[game_index]
         move = Game.all_moves[move_index]
-        if move.is_valid(game):
-            new_game = game.perform(move)
+        if move.is_valid(game_state.game):
+            new_game = game_state.game.perform(move)
+            new_state = GameState(new_game, move, game_state)
             if game_end_checker.is_end(new_game):
-                yield [GameState(game, move)]
-            new_games.append(GameState(new_game, move))
+                yield new_state
+            new_games.append(new_state)
             if len(new_games) == beta:
                 break
-    for new_game in new_games:
-        for game_sequence in get_shortest_game(new_game, beta, deepcopy(game_end_checker), agent):
-            game_sequence.append(game_move_pair)
-            yield game_sequence
+    yield from get_shortest_game(new_games, beta, deepcopy(game_end_checker), agent)
