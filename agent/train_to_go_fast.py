@@ -11,11 +11,11 @@ from torch.optim import Adam
 from torch.utils.data import DataLoader
 
 from Config import Config
-from agent.SpeedAgent import SpeedAgent
-from agent.SpeedRLDataset import SpeedRLDataset
+from agent.Agent import Agent
+from agent.RLDataset import RLDataset
 from src.Game import Game
 
-agent = SpeedAgent()
+agent = Agent()
 agent.load_state_dict(torch.load(Config.model_path.joinpath('speed_game.pth')))
 
 
@@ -83,7 +83,7 @@ def train_to_go_fast():
     train_buffer = deque(maxlen=10_000)
     loss_function = nn.MSELoss()
     optimizer = Adam(agent.parameters(), lr=5e-7)
-    dataset = SpeedRLDataset(train_buffer)
+    dataset = RLDataset(train_buffer)
     results_over_time = deque(maxlen=100)
     beta = Config.beta
     for epoch in count(

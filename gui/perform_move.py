@@ -1,12 +1,12 @@
 import torch
 
 from Config import Config
-from agent.SpeedAgent import SpeedAgent
+from agent.Agent import Agent
 from src.Game import Game
 from src.moves import Move
-from training_variants.train_to_go_fast import get_expected_completion_times, GameState
+from agent.train_to_go_fast import get_expected_completion_times, GameState
 
-agent = SpeedAgent()
+agent = Agent()
 agent.load_state_dict(torch.load(Config.model_path.joinpath('speed_game_16000_26.945.pth')))
 agent.eval()
 
