@@ -40,11 +40,9 @@ class _ConfigAgent:
         32,
         32,
     )
-    c = 0.5
-    train_learning_rate = 5e-5
-    retrain_learning_rate = 1e-3
-    # debug = True
-    debug = False
+    initial_train_learning_rate = 1e-3
+    debug = True
+    # debug = False
     if not debug:
         random_state = random.randint(0, 2 ** 32)
         print(f"{random_state=}")
@@ -55,7 +53,7 @@ class _ConfigAgent:
 class Config(_ConfigPaths, _ConfigAgent, _DBConfig):
     agent_print_interval = 10
     results_over_time_counter = 100
-    agent_save_interval = 1000
+    agent_save_interval = 500
     play_beta = 10
     beta = 10
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
