@@ -47,7 +47,7 @@ class Agent(pl.LightningModule):
 
     def configure_optimizers(self, optimizer: Optional[Optimizer] = None):
         if optimizer is None:
-            optimizer = torch.optim.Adam(self.parameters(), lr=5e-7)
+            optimizer = torch.optim.Adam(self.parameters(), lr=1e-4)
         return optimizer
 
     def training_step(self, batch, batch_idx):

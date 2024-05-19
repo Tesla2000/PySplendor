@@ -26,6 +26,7 @@ class _ConfigPaths:
     model_path.mkdir(exist_ok=True)
     gui = root / "gui"
     templates = gui / "template"
+    ai_weights = root / 'speed_game.pth'
 
 
 class _ConfigAgent:
@@ -44,15 +45,11 @@ class _ConfigAgent:
     train_learning_rate = 5e-5
     retrain_learning_rate = 1e-3
     random_state = 42
-    # debug = True
-    debug = False
+    debug = True
+    # debug = False
     if not debug:
         random_state = random.randint(0, 2 ** 32)
         print(f"{random_state=}")
-    retrain = False
-    # retrain = True
-    # pareto_optimize = True
-    pareto_optimize = False
 
 
 class Config(_ConfigPaths, _ConfigAgent, _DBConfig):

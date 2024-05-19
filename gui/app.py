@@ -8,7 +8,6 @@ from gui.perform_move import perform_move
 from src.Game import Game
 from src.entities.AllResources import AllResources
 from src.entities.BasicResources import BasicResources
-from src.entities.Card import Card
 from src.moves import GrabThreeResource, GrabTwoResource
 
 game = Game()
