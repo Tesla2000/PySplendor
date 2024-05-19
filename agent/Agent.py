@@ -1,9 +1,9 @@
 from itertools import pairwise, starmap
 from typing import Optional
 
+import pytorch_lightning as pl
 import torch
 from torch import nn, Tensor
-import pytorch_lightning as pl
 from torch.optim import Optimizer
 
 from Config import Config
@@ -47,7 +47,7 @@ class Agent(pl.LightningModule):
 
     def configure_optimizers(self, optimizer: Optional[Optimizer] = None):
         if optimizer is None:
-            optimizer = torch.optim.Adam(self.parameters(), lr=5e-7)
+            optimizer = torch.optim.Adam(self.parameters(), lr=Config.initial_train_learning_rate)
         return optimizer
 
     def training_step(self, batch, batch_idx):
@@ -55,4 +55,4 @@ class Agent(pl.LightningModule):
         outputs = self(state)
         loss = sum(self.loss_fn(output[move_index], move_till_end.float()) for move_index, move_till_end, output in
                    zip(move_indexes, moves_till_end, outputs))
-        return loss
+        return {"loss": loss}

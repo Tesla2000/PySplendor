@@ -9,13 +9,6 @@ class GameMovePair(NamedTuple):
     move: Move
 
 
-class NoValidMove(ValueError):
-    blocked_player: int
-
-    def __init__(self, blocked_player: int):
-        self.blocked_player = blocked_player
-
-
 GameMovePairs = list[GameMovePair]
 
 
@@ -31,3 +24,10 @@ class GameState(NamedTuple):
             output.append(GameMovePair(prev_state.previous_state.game, prev_state.move))
             prev_state = prev_state.previous_state
         return output
+
+
+class NoValidMove(ValueError):
+    raw_game_states: list[GameState]
+
+    def __init__(self, raw_game_states: list[GameState]):
+        self.raw_game_states = raw_game_states
