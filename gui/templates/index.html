@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/deafult_style.css') }}">
+    <title>Splendor</title>
+</head>
+<body>
+    <div class="board">
+        {% for tier in ['3', '2', '1'] %}
+        <div class="row tier-{{ tier }}">
+            {% for card in cards[tier] %}
+            <div class="card" style="background-image: url('{{ url_for('static', filename='components/cards/' + card['production'].capitalize() + '.png') }}');">
+                {% if card['points']|int > 0 %}
+                <div class="gain">{{ card['points'] }}</div>
+                {% endif %}
+                <div class="costs">
+                    {% if card['white']|int > 0 %}
+                    <span class="cost white">{{ card['white'] }}</span>
+                    {% endif %}
+                    {% if card['green']|int > 0 %}
+                    <span class="cost green">{{ card['green'] }}</span>
+                    {% endif %}
+                    {% if card['blue']|int > 0 %}
+                    <span class="cost blue">{{ card['blue'] }}</span>
+                    {% endif %}
+                    {% if card['black']|int > 0 %}
+                    <span class="cost black">{{ card['black'] }}</span>
+                    {% endif %}
+                    {% if card['red']|int > 0 %}
+                    <span class="cost red">{{ card['red'] }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="chips">
+        <img src="{{ url_for('static', filename='components/chips/black-resource.png') }}" alt="Black Chip">
+        <img src="{{ url_for('static', filename='components/chips/white-resource.png') }}" alt="White Chip">
+        <img src="{{ url_for('static', filename='components/chips/green-resource.png') }}" alt="Green Chip">
+        <img src="{{ url_for('static', filename='components/chips/blue-resource.png') }}" alt="Blue Chip">
+        <img src="{{ url_for('static', filename='components/chips/red-resource.png') }}" alt="Red Chip">
+        <img src="{{ url_for('static', filename='components/chips/gold-resource.png') }}" alt="Gold Chip">
+    </div>
+
+</body>
+</html>
