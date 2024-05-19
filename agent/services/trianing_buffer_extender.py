@@ -25,7 +25,7 @@ class TrainingBufferExtenderBothPlayers(TrainingBufferExtender):
 
 class TrainingBufferExtenderBestPlayer(TrainingBufferExtender):
     def append_to_buffer(self, train_buffer: deque, game_sequence: GameMovePairs):
-        players = game_sequence[-1].game.players
+        players = game_sequence[0].game.players
         winner = players[-1].id if players[-1].points >= Config.min_n_points_to_finish else players[0].id
         not_finished_moves = get_not_finished_moves(winner, game_sequence)
         for turns_till_end, (game, move) in enumerate(not_finished_moves):

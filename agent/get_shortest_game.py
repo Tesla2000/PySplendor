@@ -14,6 +14,7 @@ def get_shortest_game(raw_game_states: list[GameState], beta: int, game_end_chec
                       agent: Agent) -> Generator[GameState, None, int]:
     game_states = list(filter(lambda game_state: not game_state.game.is_terminal(), raw_game_states))
     if not game_states:
+        print("No valid moves")
         raise NoValidMove(raw_game_states)
     board_states = tuple(game.get_state() for game, _, _ in game_states)
     move_probs = agent(torch.tensor(board_states).float()).flatten().numpy()

@@ -1,6 +1,7 @@
 import logging
 import random
 import re
+import sys
 import warnings
 from collections import deque
 from contextlib import suppress
@@ -40,19 +41,22 @@ def _train_epoch(beta: int, results_over_time: deque[float], train_dataset: RLDa
     shortest_game = random.choice(shortest_games)
     results_over_time.append(len(shortest_game) / 2)
     training_buffer_extender.append_to_buffer(train_dataset.train_buffer, shortest_game)
-    if epoch % 1 == 0:
+    if epoch % Config.agent_print_interval == 0:
         print(epoch, fmean(results_over_time), sorted(results_over_time))
-    if epoch % 1000 == 0:
+    if epoch % Config.agent_save_interval == 0:
         torch.save(agent.state_dict(),
                    Config.model_path.joinpath(f'speed_game_{epoch}_{fmean(results_over_time)}.pth'))
-    train_loader = DataLoader(train_dataset, batch_size=128, num_workers=4)
+        agent.step_optimizer()
+        # Config.beta = round(Config.beta * 1.2)
+    train_loader = DataLoader(train_dataset, batch_size=128,)
     trainer.fit(agent, train_loader)
+    pass
 
 
 def train_to_go_fast():
     train_buffer = RLDataset()
-    trainer = pl.Trainer(max_epochs=1)
-    results_over_time = deque(maxlen=100)
+    trainer = pl.Trainer(max_epochs=1, log_every_n_steps=sys.maxsize)
+    results_over_time = deque(maxlen=Config.results_over_time_counter)
     beta = Config.beta
     training_buffer_extender = TrainingBufferExtenderBestPlayer()
     game_end_checker = EndOnFirstPlayer()

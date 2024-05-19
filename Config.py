@@ -5,9 +5,9 @@ from pathlib import Path
 import numpy as np
 import torch
 from dotenv import load_dotenv
+from lightning import seed_everything
 
 load_dotenv()
-
 
 class _DBConfig:
     db_name = os.getenv("POSTGRES_DB")
@@ -53,31 +53,24 @@ class _ConfigAgent:
 
 
 class Config(_ConfigPaths, _ConfigAgent, _DBConfig):
+    agent_print_interval = 10
+    results_over_time_counter = 100
+    agent_save_interval = 1000
     play_beta = 10
-    beta = 100
-    print_interval = 1
-    win_prob_weight = 30
-    max_retrain_iterations = 1000
-    no_improvement_limit = 3
+    beta = 10
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     dirichlet_alpha = .3
     dirichlet_epsilon = .25
     test_size = .2
     train = True
-    max_results_held = 100
-    minimal_relative_agent_improvement = 1.1
-    min_games_to_replace_agents = 40
-    train_batch_size = 128
-    training_buffer_len = 100000
+    training_buffer_len = 10_000
     min_n_points_to_finish = 15
     n_simulations = 1000
     n_games = None
     n_players = 2
     n_actions = 45
-    eval_rate = 0.2
 
 
+seed_everything(Config.random_state, workers=True)
 random.seed(Config.random_state)
-np.random.seed(42)
-torch.random.manual_seed(42)
-torch.cuda.random.manual_seed(42)
+np.random.seed(Config.random_state)
