@@ -2,3 +2,4 @@
 /models/
 /.venv
 /.env
+/train_log.log

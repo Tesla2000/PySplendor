@@ -1,10 +1,10 @@
 import logging
 import random
 import re
-import sys
 import warnings
 from collections import deque
-from contextlib import suppress
+from contextlib import suppress, redirect_stdout
+from copy import deepcopy
 from itertools import count
 from statistics import fmean
 
@@ -31,7 +31,7 @@ with suppress(ValueError):
     agent.load_state_dict(torch.load(next(Config.model_path.glob(f'speed_game_{last_saved_epoch}*'))))
 
 
-def _train_epoch(beta: int, results_over_time: deque[float], train_dataset: RLDataset, epoch: int, trainer: pl.Trainer, training_buffer_extender: TrainingBufferExtender, game_end_checker: GameEndChecker):
+def _train_epoch(beta: int, results_over_time: deque[float], train_dataset: RLDataset, epoch: int, training_buffer_extender: TrainingBufferExtender, game_end_checker: GameEndChecker):
     agent.eval()
     root = Game()
     try:
@@ -42,23 +42,20 @@ def _train_epoch(beta: int, results_over_time: deque[float], train_dataset: RLDa
     results_over_time.append(len(shortest_game) / 2)
     training_buffer_extender.append_to_buffer(train_dataset.train_buffer, shortest_game)
     if epoch % Config.agent_print_interval == 0:
-        print(epoch, fmean(results_over_time), sorted(results_over_time))
+        with redirect_stdout(Config.train_values_file):
+            print(epoch, fmean(results_over_time), sorted(results_over_time), flush=True)
     if epoch % Config.agent_save_interval == 0:
         torch.save(agent.state_dict(),
                    Config.model_path.joinpath(f'speed_game_{epoch}_{fmean(results_over_time)}.pth'))
-        agent.step_optimizer()
-        # Config.beta = round(Config.beta * 1.2)
-    train_loader = DataLoader(train_dataset, batch_size=128,)
-    trainer.fit(agent, train_loader)
-    pass
+    train_loader = DataLoader(train_dataset, batch_size=128)
+    pl.Trainer(max_epochs=1).fit(agent, train_loader)
 
 
 def train_to_go_fast():
     train_buffer = RLDataset()
-    trainer = pl.Trainer(max_epochs=1, log_every_n_steps=sys.maxsize)
     results_over_time = deque(maxlen=Config.results_over_time_counter)
     beta = Config.beta
     training_buffer_extender = TrainingBufferExtenderBestPlayer()
     game_end_checker = EndOnFirstPlayer()
     for epoch in count(last_saved_epoch + 1):
-        _train_epoch(beta, results_over_time, train_buffer, epoch, trainer, training_buffer_extender, game_end_checker)
+        _train_epoch(beta, results_over_time, train_buffer, epoch, training_buffer_extender, game_end_checker)

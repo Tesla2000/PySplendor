@@ -1,3 +1,4 @@
+import atexit
 import os
 import random
 from pathlib import Path
@@ -9,6 +10,7 @@ from lightning import seed_everything
 
 load_dotenv()
 
+
 class _DBConfig:
     db_name = os.getenv("POSTGRES_DB")
     db_password = os.getenv("POSTGRES_PASSWORD")
@@ -18,15 +20,12 @@ class _DBConfig:
 
 class _ConfigPaths:
     root = Path(__file__).parent
-    training_data_path = root / "training_data"
-    training_data_path.mkdir(exist_ok=True)
-    evaluation_data_path = root / "evaluation_data"
-    evaluation_data_path.mkdir(exist_ok=True)
     model_path = root / "models"
     model_path.mkdir(exist_ok=True)
     gui = root / "gui"
     templates = gui / "template"
     ai_weights = root / 'speed_game.pth'
+    train_values_file = (root / "train_log.log").open('w')
 
 
 class _ConfigAgent:
@@ -44,12 +43,13 @@ class _ConfigAgent:
     c = 0.5
     train_learning_rate = 5e-5
     retrain_learning_rate = 1e-3
-    random_state = 42
-    debug = True
-    # debug = False
+    # debug = True
+    debug = False
     if not debug:
         random_state = random.randint(0, 2 ** 32)
         print(f"{random_state=}")
+    else:
+        random_state = 42
 
 
 class Config(_ConfigPaths, _ConfigAgent, _DBConfig):
@@ -74,3 +74,8 @@ class Config(_ConfigPaths, _ConfigAgent, _DBConfig):
 seed_everything(Config.random_state, workers=True)
 random.seed(Config.random_state)
 np.random.seed(Config.random_state)
+
+
+@atexit.register
+def close():
+    Config.train_values_file.close()

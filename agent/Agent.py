@@ -1,11 +1,10 @@
 from itertools import pairwise, starmap
 from typing import Optional
 
+import pytorch_lightning as pl
 import torch
 from torch import nn, Tensor
-import pytorch_lightning as pl
 from torch.optim import Optimizer
-from torch.optim.lr_scheduler import ExponentialLR
 
 from Config import Config
 
