@@ -4,48 +4,252 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/deafult_style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom-fonts.css') }}">
     <title>Splendor</title>
 </head>
 <body>
-    <div class="board">
-        {% for tier in ['3', '2', '1'] %}
-        <div class="row tier-{{ tier }}">
-            {% for card in cards[tier] %}
-            <div class="card" style="background-image: url('{{ url_for('static', filename='components/cards/' + card['production'].capitalize() + '.png') }}');">
-                {% if card['points']|int > 0 %}
-                <div class="gain">{{ card['points'] }}</div>
-                {% endif %}
-                <div class="costs">
-                    {% if card['white']|int > 0 %}
-                    <span class="cost white">{{ card['white'] }}</span>
-                    {% endif %}
-                    {% if card['green']|int > 0 %}
-                    <span class="cost green">{{ card['green'] }}</span>
-                    {% endif %}
-                    {% if card['blue']|int > 0 %}
-                    <span class="cost blue">{{ card['blue'] }}</span>
-                    {% endif %}
-                    {% if card['black']|int > 0 %}
-                    <span class="cost black">{{ card['black'] }}</span>
-                    {% endif %}
-                    {% if card['red']|int > 0 %}
-                    <span class="cost red">{{ card['red'] }}</span>
-                    {% endif %}
-                </div>
-            </div>
-            {% endfor %}
+<div class="stars"></div>
+<div class="twinkling"></div>
+<!--Górny panel SI-->
+<div class="player-panel top neon-glow">
+    <img src="{{ url_for('static', filename='components/custom/rectangle.svg') }}" alt="Top Half of Rectangle">
+</div>
+<div class="si-cards">
+    {% for color, count in si_card_count.items() %}
+    <div class="card">
+        <img src="{{ url_for('static', filename='components/cards/' + color.capitalize() + '.png') }}"
+             alt="{{ color }} Card">
+        <div class="card-count">{{ count }}</div>
+    </div>
+    {% endfor %}
+</div>
+<div class="si-total-points">{{ player_total_points }}</div>
+<div class="si-chips">
+    {% for color, count in si_chips.items() %}
+    <div class="si-chip">
+        <div class="si-chip-count">{{ count }}</div>
+        <img src="{{ url_for('static', filename='components/chips/' + color + '-resource.png') }}"
+             alt="{{ color.capitalize() }} Chip">
+    </div>
+    {% endfor %}
+</div>
+<!--Dolny panel gracza-->
+<div class="player-panel bottom neon-glow">
+    <img src="{{ url_for('static', filename='components/custom/rectangle.svg') }}" alt="Bottom Half of Rectangle">
+</div>
+<div class="player-cards">
+    {% for color, count in player_card_count.items() %}
+    <div class="card">
+        <img src="{{ url_for('static', filename='components/cards/' + color.capitalize() + '.png') }}"
+             alt="{{ color }} Card">
+        <div class="card-count">{{ count }}</div>
+    </div>
+    {% endfor %}
+</div>
+<div class="total-points">{{ player_total_points }}</div>
+<div class="player-chips">
+    {% for color, count in player_chips.items() %}
+    <div class="player-chip">
+        <div class="player-chip-count">{{ count }}</div>
+        <img src="{{ url_for('static', filename='components/chips/' + color + '-resource.png') }}"
+             alt="{{ color.capitalize() }} Chip">
+    </div>
+    {% endfor %}
+</div>
+
+
+<!--------------------------------------------------ŚRODKOWA PLANSZA-------------------------------------------------->
+<div class="middle-board">
+    <img src="{{ url_for('static', filename='components/custom/rectangle.svg') }}" alt="rectangle middle board"
+         class="neon-glow">
+</div>
+<div class="board">
+    <!--------------------------------------------------ARYSTOKRACI-------------------------------------------------->
+    <div class="aristocrats">
+        {% for img_url in aristocrats_urls %}
+        <div class="aristocrat">
+            <img src="{{ img_url }}" alt="Aristocrat">
         </div>
         {% endfor %}
     </div>
-
-    <div class="chips">
-        <img src="{{ url_for('static', filename='components/chips/black-resource.png') }}" alt="Black Chip">
-        <img src="{{ url_for('static', filename='components/chips/white-resource.png') }}" alt="White Chip">
-        <img src="{{ url_for('static', filename='components/chips/green-resource.png') }}" alt="Green Chip">
-        <img src="{{ url_for('static', filename='components/chips/blue-resource.png') }}" alt="Blue Chip">
-        <img src="{{ url_for('static', filename='components/chips/red-resource.png') }}" alt="Red Chip">
-        <img src="{{ url_for('static', filename='components/chips/gold-resource.png') }}" alt="Gold Chip">
+    <!--------------------------------------------------KARTY-------------------------------------------------->
+    {% for tier in ['3', '2', '1'] %}
+    <div class="row tier-{{ tier }}">
+        <div class="reverse-card">
+            {% if tier == '1' %}
+            <img src="{{ url_for('static', filename='components/cards-rev/Green.png') }}" alt="Green Reverse Card">
+            {% elif tier == '2' %}
+            <img src="{{ url_for('static', filename='components/cards-rev/Yellow.png') }}" alt="Yellow Reverse Card">
+            {% elif tier == '3' %}
+            <img src="{{ url_for('static', filename='components/cards-rev/Blue.png') }}" alt="Blue Reverse Card">
+            {% endif %}
+            <div class="card-count">{{ cards_left[tier] }}</div>
+        </div>
+        {% for card in cards[tier] %}
+        <div class="card clickable" onclick="openModal(this)"
+             style="background-image: url('{{ url_for('static', filename='components/cards/' + card['production'].capitalize() + '.png') }}');"
+             data-points="{{ card['points'] }}" data-white="{{ card['white'] }}" data-green="{{ card['green'] }}"
+             data-blue="{{ card['blue'] }}" data-black="{{ card['black'] }}" data-red="{{ card['red'] }}"
+             data-production="{{ card['production'] }}">
+            {% if card['points']|int > 0 %}
+            <div class="gain">{{ card['points'] }}</div>
+            {% endif %}
+            <div class="costs">
+                {% if card['white']|int > 0 %}
+                <span class="cost white">{{ card['white'] }}</span>
+                {% endif %}
+                {% if card['green']|int > 0 %}
+                <span class="cost green">{{ card['green'] }}</span>
+                {% endif %}
+                {% if card['blue']|int > 0 %}
+                <span class="cost blue">{{ card['blue'] }}</span>
+                {% endif %}
+                {% if card['black']|int > 0 %}
+                <span class="cost black">{{ card['black'] }}</span>
+                {% endif %}
+                {% if card['red']|int > 0 %}
+                <span class="cost red">{{ card['red'] }}</span>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
     </div>
+    {% endfor %}
+</div>
+<!--------------------------------------------------KAMIENIE-------------------------------------------------->
+<div class="chips">
+    <div class="chip">
+        <img src="{{ url_for('static', filename='components/chips/black-resource.png') }}" alt="Black Chip">
+        <div class="chip-count">{{ chips_left['black'] }}</div>
+    </div>
+    <div class="chip">
+        <img src="{{ url_for('static', filename='components/chips/white-resource.png') }}" alt="White Chip">
+        <div class="chip-count">{{ chips_left['white'] }}</div>
+    </div>
+    <div class="chip">
+        <img src="{{ url_for('static', filename='components/chips/green-resource.png') }}" alt="Green Chip">
+        <div class="chip-count">{{ chips_left['green'] }}</div>
+    </div>
+    <div class="chip">
+        <img src="{{ url_for('static', filename='components/chips/blue-resource.png') }}" alt="Blue Chip">
+        <div class="chip-count">{{ chips_left['blue'] }}</div>
+    </div>
+    <div class="chip">
+        <img src="{{ url_for('static', filename='components/chips/red-resource.png') }}" alt="Red Chip">
+        <div class="chip-count">{{ chips_left['red'] }}</div>
+    </div>
+    <div class="chip">
+        <img src="{{ url_for('static', filename='components/chips/gold-resource.png') }}" alt="Gold Chip">
+        <div class="chip-count">{{ chips_left['gold'] }}</div>
+    </div>
+</div>
 
+<!---------------------------------------------ZAREZERWOWANE KARTY-------------------------------------------------->
+<div class="card-reserved">
+    {% for card in si_cards_reserved%}
+    <div class="card">
+        <img src="{{ url_for('static', filename='components/cards/' + card['production'].capitalize() + '.png') }}"
+             alt="{{card['production'].capitalize()}} Card">
+        {% if card['gain']|int > 0 %}
+        <div class="gain">{{ card['gain'] }}</div>
+        {% endif %}
+        <div class="costs">
+            {% if card['cost']['white']|int > 0 %}
+            <span class="cost white">{{ card['cost']['white'] }}</span>
+            {% endif %}
+            {% if card['cost']['green']|int > 0 %}
+            <span class="cost green">{{ card['cost']['green'] }}</span>
+            {% endif %}
+            {% if card['cost']['blue']|int > 0 %}
+            <span class="cost blue">{{ card['cost']['blue'] }}</span>
+            {% endif %}
+            {% if card['cost']['black']|int > 0 %}
+            <span class="cost black">{{ card['cost']['black'] }}</span>
+            {% endif %}
+            {% if card['cost']['red']|int > 0 %}
+            <span class="cost red">{{ card['cost']['red'] }}</span>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="card-reserved-player">
+    {% for card in player_cards_reserved%}
+    <div class="card" onclick="openReservedModal(this)" style="background-image: url('{{ url_for('static', filename='components/cards/' + card['production'].capitalize() + '.png') }}');"
+         data-points="{{ card['gain'] }}" data-white="{{ card['cost']['white'] }}" data-green="{{ card['cost']['green'] }}"
+             data-blue="{{ card['cost']['blue'] }}" data-black="{{ card['cost']['black'] }}" data-red="{{ card['cost']['red'] }}"
+             data-production="{{ card['production'] }}">
+        <img src="{{ url_for('static', filename='components/cards/' + card['production'].capitalize() + '.png') }}"
+             alt="{{card['production'].capitalize()}} Card">
+        {% if card['gain']|int > 0 %}
+        <div class="gain">{{ card['gain'] }}</div>
+        {% endif %}
+        <div class="costs">
+            {% if card['cost']['white']|int > 0 %}
+            <span class="cost white">{{ card['cost']['white'] }}</span>
+            {% endif %}
+            {% if card['cost']['green']|int > 0 %}
+            <span class="cost green">{{ card['cost']['green'] }}</span>
+            {% endif %}
+            {% if card['cost']['blue']|int > 0 %}
+            <span class="cost blue">{{ card['cost']['blue'] }}</span>
+            {% endif %}
+            {% if card['cost']['black']|int > 0 %}
+            <span class="cost black">{{ card['cost']['black'] }}</span>
+            {% endif %}
+            {% if card['cost']['red']|int > 0 %}
+            <span class="cost red">{{ card['cost']['red'] }}</span>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+<!--------------------------------------------------MODAL KUP KARTE-------------------------------------------------->
+<div id="cardModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>Do you want to buy this card?</h2>
+        <div class="card-magnified">
+            <img id="modal-card-image" src="" alt="Card">
+            <div class="gain-magnified"><span id="modal-card-points"></span></div>
+            <div class="costs-magnified">
+                <span id="modal-card-cost-white" class="cost-magnified white"></span>
+                <span id="modal-card-cost-green" class="cost-magnified green"></span>
+                <span id="modal-card-cost-blue" class="cost-magnified blue"></span>
+                <span id="modal-card-cost-black" class="cost-magnified black"></span>
+                <span id="modal-card-cost-red" class="cost-magnified red"></span>
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button class="buy-button">BUY</button>
+            <button class="reserve-button">
+                RESERVE <img src="../static/components/chips/gold-resource.png" alt="Gold Coin" class="coin-icon">
+            </button>
+        </div>
+    </div>
+</div>
+<div id="reservedCardModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeReservedModal()">&times;</span>
+        <h2>Do you want to buy your reserved card?</h2>
+        <div class="card-magnified">
+            <img id="modal-r-card-image" src="" alt="Card">
+            <div class="gain-magnified"><span id="modal-r-card-points"></span></div>
+            <div class="costs-magnified">
+                <span id="modal-r-card-cost-white" class="cost-magnified white"></span>
+                <span id="modal-r-card-cost-green" class="cost-magnified green"></span>
+                <span id="modal-r-card-cost-blue" class="cost-magnified blue"></span>
+                <span id="modal-r-card-cost-black" class="cost-magnified black"></span>
+                <span id="modal-r-card-cost-red" class="cost-magnified red"></span>
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button class="buy-button">BUY</button>
+        </div>
+    </div>
+</div>
+
+<script src="../static/js/script.js"></script>
 </body>
 </html>
