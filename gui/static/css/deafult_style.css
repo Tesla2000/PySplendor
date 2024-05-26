@@ -1,15 +1,54 @@
 body {
-    background-color: black;
-    color: white;
-    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    font-family: 'itc_benguiat_stdBkCn', Arial, sans-serif;
+    color: antiquewhite;
 }
 
 .board {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 20px;
+    padding: 10px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 5;
+    max-width: 800px;
 }
+
+.middle-board {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+}
+
+.middle-board img {
+    width: 90vw;
+    height: auto;
+}
+
+.neon-glow {
+    filter: drop-shadow(1px 1px 2px rgba(219, 193, 144, 0.4)) drop-shadow(-1px -1px 2px rgba(219, 193, 144, 0.3)) drop-shadow(2px 2px 4px rgba(219, 193, 144, 0.2)) drop-shadow(-2px -2px 4px rgba(219, 193, 144, 0.1));
+    animation: neon-flicker 3s infinite alternate;
+}
+
+@keyframes neon-flicker {
+    0%, 100% {
+        filter: drop-shadow(1px 1px 2px rgba(219, 193, 144, 0.4)) drop-shadow(-1px -1px 2px rgba(219, 193, 144, 0.3)) drop-shadow(2px 2px 4px rgba(219, 193, 144, 0.2)) drop-shadow(-2px -2px 4px rgba(219, 193, 144, 0.1));
+    }
+    50% {
+        filter: drop-shadow(1px 1px 2px rgba(219, 193, 144, 0.6)) drop-shadow(-1px -1px 2px rgba(219, 193, 144, 0.4)) drop-shadow(2px 2px 4px rgba(219, 193, 144, 0.3)) drop-shadow(-2px -2px 4px rgba(219, 193, 144, 0.2));
+    }
+}
+
+/*------------------------------------------------CARDS------------------------------------------------*/
 
 .row {
     display: flex;
@@ -17,19 +56,41 @@ body {
     margin: 10px 0;
 }
 
+.reverse-card {
+    position: relative;
+    width: 130px;
+    height: 190px;
+    margin: 10px;
+}
+
+.reverse-card img {
+    width: 100%;
+    height: 100%;
+}
+
+.card-count {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.5em;
+    color: white;
+    text-shadow: 0 0 5px black;
+}
+
 .card {
     position: relative;
-    width: 120px;
-    height: 180px;
+    width: 130px;
+    height: 190px;
     margin: 10px;
     background-size: cover;
 }
 
 .gain {
     position: absolute;
-    top: 10%;
-    right: 50%;
-    font-size: 24px;
+    top: 12%;
+    right: 45%;
+    font-size: 32px;
     font-weight: bold;
 }
 
@@ -44,7 +105,7 @@ body {
 .costs {
     position: absolute;
     bottom: 10px;
-    left: 10px;
+    left: 15px;
     display: flex;
     flex-wrap: wrap;
     gap: 5px;
@@ -59,7 +120,7 @@ body {
     justify-content: center;
     font-size: 16px;
     color: white;
-    text-shadow: 1px 1px 2px black;
+    padding: 1px;
 }
 
 .cost.white {
@@ -83,14 +144,492 @@ body {
     background-color: #f00;
 }
 
+/*------------------------------------------------CHIPS------------------------------------------------*/
+
+
 .chips {
     position: absolute;
-    top: 0;
-    right: 20px;
+    top: 50%;
+    right: 10%;
+    transform: translateY(-50%);
     display: flex;
     flex-direction: column;
+    align-items: center;
+    z-index: 2;
 }
-.chips img {
-    width: 100px; /* Adjust size as needed */
-    margin-bottom: 10px; /* Spacing between chips */
+
+.chip {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.chip img {
+    width: 120px; /* Adjust chip image size as needed */
+}
+
+.chip-count {
+    margin-right: 15%; /* Adjust spacing between chip count and chip image */
+    font-size: 32px; /* Adjust font size of the chip count */
+    color: white; /* Text color */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Optional text shadow */
+    order: -1; /* Move chip count before the image */
+}
+
+/*------------------------------------------------BACKGROUND------------------------------------------------*/
+
+
+@keyframes move-twink-back {
+    from {
+        background-position: 0 0;
+    }
+    to {
+        background-position: -10000px 5000px;
+    }
+}
+
+
+.stars, .twinkling {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.stars {
+    background: #000 url(../components/background/stars.png) repeat top center;
+    z-index: 0;
+}
+
+.twinkling {
+    background: transparent url(../components/background/twinkling.png) repeat top center;
+    z-index: 1;
+    animation: move-twink-back 200s linear infinite;
+}
+
+/*------------------------------------------------PLAYER PANELS------------------------------------------------*/
+
+.player-panel {
+    width: 70%;
+    height: 28vh;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 3;
+}
+
+.player-panel img {
+    width: 100%;
+    height: auto;
+    z-index: 3;
+    display: block;
+    object-fit: cover;
+}
+
+.top {
+    top: -30%;
+}
+
+.bottom {
+    bottom: -30%;
+}
+
+.player-cards {
+    position: absolute;
+    bottom: -9%; /* Position at the bottom of the viewport */
+    left: 40%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+    height: 50%; /* Adjust height to show only the top half of the cards */
+    padding: 10px;
+    z-index: 4; /* Ensure it is above other elements */
+}
+
+.total-points {
+    z-index: 4;
+    font-size: 3.5em;
+    color: white;
+    margin-left: 20%;
+    align-self: flex-start;
+    position: absolute;
+    left: 0;
+    margin-bottom: 3%;
+    bottom: 0; /* Position above the cards */
+}
+
+.player-cards .card {
+    position: relative;
+    width: 150px;
+    height: auto;
+    margin-left: -80px; /* Overlap cards correctly */
+}
+
+.player-cards .card img {
+    width: 100%;
+    height: 100%;
+    border-radius: 5px;
+    filter: drop-shadow(0px 5px 10px rgba(0, 0, 0, 0.8));
+}
+
+.player-cards .card .card-count {
+    position: absolute;
+    top: -10px;
+    right: 0;
+    color: white;
+    font-size: 2.5em;
+}
+
+.player-chips {
+    position: absolute;
+    bottom: 0;
+    left: 67%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    z-index: 4;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.player-chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 5px; /* Adjust spacing between chips */
+}
+
+.player-chip img {
+    width: 80px; /* Adjust chip image size as needed */
+}
+
+.player-chip-count {
+    font-size: 32px; /* Adjust font size of the chip count */
+    color: white; /* Text color */
+    margin-bottom: 10px; /* Space between the count and the chip */
+}
+
+/*------------------------------------------------SI PANEL------------------------------------------------*/
+
+.si-cards {
+    position: absolute;
+    top: -9%;
+    left: 60%;
+    transform: translateX(-50%) rotate(180deg); /* Rotate cards */
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end; /* Align items to the end */
+    height: 50%; /* Adjust height to show only the bottom half of the cards */
+    padding: 10px;
+    z-index: 4;
+}
+
+
+.si-total-points {
+    z-index: 4;
+    font-size: 3.5em;
+    color: white;
+    margin-right: 20%;
+    align-self: flex-start;
+    position: absolute;
+    right: 0;
+    margin-top: 3%;
+    top: 0;
+}
+
+.si-cards .card {
+    position: relative;
+    width: 150px;
+    height: auto;
+    margin-left: -80px; /* Overlap cards correctly */
+}
+
+.si-cards .card img {
+    width: 100%;
+    height: 100%;
+    border-radius: 5px;
+    filter: drop-shadow(0px 5px 10px rgba(0, 0, 0, 0.8));
+}
+
+.si-cards .card .card-count {
+    position: absolute;
+    margin-bottom: 122%;
+    left: 30%;
+    color: white;
+    font-size: 2.5em;
+    transform: rotate(180deg);
+}
+
+.si-chips {
+    position: absolute;
+    top: 0;
+    left: 33%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    z-index: 4;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+.si-chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 5px; /* Adjust spacing between chips */
+}
+
+.si-chip img {
+    width: 80px; /* Adjust chip image size as needed */
+}
+
+.si-chip-count {
+    font-size: 32px;
+    color: white;
+    margin-bottom: 10px;
+}
+
+/*------------------------------------------------RESERVED CARDS------------------------------------------------*/
+
+
+.card-reserved {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    z-index: 4;
+}
+
+.card-reserved .card img {
+    width: 140px;
+    height: auto;
+    border-radius: 5px;
+    filter: drop-shadow(0px 5px 10px rgba(0, 0, 0, 0.8));
+}
+
+.card-reserved .card {
+    position: relative;
+    width: 140px;
+    height: auto;
+    margin-bottom: -70px;
+    transform: rotate(90deg);
+    margin-left: 30px;
+}
+
+.card-reserved-player {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    justify-content: flex-start;
+    z-index: 4;
+}
+
+.card-reserved-player .card img {
+    width: 140px;
+    height: auto;
+    border-radius: 5px;
+    filter: drop-shadow(0px 5px 10px rgba(0, 0, 0, 0.8));
+}
+
+.card-reserved-player .card {
+    position: relative;
+    width: 140px;
+    height: auto;
+    margin-top: -70px;
+    margin-left: 30px;
+    transform: rotate(90deg);
+}
+
+/*------------------------------------------------MODAL------------------------------------------------*/
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 6;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    border-color: rgba(219, 193, 144, 1);
+    background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent black overlay */
+
+}
+
+.modal-content {
+    background-color: #000000;
+    margin: 15% auto;
+    padding: 20px;
+    border: 2px solid rgba(219, 193, 144, 1);
+    width: 80%;
+    max-width: 500px;
+    position: relative;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    align-self: flex-end;
+    align-items: flex-end;
+    text-align: right;
+}
+
+.close:hover,
+.close:focus {
+    color: red;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+
+.modal-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 40px;
+}
+
+.buy-button,
+.reserve-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+}
+
+.buy-button {
+    background-color: green;
+    color: white;
+    margin-right: 20px;
+}
+
+.reserve-button {
+    background-color: orange;
+    color: white;
+    display: flex;
+    align-items: center;
+}
+
+.coin-icon {
+    width: 20px;
+    height: auto;
+    margin-left: 10px;
+}
+
+.card-magnified {
+    position: relative;
+    width: 250px;
+    height: auto;
+    margin: 10px;
+    background-size: cover;
+}
+
+.card-magnified img {
+    width: 100%;
+    height: auto;
+    z-index: 3;
+    display: block;
+    object-fit: cover;
+}
+
+.gain-magnified {
+    position: absolute;
+    top: 12%;
+    right: 45%;
+    font-size: 44px;
+    font-weight: bold;
+}
+
+.costs-magnified {
+    position: absolute;
+    bottom: 10px;
+    left: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.cost-magnified {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: white;
+    box-sizing: border-box; /* Ensure border and padding are included in the element's total size */
+    text-align: center; /* Center text horizontally */
+    line-height: 1; /* Normal line height */
+    padding-top: 8px; /* Adjust this value to move text down */
+}
+
+.cost-magnified.white {
+    background-color: #fff;
+    color: #000;
+}
+
+.cost-magnified.green {
+    background-color: #115a00;
+}
+
+.cost-magnified.blue {
+    background-color: #00f;
+}
+
+.cost-magnified.black {
+    background-color: #000;
+}
+
+.cost-magnified.red {
+    background-color: #f00;
+}
+
+
+/*------------------------------------------------ARISTOCRATS------------------------------------------------*/
+
+.aristocrats {
+    position: absolute;
+    top: 50%;
+    left: -30%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 2;
+}
+
+.aristocrat {
+    display: flex;
+    align-items: center;
+    margin: 20px;
+}
+
+.aristocrat img {
+    width: 160px;
 }
