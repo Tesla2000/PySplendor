@@ -23,7 +23,7 @@ class _ConfigPaths:
     model_path = root / "models"
     model_path.mkdir(exist_ok=True)
     gui = root / "gui"
-    templates = gui / "template"
+    templates = gui / "templates"
     ai_weights = root / 'speed_game.pth'
     train_values_file = (root / "train_log.log").open('w')
 

@@ -1,0 +1,56 @@
+@font-face {
+    font-family: 'itc_benguiat_stdBdCn';
+    src: url('../fonts/itcbenguiatstdboldcn-webfont.woff2') format('woff2'),
+         url('../fonts/itcbenguiatstdboldcn-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+
+
+
+@font-face {
+    font-family: 'itc_benguiat_stdBdCnIt';
+    src: url('../fonts/itcbenguiatstdboldcnit-webfont.woff2') format('woff2'),
+         url('../fonts/itcbenguiatstdboldcnit-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+
+
+
+@font-face {
+    font-family: 'itc_benguiat_stdBkCn';
+    src: url('../fonts/itcbenguiatstdbookcn-webfont.woff2') format('woff2'),
+         url('../fonts/itcbenguiatstdbookcn-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+
+
+
+@font-face {
+    font-family: 'itc_benguiat_stdBkCnIt';
+    src: url('../fonts/itcbenguiatstdbookcnit-webfont.woff2') format('woff2'),
+         url('../fonts/itcbenguiatstdbookcnit-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+
+
+
+@font-face {
+    font-family: 'itc_benguiat_stdMdCnIt';
+    src: url('../fonts/itcbenguiatstdmediumcnit-webfont.woff2') format('woff2'),
+         url('../fonts/itcbenguiatstdmediumcnit-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
