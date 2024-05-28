@@ -1,4 +1,5 @@
 from dataclasses import asdict, astuple
+from itertools import count
 
 from flask import Flask, render_template, url_for, request, jsonify
 
@@ -8,6 +9,7 @@ from src.entities.AllResources import AllResources
 from src.entities.BasicResources import BasicResources
 from src.entities.Card import empty_card
 from src.moves import GrabThreeResource, GrabTwoResource
+from app_utils import card_to_dict
 
 app = Flask(__name__)
 
@@ -74,8 +76,8 @@ def index():
     aristocrats_urls = select_aristocrats(game)
     return render_template(
         "index.html",
-        cards=dict(enumerate(map(lambda tier: list(map(asdict, tier.visible)),
-                                 game.board.tiers), 1)),
+        cards=dict(zip(map(str, count(1)), map(lambda tier: list(map(card_to_dict, tier.visible)),
+                                 game.board.tiers))),
         cards_left=list(map(lambda tier: len(tier.hidden), game.board.tiers)),
         chips_left=asdict(game.board.resources),
         player_card_count=asdict(game.current_player.production),
