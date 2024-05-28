@@ -185,3 +185,6 @@ class Game:
         if self.is_terminal():
             return 1, True
         return 0, False
+
+    def __hash__(self):
+        return id(self)

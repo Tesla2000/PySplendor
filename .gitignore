@@ -1,5 +1,4 @@
 /sandbox.py
-/data/
 /models/
 /evaluation_data/
 /training_data/
@@ -7,3 +6,5 @@
 .idea/Splendor.iml
 .idea/misc.xml
 /.venv
+/.env
+/train_log.log
