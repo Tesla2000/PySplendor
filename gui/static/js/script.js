@@ -27,8 +27,12 @@ function sendImageClass(imageClass, clickType) {
         .then(response => response.json())
         .then(data => {
             console.log('Success:', data);
+            // TODO: Z jakiegos powodu nie updateuje za 3 razem i nie wyświetla overlaya po skońćzonym turnie,
             if (data.success) {
                 updateChipCount(imageClass, clickType);
+                if (data.turn_finished) {
+                    showTurnFinishedOverlay();
+                }
             }
         })
         .catch((error) => {
@@ -148,3 +152,11 @@ window.onclick = function (event) {
     }
 }
 
+function showTurnFinishedOverlay() {
+    var overlay = document.getElementById('turnOverlay');
+    overlay.style.display = 'flex';
+
+    setTimeout(function () {
+        overlay.style.display = 'none';
+    }, 3000); //ustawic po ilu ma sie chować
+}
