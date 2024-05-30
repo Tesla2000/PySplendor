@@ -87,7 +87,6 @@
         </div>
         {% for card in cards[tier] %}
         {% set card_id = "tier" ~ tier ~ "_index" ~ loop.index %}
-        <!--        TODO: DLA KART NA BOARDZIE: Dla modala przekazuje ile kosztuje karta, jaki kolor, ile punktów dodaje etc tylko nie wiem jak tego uzyc w grze w akcji więc to pozostawiam tobie XD-->
         <div class="card" data-id="{{ card_id }}" onclick="openModal(this)" data-points="{{ card['points'] }}"
              data-white="{{ card['white'] }}" data-green="{{ card['green'] }}"
              data-blue="{{ card['blue'] }}" data-black="{{ card['black'] }}" data-red="{{ card['red'] }}"
@@ -128,7 +127,7 @@
     </div>
     <div class="chip">
         <img src="{{ url_for('static', filename='components/chips/white-resource.png') }}" alt="White Chip"
-             class="resource_black">
+             class="resource_white">
         <div class="chip-count">{{ chips_left['white'] }}</div>
     </div>
     <div class="chip">
@@ -158,24 +157,24 @@
     <div class="card">
         <img src="{{ url_for('static', filename='components/cards/' + card['production'].capitalize() + '.png') }}"
              alt="{{card['production'].capitalize()}} Card">
-        {% if card['gain']|int > 0 %}
-        <div class="gain">{{ card['gain'] }}</div>
+        {% if card['points']|int > 0 %}
+        <div class="gain">{{ card['points'] }}</div>
         {% endif %}
         <div class="costs">
-            {% if card['cost']['white']|int > 0 %}
-            <span class="cost white">{{ card['cost']['white'] }}</span>
+            {% if card['white']|int > 0 %}
+            <span class="cost white">{{ card['white'] }}</span>
             {% endif %}
-            {% if card['cost']['green']|int > 0 %}
-            <span class="cost green">{{ card['cost']['green'] }}</span>
+            {% if card['green']|int > 0 %}
+            <span class="cost green">{{ card['green'] }}</span>
             {% endif %}
-            {% if card['cost']['blue']|int > 0 %}
-            <span class="cost blue">{{ card['cost']['blue'] }}</span>
+            {% if card['blue']|int > 0 %}
+            <span class="cost blue">{{ card['blue'] }}</span>
             {% endif %}
-            {% if card['cost']['black']|int > 0 %}
-            <span class="cost black">{{ card['cost']['black'] }}</span>
+            {% if card['black']|int > 0 %}
+            <span class="cost black">{{ card['black'] }}</span>
             {% endif %}
-            {% if card['cost']['red']|int > 0 %}
-            <span class="cost red">{{ card['cost']['red'] }}</span>
+            {% if card['red']|int > 0 %}
+            <span class="cost red">{{ card['red'] }}</span>
             {% endif %}
         </div>
     </div>
@@ -187,32 +186,32 @@
     {% set card_id = "reserved_index" ~ loop.index %}
     <div class="card" data-id="{{ card_id }}" onclick="openReservedModal(this)"
          style="background-image: url('{{ url_for('static', filename='components/cards/' + card['production'].capitalize() + '.png') }}');"
-         data-points="{{ card['gain'] }}" data-white="{{ card['cost']['white'] }}"
-         data-green="{{ card['cost']['green'] }}"
-         data-blue="{{ card['cost']['blue'] }}" data-black="{{ card['cost']['black'] }}"
-         data-red="{{ card['cost']['red'] }}"
+         data-points="{{ card['points'] }}" data-white="{{ card['white'] }}"
+         data-green="{{ card['green'] }}"
+         data-blue="{{ card['blue'] }}" data-black="{{ card['black'] }}"
+         data-red="{{ card['red'] }}"
          data-production="{{ card['production'] }}">
         <!--        TODO: DLA ZAREZERWOANYCH KTORE CHCE KUPIC: Dla modala przekazuje ile kosztuje karta, jaki kolor, ile punktów dodaje etc tylko nie wiem jak tego uzyc w grze w akcji więc to pozostawiam tobie XD-->
         <img src="{{ url_for('static', filename='components/cards/' + card['production'].capitalize() + '.png') }}"
              alt="{{card['production'].capitalize()}} Card">
-        {% if card['gain']|int > 0 %}
-        <div class="gain">{{ card['gain'] }}</div>
+        {% if card['points']|int > 0 %}
+        <div class="gain">{{ card['points'] }}</div>
         {% endif %}
         <div class="costs">
-            {% if card['cost']['white']|int > 0 %}
-            <span class="cost white">{{ card['cost']['white'] }}</span>
+            {% if card['white']|int > 0 %}
+            <span class="cost white">{{ card['white'] }}</span>
             {% endif %}
-            {% if card['cost']['green']|int > 0 %}
-            <span class="cost green">{{ card['cost']['green'] }}</span>
+            {% if card['green']|int > 0 %}
+            <span class="cost green">{{ card['green'] }}</span>
             {% endif %}
-            {% if card['cost']['blue']|int > 0 %}
-            <span class="cost blue">{{ card['cost']['blue'] }}</span>
+            {% if card['blue']|int > 0 %}
+            <span class="cost blue">{{ card['blue'] }}</span>
             {% endif %}
-            {% if card['cost']['black']|int > 0 %}
-            <span class="cost black">{{ card['cost']['black'] }}</span>
+            {% if card['black']|int > 0 %}
+            <span class="cost black">{{ card['black'] }}</span>
             {% endif %}
-            {% if card['cost']['red']|int > 0 %}
-            <span class="cost red">{{ card['cost']['red'] }}</span>
+            {% if card['red']|int > 0 %}
+            <span class="cost red">{{ card['red'] }}</span>
             {% endif %}
         </div>
     </div>

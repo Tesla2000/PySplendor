@@ -1,16 +1,15 @@
-import logging
 from dataclasses import asdict, astuple
 from itertools import count
 
 from flask import Flask, render_template, url_for, request, jsonify
 
+from app_utils import card_to_dict
 from perform_move import perform_move
 from src.Game import Game
 from src.entities.AllResources import AllResources
 from src.entities.BasicResources import BasicResources
 from src.entities.Card import empty_card
-from src.moves import GrabThreeResource, GrabTwoResource
-from app_utils import card_to_dict
+from src.moves import GrabThreeResource, GrabTwoResource, ReserveVisible
 from src.moves.BuildBoard import BuildBoard
 from src.moves.BuildReserve import BuildReserve
 
@@ -28,38 +27,37 @@ def select_aristocrats(game: Game):
 
 game = Game()
 
-# TODO: Nie mam pojecia czy to dobrze, looknij tez w index w miejsca gdzie jest todo
 image2build = {  # to be wired
-    "tier1_index1": BuildBoard(tier_index=1, index=1),
-    "tier1_index2": BuildBoard(tier_index=1, index=2),
-    "tier1_index3": BuildBoard(tier_index=1, index=3),
-    "tier1_index4": BuildBoard(tier_index=1, index=4),
-    "tier2_index1": BuildBoard(tier_index=2, index=1),
-    "tier2_index2": BuildBoard(tier_index=2, index=2),
-    "tier2_index3": BuildBoard(tier_index=2, index=3),
-    "tier2_index4": BuildBoard(tier_index=2, index=3),
-    "tier3_index1": BuildBoard(tier_index=3, index=1),
-    "tier3_index2": BuildBoard(tier_index=3, index=2),
-    "tier3_index3": BuildBoard(tier_index=3, index=3),
-    "tier3_index4": BuildBoard(tier_index=3, index=4),
-    "reserved_index1": BuildReserve(1),
-    "reserved_index2": BuildReserve(2),
-    "reserved_index3": BuildReserve(3),
+    "tier1_index1": BuildBoard(tier_index=0, index=0),
+    "tier1_index2": BuildBoard(tier_index=0, index=1),
+    "tier1_index3": BuildBoard(tier_index=0, index=2),
+    "tier1_index4": BuildBoard(tier_index=0, index=3),
+    "tier2_index1": BuildBoard(tier_index=1, index=0),
+    "tier2_index2": BuildBoard(tier_index=1, index=1),
+    "tier2_index3": BuildBoard(tier_index=1, index=2),
+    "tier2_index4": BuildBoard(tier_index=1, index=2),
+    "tier3_index1": BuildBoard(tier_index=2, index=0),
+    "tier3_index2": BuildBoard(tier_index=2, index=1),
+    "tier3_index3": BuildBoard(tier_index=2, index=2),
+    "tier3_index4": BuildBoard(tier_index=2, index=3),
+    "reserved_index1": BuildReserve(0),
+    "reserved_index2": BuildReserve(1),
+    "reserved_index3": BuildReserve(2),
 }
 
 image2reserve = {  # to be wired
-    "tier1_index1": BuildBoard(tier_index=1, index=1),
-    "tier1_index2": BuildBoard(tier_index=1, index=2),
-    "tier1_index3": BuildBoard(tier_index=1, index=3),
-    "tier1_index4": BuildBoard(tier_index=1, index=4),
-    "tier2_index1": BuildBoard(tier_index=2, index=1),
-    "tier2_index2": BuildBoard(tier_index=2, index=2),
-    "tier2_index3": BuildBoard(tier_index=2, index=3),
-    "tier2_index4": BuildBoard(tier_index=2, index=3),
-    "tier3_index1": BuildBoard(tier_index=3, index=1),
-    "tier3_index2": BuildBoard(tier_index=3, index=2),
-    "tier3_index3": BuildBoard(tier_index=3, index=3),
-    "tier3_index4": BuildBoard(tier_index=3, index=4),
+    "tier1_index1": ReserveVisible(tier_index=0, index=0),
+    "tier1_index2": ReserveVisible(tier_index=0, index=1),
+    "tier1_index3": ReserveVisible(tier_index=0, index=2),
+    "tier1_index4": ReserveVisible(tier_index=0, index=3),
+    "tier2_index1": ReserveVisible(tier_index=1, index=0),
+    "tier2_index2": ReserveVisible(tier_index=1, index=1),
+    "tier2_index3": ReserveVisible(tier_index=1, index=2),
+    "tier2_index4": ReserveVisible(tier_index=1, index=2),
+    "tier3_index1": ReserveVisible(tier_index=2, index=0),
+    "tier3_index2": ReserveVisible(tier_index=2, index=1),
+    "tier3_index3": ReserveVisible(tier_index=2, index=2),
+    "tier3_index4": ReserveVisible(tier_index=2, index=3),
 }
 
 image2resource = {
@@ -88,9 +86,9 @@ def index():
         si_total_points=game.players[-1].points,
         si_chips=asdict(game.players[-1].resources),
         si_cards_reserved=list(
-            filter(lambda card: card != empty_card, game.players[-1].reserve)),
-        player_cards_reserved=list(filter(lambda card: card != empty_card,
-                                          game.current_player.reserve)),
+            map(card_to_dict, filter(lambda card: card != empty_card, game.players[-1].reserve))),
+        player_cards_reserved=list(map(card_to_dict, filter(lambda card: card != empty_card,
+                                          game.current_player.reserve))),
         aristocrats_urls=aristocrats_urls,
     )
 
@@ -111,17 +109,24 @@ def click_resource():
             grabbed_resources = new_resources.get_basic()
         else:
             grabbed_resources += chosen_resource
+        if sum(game.current_player.resources) + sum(grabbed_resources) > 10:
+            grabbed_resources = (AllResources(*grabbed_resources) - chosen_resource).get_basic()
+            return jsonify(success=False)
         if sum(grabbed_resources) == 3:
             game = perform_move(game, GrabThreeResource(grabbed_resources))
+            grabbed_resources = BasicResources()
             return jsonify(success=True, turn_finished=True)
         if max(grabbed_resources) == 2 and game.board.resources[
             astuple(grabbed_resources).index(max(grabbed_resources))
-        ] < 2:
+        ] < 4:
+            grabbed_resources = (AllResources(*grabbed_resources) - chosen_resource).get_basic()
             return jsonify(success=False)
         if max(grabbed_resources) == 2 and sum(grabbed_resources) == 3:
+            grabbed_resources = (AllResources(*grabbed_resources) - chosen_resource).get_basic()
             return jsonify(success=False)
         if max(grabbed_resources) == 2 and sum(grabbed_resources) != 3:
             game = perform_move(game, GrabTwoResource(grabbed_resources))
+            grabbed_resources = BasicResources()
             return jsonify(success=True, turn_finished=True)
 
         return jsonify(success=True, turn_finished=False)
@@ -136,8 +141,6 @@ def click_card():
     card_id = data.get('card_id')
     action = data.get('action')
 
-    # Determine the appropriate action based on the card_id and action
-    # TODO: Checknij czy tam ma być
     if action == 'buy':
         if card_id in image2build:
             action = image2build[card_id]

@@ -32,6 +32,7 @@ function sendImageClass(imageClass, clickType) {
                 updateChipCount(imageClass, clickType);
                 if (data.turn_finished) {
                     showTurnFinishedOverlay();
+                    location.reload()
                 }
             }
         })
@@ -199,6 +200,8 @@ function sendCardAction(cardId, action) {
         if (data.success) {
             closeModal();
             closeReservedModal();
+            showTurnFinishedOverlay();
+            location.reload()
         }
     })
     .catch((error) => {
