@@ -87,10 +87,13 @@
         </div>
         {% for card in cards[tier] %}
         {% set card_id = "tier" ~ tier ~ "_index" ~ loop.index %}
-        <div class="card" data-id="{{ card_id }}" onclick="openModal(this)" data-points="{{ card['points'] }}" data-white="{{ card['white'] }}" data-green="{{ card['green'] }}"
+        <!--        TODO: DLA KART NA BOARDZIE: Dla modala przekazuje ile kosztuje karta, jaki kolor, ile punktów dodaje etc tylko nie wiem jak tego uzyc w grze w akcji więc to pozostawiam tobie XD-->
+        <div class="card" data-id="{{ card_id }}" onclick="openModal(this)" data-points="{{ card['points'] }}"
+             data-white="{{ card['white'] }}" data-green="{{ card['green'] }}"
              data-blue="{{ card['blue'] }}" data-black="{{ card['black'] }}" data-red="{{ card['red'] }}"
              data-production="{{ card['production'] }}" data-tier="{{ tier }}">
-             <img src="{{ url_for('static', filename='components/cards/' + card['production'].capitalize() + '.png') }}" alt="card['production'].capitalize() Card">
+            <img src="{{ url_for('static', filename='components/cards/' + card['production'].capitalize() + '.png') }}"
+                 alt="card['production'].capitalize() Card">
             {% if card['points']|int > 0 %}
             <div class="gain">{{ card['points'] }}</div>
             {% endif %}
@@ -119,23 +122,28 @@
 <!--------------------------------------------------KAMIENIE-------------------------------------------------->
 <div class="chips">
     <div class="chip">
-        <img src="{{ url_for('static', filename='components/chips/black-resource.png') }}" alt="Black Chip" class="resource_black">
+        <img src="{{ url_for('static', filename='components/chips/black-resource.png') }}" alt="Black Chip"
+             class="resource_black">
         <div class="chip-count">{{ chips_left['black'] }}</div>
     </div>
     <div class="chip">
-        <img src="{{ url_for('static', filename='components/chips/white-resource.png') }}" alt="White Chip" class="resource_black">
+        <img src="{{ url_for('static', filename='components/chips/white-resource.png') }}" alt="White Chip"
+             class="resource_black">
         <div class="chip-count">{{ chips_left['white'] }}</div>
     </div>
     <div class="chip">
-        <img src="{{ url_for('static', filename='components/chips/green-resource.png') }}" alt="Green Chip" class="resource_green">
+        <img src="{{ url_for('static', filename='components/chips/green-resource.png') }}" alt="Green Chip"
+             class="resource_green">
         <div class="chip-count">{{ chips_left['green'] }}</div>
     </div>
     <div class="chip">
-        <img src="{{ url_for('static', filename='components/chips/blue-resource.png') }}" alt="Blue Chip" class="resource_blue">
+        <img src="{{ url_for('static', filename='components/chips/blue-resource.png') }}" alt="Blue Chip"
+             class="resource_blue">
         <div class="chip-count">{{ chips_left['blue'] }}</div>
     </div>
     <div class="chip">
-        <img src="{{ url_for('static', filename='components/chips/red-resource.png') }}" alt="Red Chip" class="resource_red">
+        <img src="{{ url_for('static', filename='components/chips/red-resource.png') }}" alt="Red Chip"
+             class="resource_red">
         <div class="chip-count">{{ chips_left['red'] }}</div>
     </div>
     <div class="chip">
@@ -177,10 +185,14 @@
 <div class="card-reserved-player">
     {% for card in player_cards_reserved%}
     {% set card_id = "reserved_index" ~ loop.index %}
-    <div class="card" data-id="{{ card_id }}" onclick="openReservedModal(this)" style="background-image: url('{{ url_for('static', filename='components/cards/' + card['production'].capitalize() + '.png') }}');"
-         data-points="{{ card['gain'] }}" data-white="{{ card['cost']['white'] }}" data-green="{{ card['cost']['green'] }}"
-             data-blue="{{ card['cost']['blue'] }}" data-black="{{ card['cost']['black'] }}" data-red="{{ card['cost']['red'] }}"
-             data-production="{{ card['production'] }}">
+    <div class="card" data-id="{{ card_id }}" onclick="openReservedModal(this)"
+         style="background-image: url('{{ url_for('static', filename='components/cards/' + card['production'].capitalize() + '.png') }}');"
+         data-points="{{ card['gain'] }}" data-white="{{ card['cost']['white'] }}"
+         data-green="{{ card['cost']['green'] }}"
+         data-blue="{{ card['cost']['blue'] }}" data-black="{{ card['cost']['black'] }}"
+         data-red="{{ card['cost']['red'] }}"
+         data-production="{{ card['production'] }}">
+        <!--        TODO: DLA ZAREZERWOANYCH KTORE CHCE KUPIC: Dla modala przekazuje ile kosztuje karta, jaki kolor, ile punktów dodaje etc tylko nie wiem jak tego uzyc w grze w akcji więc to pozostawiam tobie XD-->
         <img src="{{ url_for('static', filename='components/cards/' + card['production'].capitalize() + '.png') }}"
              alt="{{card['production'].capitalize()}} Card">
         {% if card['gain']|int > 0 %}

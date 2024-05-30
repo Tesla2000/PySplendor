@@ -28,6 +28,7 @@ def select_aristocrats(game: Game):
 
 game = Game()
 
+# TODO: Nie mam pojecia czy to dobrze, looknij tez w index w miejsca gdzie jest todo
 image2build = {  # to be wired
     "tier1_index1": BuildBoard(tier_index=1, index=1),
     "tier1_index2": BuildBoard(tier_index=1, index=2),
@@ -77,7 +78,7 @@ def index():
     return render_template(
         "index.html",
         cards=dict(zip(map(str, count(1)), map(lambda tier: list(map(card_to_dict, tier.visible)),
-                                 game.board.tiers))),
+                                               game.board.tiers))),
         cards_left=list(map(lambda tier: len(tier.hidden), game.board.tiers)),
         chips_left=asdict(game.board.resources),
         player_card_count=asdict(game.current_player.production),
@@ -92,7 +93,6 @@ def index():
                                           game.current_player.reserve)),
         aristocrats_urls=aristocrats_urls,
     )
-
 
 
 @app.route('/click_resource', methods=['POST'])
@@ -127,6 +127,7 @@ def click_resource():
         return jsonify(success=True, turn_finished=False)
 
     return jsonify(success=False)
+
 
 @app.route('/click_card', methods=['POST'])
 def click_card():
