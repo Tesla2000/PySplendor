@@ -40,9 +40,9 @@ image2build = {  # to be wired
     "tier3_index2": BuildBoard(tier_index=2, index=1),
     "tier3_index3": BuildBoard(tier_index=2, index=2),
     "tier3_index4": BuildBoard(tier_index=2, index=3),
-    "reserved_index1": BuildReserve(1),
-    "reserved_index2": BuildReserve(2),
-    "reserved_index3": BuildReserve(3),
+    "reserved_index1": BuildReserve(0),
+    "reserved_index2": BuildReserve(1),
+    "reserved_index3": BuildReserve(2),
 }
 
 image2reserve = {  # to be wired
@@ -86,9 +86,9 @@ def index():
         si_total_points=game.players[-1].points,
         si_chips=asdict(game.players[-1].resources),
         si_cards_reserved=list(
-            filter(lambda card: card != empty_card, game.players[-1].reserve)),
-        player_cards_reserved=list(filter(lambda card: card != empty_card,
-                                          game.current_player.reserve)),
+            map(card_to_dict, filter(lambda card: card != empty_card, game.players[-1].reserve))),
+        player_cards_reserved=list(map(card_to_dict, filter(lambda card: card != empty_card,
+                                          game.current_player.reserve))),
         aristocrats_urls=aristocrats_urls,
     )
 
@@ -111,15 +111,17 @@ def click_resource():
             grabbed_resources += chosen_resource
         if sum(grabbed_resources) == 3:
             game = perform_move(game, GrabThreeResource(grabbed_resources))
+            grabbed_resources = BasicResources()
             return jsonify(success=True, turn_finished=True)
         if max(grabbed_resources) == 2 and game.board.resources[
             astuple(grabbed_resources).index(max(grabbed_resources))
-        ] < 2:
+        ] < 4:
             return jsonify(success=False)
         if max(grabbed_resources) == 2 and sum(grabbed_resources) == 3:
             return jsonify(success=False)
         if max(grabbed_resources) == 2 and sum(grabbed_resources) != 3:
             game = perform_move(game, GrabTwoResource(grabbed_resources))
+            grabbed_resources = BasicResources()
             return jsonify(success=True, turn_finished=True)
 
         return jsonify(success=True, turn_finished=False)

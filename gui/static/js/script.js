@@ -32,6 +32,7 @@ function sendImageClass(imageClass, clickType) {
                 updateChipCount(imageClass, clickType);
                 if (data.turn_finished) {
                     showTurnFinishedOverlay();
+                    location.reload()
                 }
             }
         })
