@@ -1,13 +1,13 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Add click event listener to all images
-    document.querySelectorAll('img').forEach(function(image) {
-        image.addEventListener('click', function(event) {
+    document.querySelectorAll('.chips .chip img').forEach(function (image) {
+        image.addEventListener('click', function (event) {
             var imageClass = this.className;
             var clickType = event.button === 0 ? 'left' : 'unknown'; // 0 indicates a left click
             sendImageClass(imageClass, clickType);
         });
 
-        image.addEventListener('contextmenu', function(event) {
+        image.addEventListener('contextmenu', function (event) {
             event.preventDefault(); // Prevent the context menu from appearing
             var imageClass = this.className;
             var clickType = 'right';
@@ -17,27 +17,57 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function sendImageClass(imageClass, clickType) {
-    fetch('/click', {
+    fetch('/click_resource', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ class: imageClass, clickType: clickType }),
+        body: JSON.stringify({class: imageClass, clickType: clickType}),
     })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Success:', data);
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-    });
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success:', data);
+            // TODO: Z jakiegos powodu nie updateuje za 3 razem i nie wyświetla overlaya po skońćzonym turnie,
+            if (data.success) {
+                updateChipCount(imageClass, clickType);
+                if (data.turn_finished) {
+                    showTurnFinishedOverlay();
+                }
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+}
+
+function updateChipCount(imageClass, clickType) {
+    var chipElement = document.querySelector(`.${imageClass}`).closest('.chip');
+    var chipCountElement = chipElement.querySelector('.chip-count');
+    var currentCount = parseInt(chipCountElement.textContent, 10);
+
+    if (clickType === 'left') {
+        currentCount -= 1;
+    } else if (clickType === 'right') {
+        currentCount += 1;
+    }
+
+    // Ensure the count does not go below 0
+    if (currentCount < 0) {
+        currentCount = 0;
+    }
+
+    chipCountElement.textContent = currentCount;
 }
 
 
 function openModal(card) {
 
+    var cardId = card.dataset.id;
+    // Get the img element inside the card
+    var cardImage = card.querySelector('img');
+    var cardImageSrc = cardImage ? cardImage.src : '';
+
     // Get card information from data attributes
-    var cardImageSrc = card.style.backgroundImage.slice(5, -2);
     var cardPoints = card.dataset.points;
     var cardWhite = card.dataset.white;
     var cardGreen = card.dataset.green;
@@ -45,6 +75,7 @@ function openModal(card) {
     var cardBlack = card.dataset.black;
     var cardRed = card.dataset.red;
     var cardProduction = card.dataset.production;
+    var cardTier = card.dataset.tier;
 
     // Set the modal content
     document.getElementById('modal-card-image').src = cardImageSrc;
@@ -56,6 +87,10 @@ function openModal(card) {
     setCost('modal-card-cost-black', cardBlack);
     setCost('modal-card-cost-red', cardRed);
 
+    setCost('modal-card-production', cardProduction)
+    setCost('modal-card-tier', cardTier)
+
+    document.getElementById('cardModal').dataset.cardId = cardId;
     // Display the modal
     document.getElementById('cardModal').style.display = 'block';
 }
@@ -75,7 +110,7 @@ function closeModal() {
 }
 
 // Close the modal when clicking outside of it
-window.onclick = function(event) {
+window.onclick = function (event) {
     var modal = document.getElementById('cardModal');
     if (event.target == modal) {
         modal.style.display = 'none';
@@ -89,6 +124,7 @@ window.onclick = function(event) {
 function openReservedModal(card) {
 
     // Get card information from data attributes
+    var cardId = card.dataset.id;
     var cardImageSrc = card.style.backgroundImage.slice(5, -2);
     var cardPoints = card.dataset.points;
     var cardWhite = card.dataset.white;
@@ -107,6 +143,7 @@ function openReservedModal(card) {
     setCost('modal-r-card-cost-black', cardBlack);
     setCost('modal-r-card-cost-red', cardRed);
 
+    document.getElementById('reservedCardModal').dataset.cardId = cardId;
     // Display the modal
     document.getElementById('reservedCardModal').style.display = 'block';
 }
@@ -116,10 +153,55 @@ function closeReservedModal() {
 }
 
 // Close the modal when clicking outside of it
-window.onclick = function(event) {
+window.onclick = function (event) {
     var modal = document.getElementById('reservedCardModal');
     if (event.target == modal) {
         modal.style.display = 'none';
     }
 }
 
+function showTurnFinishedOverlay() {
+    var overlay = document.getElementById('turnOverlay');
+    overlay.style.display = 'flex';
+
+    setTimeout(function () {
+        overlay.style.display = 'none';
+    }, 3000); //ustawic po ilu ma sie chować
+}
+//
+
+function buyCard() {
+    var cardId = document.getElementById('cardModal').dataset.cardId;
+    sendCardAction(cardId, 'buy');
+}
+
+function reserveCard() {
+    var cardId = document.getElementById('cardModal').dataset.cardId;
+    sendCardAction(cardId, 'reserve');
+}
+
+function buyReservedCard() {
+    var cardId = document.getElementById('reservedCardModal').dataset.cardId;
+    sendCardAction(cardId, 'buy');
+}
+
+function sendCardAction(cardId, action) {
+    fetch('/click_card', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ card_id: cardId, action: action }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Success:', data);
+        if (data.success) {
+            closeModal();
+            closeReservedModal();
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+}
