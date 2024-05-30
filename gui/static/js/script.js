@@ -62,6 +62,7 @@ function updateChipCount(imageClass, clickType) {
 
 function openModal(card) {
 
+    var cardId = card.dataset.id;
     // Get the img element inside the card
     var cardImage = card.querySelector('img');
     var cardImageSrc = cardImage ? cardImage.src : '';
@@ -74,6 +75,7 @@ function openModal(card) {
     var cardBlack = card.dataset.black;
     var cardRed = card.dataset.red;
     var cardProduction = card.dataset.production;
+    var cardTier = card.dataset.tier;
 
     // Set the modal content
     document.getElementById('modal-card-image').src = cardImageSrc;
@@ -85,6 +87,10 @@ function openModal(card) {
     setCost('modal-card-cost-black', cardBlack);
     setCost('modal-card-cost-red', cardRed);
 
+    setCost('modal-card-production', cardProduction)
+    setCost('modal-card-tier', cardTier)
+
+    document.getElementById('cardModal').dataset.cardId = cardId;
     // Display the modal
     document.getElementById('cardModal').style.display = 'block';
 }
@@ -118,6 +124,7 @@ window.onclick = function (event) {
 function openReservedModal(card) {
 
     // Get card information from data attributes
+    var cardId = card.dataset.id;
     var cardImageSrc = card.style.backgroundImage.slice(5, -2);
     var cardPoints = card.dataset.points;
     var cardWhite = card.dataset.white;
@@ -136,6 +143,7 @@ function openReservedModal(card) {
     setCost('modal-r-card-cost-black', cardBlack);
     setCost('modal-r-card-cost-red', cardRed);
 
+    document.getElementById('reservedCardModal').dataset.cardId = cardId;
     // Display the modal
     document.getElementById('reservedCardModal').style.display = 'block';
 }
@@ -159,4 +167,41 @@ function showTurnFinishedOverlay() {
     setTimeout(function () {
         overlay.style.display = 'none';
     }, 3000); //ustawic po ilu ma sie chować
+}
+//
+
+function buyCard() {
+    var cardId = document.getElementById('cardModal').dataset.cardId;
+    sendCardAction(cardId, 'buy');
+}
+
+function reserveCard() {
+    var cardId = document.getElementById('cardModal').dataset.cardId;
+    sendCardAction(cardId, 'reserve');
+}
+
+function buyReservedCard() {
+    var cardId = document.getElementById('reservedCardModal').dataset.cardId;
+    sendCardAction(cardId, 'buy');
+}
+
+function sendCardAction(cardId, action) {
+    fetch('/click_card', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ card_id: cardId, action: action }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Success:', data);
+        if (data.success) {
+            closeModal();
+            closeReservedModal();
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
 }

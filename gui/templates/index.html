@@ -86,9 +86,10 @@
             <div class="card-count">{{ cards_left[tier] }}</div>
         </div>
         {% for card in cards[tier] %}
-        <div class="card" onclick="openModal(this)" data-points="{{ card['points'] }}" data-white="{{ card['white'] }}" data-green="{{ card['green'] }}"
+        {% set card_id = "tier" ~ tier ~ "_index" ~ loop.index %}
+        <div class="card" data-id="{{ card_id }}" onclick="openModal(this)" data-points="{{ card['points'] }}" data-white="{{ card['white'] }}" data-green="{{ card['green'] }}"
              data-blue="{{ card['blue'] }}" data-black="{{ card['black'] }}" data-red="{{ card['red'] }}"
-             data-production="{{ card['production'] }}">
+             data-production="{{ card['production'] }}" data-tier="{{ tier }}">
              <img src="{{ url_for('static', filename='components/cards/' + card['production'].capitalize() + '.png') }}" alt="card['production'].capitalize() Card">
             {% if card['points']|int > 0 %}
             <div class="gain">{{ card['points'] }}</div>
@@ -175,7 +176,8 @@
 
 <div class="card-reserved-player">
     {% for card in player_cards_reserved%}
-    <div class="card" onclick="openReservedModal(this)" style="background-image: url('{{ url_for('static', filename='components/cards/' + card['production'].capitalize() + '.png') }}');"
+    {% set card_id = "reserved_index" ~ loop.index %}
+    <div class="card" data-id="{{ card_id }}" onclick="openReservedModal(this)" style="background-image: url('{{ url_for('static', filename='components/cards/' + card['production'].capitalize() + '.png') }}');"
          data-points="{{ card['gain'] }}" data-white="{{ card['cost']['white'] }}" data-green="{{ card['cost']['green'] }}"
              data-blue="{{ card['cost']['blue'] }}" data-black="{{ card['cost']['black'] }}" data-red="{{ card['cost']['red'] }}"
              data-production="{{ card['production'] }}">
@@ -220,9 +222,13 @@
                 <span id="modal-card-cost-red" class="cost-magnified red"></span>
             </div>
         </div>
+        <div>
+            <span id="modal-card-production" hidden="hidden"></span>
+            <span id="modal-card-tier" hidden="hidden"></span>
+        </div>
         <div class="modal-actions">
-            <button class="buy-button">BUY</button>
-            <button class="reserve-button">
+            <button class="buy-button" onclick="buyCard()">BUY</button>
+            <button class="reserve-button" onclick="reserveCard()">
                 RESERVE <img src="../static/components/chips/gold-resource.png" alt="Gold Coin" class="coin-icon">
             </button>
         </div>
@@ -244,7 +250,7 @@
             </div>
         </div>
         <div class="modal-actions">
-            <button class="buy-button">BUY</button>
+            <button class="buy-button" onclick="buyReservedCard()">BUY</button>
         </div>
     </div>
 </div>
