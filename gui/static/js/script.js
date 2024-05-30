@@ -200,6 +200,8 @@ function sendCardAction(cardId, action) {
         if (data.success) {
             closeModal();
             closeReservedModal();
+            showTurnFinishedOverlay();
+            location.reload()
         }
     })
     .catch((error) => {

@@ -109,6 +109,9 @@ def click_resource():
             grabbed_resources = new_resources.get_basic()
         else:
             grabbed_resources += chosen_resource
+        if sum(game.current_player.resources) + sum(grabbed_resources) > 10:
+            grabbed_resources = (AllResources(*grabbed_resources) - chosen_resource).get_basic()
+            return jsonify(success=False)
         if sum(grabbed_resources) == 3:
             game = perform_move(game, GrabThreeResource(grabbed_resources))
             grabbed_resources = BasicResources()
@@ -116,8 +119,10 @@ def click_resource():
         if max(grabbed_resources) == 2 and game.board.resources[
             astuple(grabbed_resources).index(max(grabbed_resources))
         ] < 4:
+            grabbed_resources = (AllResources(*grabbed_resources) - chosen_resource).get_basic()
             return jsonify(success=False)
         if max(grabbed_resources) == 2 and sum(grabbed_resources) == 3:
+            grabbed_resources = (AllResources(*grabbed_resources) - chosen_resource).get_basic()
             return jsonify(success=False)
         if max(grabbed_resources) == 2 and sum(grabbed_resources) != 3:
             game = perform_move(game, GrabTwoResource(grabbed_resources))
