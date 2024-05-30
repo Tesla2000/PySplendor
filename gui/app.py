@@ -1,3 +1,4 @@
+import logging
 from dataclasses import asdict, astuple
 from itertools import count
 
@@ -94,26 +95,20 @@ def index():
     )
 
 
-@app.route('/click', methods=['POST'])
-def click():
+
+@app.route('/click_resource', methods=['POST'])
+def click_resource():
     global grabbed_resources, game
     data = request.json
     image_class = data.get('class')
     right_click = data.get('clickType') == "right"
-    if image_class in image2build:
-        if right_click:
-            action = image2reserve[image_class]
-        else:
-            action = image2build[image_class]
-        if not action.is_valid(game) or astuple(grabbed_resources):
-            return jsonify(success=False)
-        game = perform_move(game, action)
-        return jsonify(success=True, turn_finished=True)
     if image_class in image2resource:
         chosen_resource = image2resource[image_class]
+
         if right_click:
             new_resources = AllResources(*grabbed_resources) - chosen_resource
             if new_resources.lacks():
+                print("TURNING BACK", new_resources)
                 return jsonify(success=False)
             grabbed_resources = new_resources.get_basic()
         else:
@@ -130,8 +125,26 @@ def click():
         if max(grabbed_resources) == 2 and sum(grabbed_resources) != 3:
             game = perform_move(game, GrabTwoResource(grabbed_resources))
             return jsonify(success=True, turn_finished=True)
+
+        print(grabbed_resources, game.board.resources)
         return jsonify(success=True, turn_finished=False)
 
+    return jsonify(success=False)
+
+def click_buy():
+    global grabbed_resources, game
+    data = request.json
+    image_class = data.get('class')
+    right_click = data.get('clickType') == "right"
+    if image_class in image2build:
+        if right_click:
+            action = image2reserve[image_class]
+        else:
+            action = image2build[image_class]
+        if not action.is_valid(game) or astuple(grabbed_resources):
+            return jsonify(success=False)
+        game = perform_move(game, action)
+        return jsonify(success=True, turn_finished=True)
     return jsonify(success=False)
 
 

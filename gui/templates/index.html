@@ -52,7 +52,7 @@
     <div class="player-chip">
         <div class="player-chip-count">{{ count }}</div>
         <img src="{{ url_for('static', filename='components/chips/' + color + '-resource.png') }}"
-             alt="{{ color.capitalize() }} Chip">
+             alt="{{ color.capitalize() }} Chip" class="{{color}}_resource_player">
     </div>
     {% endfor %}
 </div>
@@ -86,11 +86,10 @@
             <div class="card-count">{{ cards_left[tier] }}</div>
         </div>
         {% for card in cards[tier] %}
-        <div class="card clickable" onclick="openModal(this)"
-             style="background-image: url('{{ url_for('static', filename='components/cards/' + card['production'].capitalize() + '.png') }}');"
-             data-points="{{ card['points'] }}" data-white="{{ card['white'] }}" data-green="{{ card['green'] }}"
+        <div class="card" onclick="openModal(this)" data-points="{{ card['points'] }}" data-white="{{ card['white'] }}" data-green="{{ card['green'] }}"
              data-blue="{{ card['blue'] }}" data-black="{{ card['black'] }}" data-red="{{ card['red'] }}"
              data-production="{{ card['production'] }}">
+             <img src="{{ url_for('static', filename='components/cards/' + card['production'].capitalize() + '.png') }}" alt="card['production'].capitalize() Card">
             {% if card['points']|int > 0 %}
             <div class="gain">{{ card['points'] }}</div>
             {% endif %}

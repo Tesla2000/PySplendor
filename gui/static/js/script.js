@@ -1,13 +1,13 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Add click event listener to all images
-    document.querySelectorAll('img').forEach(function(image) {
-        image.addEventListener('click', function(event) {
+    document.querySelectorAll('.chips .chip img').forEach(function (image) {
+        image.addEventListener('click', function (event) {
             var imageClass = this.className;
             var clickType = event.button === 0 ? 'left' : 'unknown'; // 0 indicates a left click
             sendImageClass(imageClass, clickType);
         });
 
-        image.addEventListener('contextmenu', function(event) {
+        image.addEventListener('contextmenu', function (event) {
             event.preventDefault(); // Prevent the context menu from appearing
             var imageClass = this.className;
             var clickType = 'right';
@@ -17,27 +17,52 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function sendImageClass(imageClass, clickType) {
-    fetch('/click', {
+    fetch('/click_resource', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ class: imageClass, clickType: clickType }),
+        body: JSON.stringify({class: imageClass, clickType: clickType}),
     })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Success:', data);
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-    });
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success:', data);
+            if (data.success) {
+                updateChipCount(imageClass, clickType);
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+}
+
+function updateChipCount(imageClass, clickType) {
+    var chipElement = document.querySelector(`.${imageClass}`).closest('.chip');
+    var chipCountElement = chipElement.querySelector('.chip-count');
+    var currentCount = parseInt(chipCountElement.textContent, 10);
+
+    if (clickType === 'left') {
+        currentCount -= 1;
+    } else if (clickType === 'right') {
+        currentCount += 1;
+    }
+
+    // Ensure the count does not go below 0
+    if (currentCount < 0) {
+        currentCount = 0;
+    }
+
+    chipCountElement.textContent = currentCount;
 }
 
 
 function openModal(card) {
 
+    // Get the img element inside the card
+    var cardImage = card.querySelector('img');
+    var cardImageSrc = cardImage ? cardImage.src : '';
+
     // Get card information from data attributes
-    var cardImageSrc = card.style.backgroundImage.slice(5, -2);
     var cardPoints = card.dataset.points;
     var cardWhite = card.dataset.white;
     var cardGreen = card.dataset.green;
@@ -75,7 +100,7 @@ function closeModal() {
 }
 
 // Close the modal when clicking outside of it
-window.onclick = function(event) {
+window.onclick = function (event) {
     var modal = document.getElementById('cardModal');
     if (event.target == modal) {
         modal.style.display = 'none';
@@ -116,7 +141,7 @@ function closeReservedModal() {
 }
 
 // Close the modal when clicking outside of it
-window.onclick = function(event) {
+window.onclick = function (event) {
     var modal = document.getElementById('reservedCardModal');
     if (event.target == modal) {
         modal.style.display = 'none';
