@@ -4,7 +4,6 @@ from typing import Optional
 import pytorch_lightning as pl
 import torch
 from torch import nn, Tensor
-from torch.optim import Optimizer
 
 from Config import Config
 
@@ -35,6 +34,7 @@ class Agent(pl.LightningModule):
         if loss_fn is None:
             loss_fn = nn.MSELoss()
         self.loss_fn = loss_fn
+        self.optimizer = None
 
     def _get_size(self, n_players: int) -> int:
         return self._input_size_dictionary[n_players]
@@ -45,14 +45,24 @@ class Agent(pl.LightningModule):
             state = self.relu(state)
         return self.fc_p(state)
 
-    def configure_optimizers(self, optimizer: Optional[Optimizer] = None):
-        if optimizer is None:
-            optimizer = torch.optim.Adam(self.parameters(), lr=Config.initial_train_learning_rate)
-        return optimizer
+    def configure_optimizers(self):
+        if self.optimizer is None:
+            self.optimizer = torch.optim.Adam(
+                self.parameters(),
+                lr=Config.initial_train_learning_rate)
+        scheduler = torch.optim.lr_scheduler.ExponentialLR(
+            self.optimizer, gamma=.1 ** (1 / Config.lr_decline_rate)
+        )
+        return [self.optimizer], [
+            {"scheduler": scheduler, "interval": "epoch"}]
+
+    def lr_scheduler_step(self, scheduler, metric):
+        scheduler.step(metric)
 
     def training_step(self, batch, batch_idx):
         state, moves_till_end, move_indexes = batch
         outputs = self(state)
-        loss = sum(self.loss_fn(output[move_index], move_till_end.float()) for move_index, move_till_end, output in
+        loss = sum(self.loss_fn(output[move_index], move_till_end.float()) for
+                   move_index, move_till_end, output in
                    zip(move_indexes, moves_till_end, outputs))
         return {"loss": loss}

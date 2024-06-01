@@ -8,3 +8,4 @@
 /.venv
 /.env
 /train_log.log
+/trained_on_10/
