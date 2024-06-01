@@ -1,11 +1,11 @@
 import torch
 
-from ai_move_service import AiMoveDifferential, VeryEasyAI
+from ai_move_service import AiMoveDifferential, VeryEasyAI, EasyAI
 from src.Game import Game
 from src.entities.BasicResources import BasicResources
 from src.moves import Move, GrabTwoResource
 
-move_performer = VeryEasyAI()
+move_performer = EasyAI()
 
 
 @torch.no_grad()

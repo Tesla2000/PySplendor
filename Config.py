@@ -51,20 +51,15 @@ class _ConfigAgent:
 
 
 class Config(_ConfigPaths, _ConfigAgent, _DBConfig):
+    lr_decline_rate = 1000
     agent_print_interval = 10
     results_over_time_counter = 100
     agent_save_interval = 500
-    play_beta = 10
-    beta = 10
+    play_beta = 100
+    beta = 100
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    dirichlet_alpha = .3
-    dirichlet_epsilon = .25
-    test_size = .2
-    train = True
-    training_buffer_len = 10_000
+    training_buffer_len = 50_000
     min_n_points_to_finish = 15
-    n_simulations = 1000
-    n_games = None
     n_players = 2
     n_actions = 45
 

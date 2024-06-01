@@ -3,10 +3,12 @@ from itertools import count
 
 from flask import Flask, render_template, url_for, request, jsonify
 
+from ai_move_service import EasyAI
 from app_utils import card_to_dict
 from perform_move import perform_move
 from src.Game import Game
 from src.entities.AllResources import AllResources
+from src.entities.Aristocrat import empty_aristocrat
 from src.entities.BasicResources import BasicResources
 from src.entities.Card import empty_card
 from src.moves import GrabThreeResource, GrabTwoResource, ReserveVisible
@@ -18,7 +20,7 @@ app = Flask(__name__)
 
 def select_aristocrats(game: Game):
     selected_files = list("".join(map(str, aristocrat.cost)) for aristocrat in
-                          game.board.aristocrats)
+                          game.board.aristocrats if aristocrat != empty_aristocrat)
     return [
         url_for("static", filename=f"components/aristocrats/{file}.png")
         for file in selected_files
@@ -53,7 +55,7 @@ image2reserve = {  # to be wired
     "tier2_index1": ReserveVisible(tier_index=1, index=0),
     "tier2_index2": ReserveVisible(tier_index=1, index=1),
     "tier2_index3": ReserveVisible(tier_index=1, index=2),
-    "tier2_index4": ReserveVisible(tier_index=1, index=2),
+    "tier2_index4": ReserveVisible(tier_index=1, index=3),
     "tier3_index1": ReserveVisible(tier_index=2, index=0),
     "tier3_index2": ReserveVisible(tier_index=2, index=1),
     "tier3_index3": ReserveVisible(tier_index=2, index=2),
@@ -162,4 +164,5 @@ def click_card():
 
 
 if __name__ == "__main__":
+    game = EasyAI().perform_move(game)
     app.run(debug=True)

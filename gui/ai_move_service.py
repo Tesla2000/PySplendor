@@ -7,8 +7,10 @@ import torch
 from Config import Config
 from agent.Agent import Agent
 from agent.entities import GameState, NoValidMove
+from agent.get_shortest_game import get_shortest_game
 from agent.get_shortest_games import get_shortest_games
-from agent.services.game_end_checker import EndOnSecondPlayer
+from agent.services.game_end_checker import EndOnSecondPlayer, \
+    EndOnSpecificPlayer
 from agent.services.position_scorer import AbsoluteScorer
 from src.Game import Game
 from utils.get_not_finished_moves import get_not_finished_moves
@@ -68,10 +70,24 @@ class AiMoveDifferential(AiMoveService):
 class VeryEasyAI(AiMoveService):
     def perform_move(self, game: Game) -> Game:
         state = game.get_state()
-        output = agent(torch.Tensor(state))
+        with torch.no_grad():
+            output = agent(torch.Tensor(state))
         move_indexes = np.argsort(output)
         for move_index in move_indexes:
             move = game.all_moves[move_index]
             if move.is_valid(game):
                 return game.perform(move)
+
+
+class EasyAI(AiMoveService):
+    def perform_move(self, game: Game) -> Game:
+        end_condition = EndOnSpecificPlayer(game.current_player)
+        try:
+            shortest_game = next(get_shortest_game([GameState(game, None)], Config.play_beta, end_condition, agent))
+        except NoValidMove:
+            return VeryEasyAI().perform_move(game)
+        first_state = shortest_game.to_list()[-1]
+        move = first_state.move
+        return game.perform(move)
+
 
