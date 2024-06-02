@@ -113,8 +113,6 @@ function setCost(elementId, value) {
 
 function closeModal() {
     document.getElementById('cardModal').style.display = 'none';
-    const buyButton = document.querySelector('.buy-button');
-    buyButton.textContent = "Buy";
 }
 
 // Close the modal when clicking outside of it
@@ -174,7 +172,16 @@ function showTurnFinishedOverlay() {
 
     setTimeout(function () {
         overlay.style.display = 'none';
-    }, 3000); //ustawic po ilu ma sie chować
+    }, 3000);
+}
+
+function showNotEnoughResourcesOverlay() {
+    const overlay = document.getElementById('notEnoughOverlay');
+    overlay.style.display = 'flex';
+
+    setTimeout(function () {
+        overlay.style.display = 'none';
+    }, 3000);
 }
 
 function showWinOverlay() {
@@ -218,15 +225,10 @@ function sendCardAction(cardId, action) {
             showTurnFinishedOverlay();
             location.reload()
         } else {
-            showCantBuild()
+            showNotEnoughResourcesOverlay()
         }
     })
     .catch((error) => {
         console.error('Error:', error);
     });
-}
-
-function showCantBuild() {
-    const buyButton = document.querySelector('.buy-button');
-    buyButton.textContent = "Too few resources";
 }
