@@ -109,6 +109,8 @@ function setCost(elementId, value) {
 
 function closeModal() {
     document.getElementById('cardModal').style.display = 'none';
+    const buyButton = document.querySelector('.buy-button');
+    buyButton.textContent = "Buy";
 }
 
 // Close the modal when clicking outside of it
@@ -211,7 +213,7 @@ function sendCardAction(cardId, action) {
     });
 }
 
-function showCantBuild(message, type) {
-    const imageElement = document.getElementById('modal-card-image');
-    imageElement.src = "http://127.0.0.1:5000/static/components/cards/Blue.png";
+function showCantBuild() {
+    const buyButton = document.querySelector('.buy-button');
+    buyButton.textContent = "Too few resources";
 }
