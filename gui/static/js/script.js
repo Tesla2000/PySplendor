@@ -15,7 +15,11 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
+if (parseInt(document.querySelector('.total-points').textContent, 10) >= 15)
+    showWinOverlay()
 
+if (parseInt(document.querySelector('.si-total-points').textContent, 10) >= 15)
+    showLossOverlay()
 function sendImageClass(imageClass, clickType) {
     fetch('/click_resource', {
         method: 'POST',
@@ -172,7 +176,16 @@ function showTurnFinishedOverlay() {
         overlay.style.display = 'none';
     }, 3000); //ustawic po ilu ma sie chować
 }
-//
+
+function showWinOverlay() {
+    const overlay = document.getElementById('winOverlay');
+    overlay.style.display = 'flex';
+}
+
+function showLossOverlay() {
+    const overlay = document.getElementById('lossOverlay');
+    overlay.style.display = 'flex';
+}
 
 function buyCard() {
     var cardId = document.getElementById('cardModal').dataset.cardId;
