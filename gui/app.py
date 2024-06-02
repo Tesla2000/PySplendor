@@ -105,6 +105,7 @@ def click_resource():
         chosen_resource = image2resource[image_class]
 
         if right_click:
+            print("Putting down", chosen_resource)
             new_resources = AllResources(*grabbed_resources) - chosen_resource
             if new_resources.lacks():
                 return jsonify(success=False)
@@ -113,26 +114,33 @@ def click_resource():
             grabbed_resources += chosen_resource
         if sum(game.current_player.resources) + sum(grabbed_resources) > 10:
             grabbed_resources = (AllResources(*grabbed_resources) - chosen_resource).get_basic()
+            print("Grabbed resources", grabbed_resources)
             return jsonify(success=False)
         if sum(grabbed_resources) == 3:
             game = perform_move(game, GrabThreeResource(grabbed_resources))
             grabbed_resources = BasicResources()
+            print("Grabbed resources", grabbed_resources)
             return jsonify(success=True, turn_finished=True)
         if max(grabbed_resources) == 2 and game.board.resources[
             astuple(grabbed_resources).index(max(grabbed_resources))
         ] < 4:
             grabbed_resources = (AllResources(*grabbed_resources) - chosen_resource).get_basic()
+            print("Grabbed resources", grabbed_resources)
             return jsonify(success=False)
         if max(grabbed_resources) == 2 and sum(grabbed_resources) == 3:
             grabbed_resources = (AllResources(*grabbed_resources) - chosen_resource).get_basic()
+            print("Grabbed resources", grabbed_resources)
             return jsonify(success=False)
         if max(grabbed_resources) == 2 and sum(grabbed_resources) != 3:
             game = perform_move(game, GrabTwoResource(grabbed_resources))
             grabbed_resources = BasicResources()
+            print("Grabbed resources", grabbed_resources)
             return jsonify(success=True, turn_finished=True)
 
+        print("Grabbed resources", grabbed_resources)
         return jsonify(success=True, turn_finished=False)
 
+    print("Grabbed resources", grabbed_resources)
     return jsonify(success=False)
 
 

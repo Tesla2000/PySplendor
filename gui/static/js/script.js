@@ -26,8 +26,6 @@ function sendImageClass(imageClass, clickType) {
     })
         .then(response => response.json())
         .then(data => {
-            console.log('Success:', data);
-            // TODO: Z jakiegos powodu nie updateuje za 3 razem i nie wyświetla overlaya po skońćzonym turnie,
             if (data.success) {
                 updateChipCount(imageClass, clickType);
                 if (data.turn_finished) {
@@ -42,22 +40,25 @@ function sendImageClass(imageClass, clickType) {
 }
 
 function updateChipCount(imageClass, clickType) {
-    var chipElement = document.querySelector(`.${imageClass}`).closest('.chip');
-    var chipCountElement = chipElement.querySelector('.chip-count');
-    var currentCount = parseInt(chipCountElement.textContent, 10);
+    const chipElement = document.querySelector(`.${imageClass}`).closest('.chip');
+    const chipCountElement = chipElement.querySelector('.chip-count');
+    const resourceType = imageClass.split("_")[1]
+    const chipElementPlayer = document.querySelector(`.${resourceType}_resource_player`).closest('.player-chip');
+    const chipCountElementPlayer = chipElementPlayer.querySelector('.player-chip-count');
+
+    let currentCount = parseInt(chipCountElement.textContent, 10);
+    let currentPlayerCount = chipCountElementPlayer.textContent
 
     if (clickType === 'left') {
         currentCount -= 1;
+        currentPlayerCount += " + 1";
     } else if (clickType === 'right') {
         currentCount += 1;
-    }
-
-    // Ensure the count does not go below 0
-    if (currentCount < 0) {
-        currentCount = 0;
+        currentPlayerCount = currentPlayerCount.split(" ")[0]
     }
 
     chipCountElement.textContent = currentCount;
+    chipCountElementPlayer.textContent = currentPlayerCount;
 }
 
 
@@ -196,15 +197,21 @@ function sendCardAction(cardId, action) {
     })
     .then(response => response.json())
     .then(data => {
-        console.log('Success:', data);
         if (data.success) {
             closeModal();
             closeReservedModal();
             showTurnFinishedOverlay();
             location.reload()
+        } else {
+            showCantBuild()
         }
     })
     .catch((error) => {
         console.error('Error:', error);
     });
+}
+
+function showCantBuild(message, type) {
+    const imageElement = document.getElementById('modal-card-image');
+    imageElement.src = "http://127.0.0.1:5000/static/components/cards/Blue.png";
 }

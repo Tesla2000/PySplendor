@@ -76,6 +76,7 @@ class VeryEasyAI(AiMoveService):
         for move_index in move_indexes:
             move = game.all_moves[move_index]
             if move.is_valid(game):
+                print("AI move", move)
                 return game.perform(move)
 
 
@@ -88,6 +89,7 @@ class EasyAI(AiMoveService):
             return VeryEasyAI().perform_move(game)
         first_state = shortest_game.to_list()[-1]
         move = first_state.move
+        print("AI move", move)
         return game.perform(move)
 
 

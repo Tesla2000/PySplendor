@@ -10,9 +10,10 @@ move_performer = EasyAI()
 
 @torch.no_grad()
 def perform_move(game: Game, move: Move) -> Game:
+    print("Player move", move)
     game = game.perform(move)
+    print("performing move AI")
     game = move_performer.perform_move(game)
-    print("performed move AI")
     return game
 
 
