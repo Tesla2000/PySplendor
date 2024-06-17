@@ -1,8 +1,6 @@
 from dataclasses import asdict, astuple
 from itertools import count
-
 from flask import Flask, render_template, url_for, request, jsonify
-
 from ai_move_service import EasyAI
 from app_utils import card_to_dict
 from perform_move import perform_move
@@ -14,9 +12,38 @@ from src.entities.Card import empty_card
 from src.moves import GrabThreeResource, GrabTwoResource, ReserveVisible
 from src.moves.BuildBoard import BuildBoard
 from src.moves.BuildReserve import BuildReserve
+import threading
+import pygame
+import os
 
 app = Flask(__name__)
 
+sound_files = sorted([f for f in os.listdir('static/sounds') if f.endswith('.wav')])
+current_sound_index = 0
+
+initial_sound_file = 'gra_rozpoczyna_się_teraz,_przygotuj_swoją_strategię_background_space_music_for_a_game_lector.wav'
+
+initial_sound_played = False 
+
+def play_sound():
+    global current_sound_index, initial_sound_played
+    pygame.mixer.init()
+
+    if not initial_sound_played:
+        initial_sound_path = os.path.join('static/sound_starting_game/', initial_sound_file)
+        pygame.mixer.music.load(initial_sound_path)
+        pygame.mixer.music.play()
+        while pygame.mixer.music.get_busy():
+            pygame.time.Clock().tick(10)
+        initial_sound_played = True
+    
+    while True:
+        sound_path = os.path.join('static/sounds', sound_files[current_sound_index])
+        pygame.mixer.music.load(sound_path)
+        pygame.mixer.music.play()
+        while pygame.mixer.music.get_busy():
+            pygame.time.Clock().tick(10)
+        current_sound_index = (current_sound_index + 1) % len(sound_files)
 
 def select_aristocrats(game: Game):
     selected_files = list("".join(map(str, aristocrat.cost)) for aristocrat in
@@ -25,7 +52,6 @@ def select_aristocrats(game: Game):
         url_for("static", filename=f"components/aristocrats/{file}.png")
         for file in selected_files
     ]
-
 
 game = Game()
 
@@ -71,7 +97,6 @@ image2resource = {
 }
 grabbed_resources = BasicResources()
 
-
 @app.route("/")
 def index():
     aristocrats_urls = select_aristocrats(game)
@@ -93,7 +118,6 @@ def index():
                                           game.current_player.reserve))),
         aristocrats_urls=aristocrats_urls,
     )
-
 
 @app.route('/click_resource', methods=['POST'])
 def click_resource():
@@ -120,6 +144,7 @@ def click_resource():
             game = perform_move(game, GrabThreeResource(grabbed_resources))
             grabbed_resources = BasicResources()
             print("Grabbed resources", grabbed_resources)
+            threading.Thread(target=play_sound).start()
             return jsonify(success=True, turn_finished=True)
         if max(grabbed_resources) == 2 and game.board.resources[
             astuple(grabbed_resources).index(max(grabbed_resources))
@@ -135,6 +160,7 @@ def click_resource():
             game = perform_move(game, GrabTwoResource(grabbed_resources))
             grabbed_resources = BasicResources()
             print("Grabbed resources", grabbed_resources)
+            threading.Thread(target=play_sound).start()
             return jsonify(success=True, turn_finished=True)
 
         print("Grabbed resources", grabbed_resources)
@@ -142,7 +168,6 @@ def click_resource():
 
     print("Grabbed resources", grabbed_resources)
     return jsonify(success=False)
-
 
 @app.route('/click_card', methods=['POST'])
 def click_card():
@@ -168,9 +193,10 @@ def click_card():
         return jsonify(success=False)
 
     game = perform_move(game, action)
+    threading.Thread(target=play_sound).start()
     return jsonify(success=True, turn_finished=True)
 
-
 if __name__ == "__main__":
+    threading.Thread(target=play_sound, daemon=True).start()
     game = EasyAI().perform_move(game)
     app.run(debug=True)

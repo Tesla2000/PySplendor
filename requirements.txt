@@ -13,3 +13,5 @@ librosa~=0.10.2
 Flask~=3.0.3
 lightning~=2.2.4
 scipy~=1.11.3
+pydub~=0.25.1
+pygame~=2.5.2
